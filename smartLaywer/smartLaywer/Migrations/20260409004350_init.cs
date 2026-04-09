@@ -732,7 +732,7 @@ namespace smartLaywer.Migrations
                 schema: "Core",
                 table: "Users",
                 columns: new[] { "Id", "Email", "FullName", "IsActive", "LastLoginAt", "NationalId", "PasswordHash", "PhoneNumber", "RoleId", "SecondNumber" },
-                values: new object[] { 1, "admin@lawyer.com", "أدمن النظام", true, new DateTime(2026, 4, 9, 2, 30, 8, 759, DateTimeKind.Local).AddTicks(9732), "29001011234567", "$2a$11$mC8769zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.", "01012345678", 1, null });
+                values: new object[] { 1, "admin@lawyer.com", "أدمن النظام", true, new DateTime(2026, 4, 9, 2, 43, 47, 504, DateTimeKind.Local).AddTicks(5003), "29001011234567", "$2a$11$mC8769zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.", "01012345678", 1, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ActualPayments_FeeId",

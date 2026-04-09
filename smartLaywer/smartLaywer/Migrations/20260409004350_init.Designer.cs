@@ -12,7 +12,7 @@ using smartLaywer.Models;
 namespace smartLaywer.Migrations
 {
     [DbContext(typeof(LegalManagementContext))]
-    [Migration("20260409003011_init")]
+    [Migration("20260409004350_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -1165,7 +1165,7 @@ namespace smartLaywer.Migrations
                             Email = "admin@lawyer.com",
                             FullName = "أدمن النظام",
                             IsActive = true,
-                            LastLoginAt = new DateTime(2026, 4, 9, 2, 30, 8, 759, DateTimeKind.Local).AddTicks(9732),
+                            LastLoginAt = new DateTime(2026, 4, 9, 2, 43, 47, 504, DateTimeKind.Local).AddTicks(5003),
                             NationalId = "29001011234567",
                             PasswordHash = "$2a$11$mC8769zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.",
                             PhoneNumber = "01012345678",
