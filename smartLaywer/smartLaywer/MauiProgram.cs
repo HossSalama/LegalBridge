@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace smartLaywer
 {
@@ -13,7 +13,8 @@ namespace smartLaywer
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
-
+            builder.Services.AddDbContext<LegalManagementContext>(option =>
+          option.UseSqlServer("Data Source=./;Initial Catalog=LegalManagementDB;Integrated Security=True;Encrypt=False;Trust Server Certificate=True"));
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
