@@ -1,0 +1,510 @@
+﻿@page "/memos"
+@namespace smartLaywer.Components.Pages
+
+<PageTitle>المذكرات والمستندات</PageTitle>
+
+<div class="memos-page" dir="rtl">
+
+    <!-- Header -->
+    <div class="page-header-row">
+        <div>
+            <h1 class="page-title">المذكرات والمستندات</h1>
+            <p class="page-sub">إدارة المذكرات القانونية وعرائض الدعاوى والمرافعات</p>
+        </div>
+        <button class="btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+            إنشاء مذكرة جديدة
+        </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">إجمالي المذكرات</p><h3 class="stat-value">5</h3></div>
+                <div class="stat-icon bg-blue"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">عرائض الدعاوى</p><h3 class="stat-value green">2</h3></div>
+                <div class="stat-icon bg-green"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z" /><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" /><path d="M2 2l7.586 7.586" /><circle cx="11" cy="11" r="2" /></svg></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">مسودات</p><h3 class="stat-value amber">1</h3></div>
+                <div class="stat-icon bg-amber"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">مقدمة</p><h3 class="stat-value green">2</h3></div>
+                <div class="stat-icon bg-green"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-row">
+        <div class="search-box">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+            <input class="search-input" placeholder="البحث بالعنوان، رقم القضية، أو اسم العميل..." />
+        </div>
+        <button class="btn-outline">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+            تصدير الكل
+        </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab tab-active">الكل (5)</button>
+        <button class="tab">مذكرات</button>
+        <button class="tab">عرائض</button>
+        <button class="tab">مرافعات</button>
+        <button class="tab">مسودات</button>
+    </div>
+
+    <!-- Memos Grid -->
+    <div class="memos-grid">
+        @foreach (var m in memos)
+        {
+            <div class="memo-card">
+                <div class="memo-top">
+                    <div class="memo-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                    </div>
+                    <div class="memo-title-area">
+                        <h3 class="memo-title">@m.Title</h3>
+                        <div class="memo-badges">
+                            <span class="badge @m.TypeBadge">@m.TypeLabel</span>
+                            <span class="badge @m.StatusBadge">@m.StatusLabel</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="memo-meta">
+                    <span><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" /></svg> القضية: <strong>@m.CaseNumber</strong></span>
+                    <span><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg> @m.ClientName</span>
+                    <span><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg> @m.Date</span>
+                    <span><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z" /></svg> @m.Author</span>
+                </div>
+
+                <div class="memo-content-box">
+                    <p>@m.Content</p>
+                </div>
+
+                @if (m.Attachments > 0)
+                {
+                    <p class="memo-attach">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /></svg>
+                        @m.Attachments مرفقات
+                    </p>
+                }
+
+                <div class="memo-actions">
+                    <button class="btn-outline btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                        عرض
+                    </button>
+                    <button class="btn-outline btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                        تعديل
+                    </button>
+                    <button class="btn-outline btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                        تحميل
+                    </button>
+                    <button class="btn-ghost btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private record MemoItem(string Title, string TypeLabel, string TypeBadge,
+        string StatusLabel, string StatusBadge, string CaseNumber,
+        string ClientName, string Date, string Author, string Content, int Attachments);
+
+    private List<MemoItem> memos = new()
+    {
+        new("مذكرة دفاع - القضية 2024/156",       "مذكرة",        "badge badge-blue",
+            "مقدم",   "badge badge-green",  "2024/156", "أحمد محمود عبد الله",
+            "2024-03-15", "المحامي/ محمد علي",
+            "مذكرة دفاع شاملة تتضمن جميع الحجج القانونية والأدلة المؤيدة لموقف المتهم...", 2),
+
+        new("عريضة دعوى مدنية - القضية 2024/142", "عريضة دعوى",  "badge badge-green",
+            "نهائي",  "badge badge-blue",   "2024/142", "سارة علي حسن",
+            "2024-02-01", "المحامي/ أحمد السيد",
+            "عريضة دعوى مدنية بشأن المطالبة بالتعويضات المالية عن الأضرار الناجمة...", 2),
+
+        new("مرافعة ختامية - القضية 2024/189",    "مرافعة",       "badge badge-purple",
+            "نهائي",  "badge badge-blue",   "2024/189", "محمد حسن إبراهيم",
+            "2024-03-20", "المحامي/ محمد علي",
+            "المرافعة الختامية في القضية الجنائية تتضمن تلخيص الأدلة والحجج القانونية...", 0),
+
+        new("مذكرة بالرد على النيابة - 2024/201",  "مذكرة موجزة", "badge badge-amber",
+            "مسودة",  "badge badge-slate",  "2024/201", "فاطمة أحمد علي",
+            "2024-03-25", "المحامي/ أحمد السيد",
+            "مذكرة بالرد على ادعاءات النيابة العامة مع تفنيد الاتهامات...", 1),
+
+        new("عريضة استئناف - القضية 2024/101",    "عريضة دعوى",  "badge badge-green",
+            "مقدم",   "badge badge-green",  "2024/101", "خالد محمود",
+            "2024-03-10", "المحامي/ محمد علي",
+            "عريضة استئناف الحكم الصادر في القضية مع بيان أسباب الطعن...", 1),
+    };
+}
+
+<style>
+    .memos-page {
+        padding: 1.5rem;
+        font-family: 'Segoe UI',Tahoma,sans-serif;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .page-sub {
+        color: #64748b;
+        margin: .25rem 0 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+        gap: 1rem;
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+    }
+
+    .stat-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-label {
+        font-size: .85rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: .2rem 0 0;
+    }
+
+        .stat-value.green {
+            color: #16a34a;
+        }
+
+        .stat-value.amber {
+            color: #d97706;
+        }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .bg-blue {
+        background: #2563eb;
+    }
+
+    .bg-green {
+        background: #16a34a;
+    }
+
+    .bg-amber {
+        background: #d97706;
+    }
+
+    .search-row {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .search-box {
+        flex: 1;
+        position: relative;
+    }
+
+    .search-icon {
+        position: absolute;
+        right: .75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: .6rem .6rem .6rem 2.2rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: .9rem;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+        .search-input:focus {
+            border-color: #d97706;
+        }
+
+    .tabs {
+        display: flex;
+        gap: .25rem;
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: .3rem;
+        width: fit-content;
+    }
+
+    .tab {
+        padding: .45rem 1rem;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        font-size: .85rem;
+        cursor: pointer;
+        color: #64748b;
+        transition: all .2s;
+        white-space: nowrap;
+    }
+
+    .tab-active {
+        background: #fff;
+        color: #d97706;
+        font-weight: 600;
+        box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+
+    .memos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill,minmax(380px,1fr));
+        gap: 1.25rem;
+    }
+
+    .memo-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        display: flex;
+        flex-direction: column;
+        gap: .85rem;
+        transition: box-shadow .2s;
+    }
+
+        .memo-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,.1);
+        }
+
+    .memo-top {
+        display: flex;
+        gap: .85rem;
+        align-items: flex-start;
+    }
+
+    .memo-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: #fef3c7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #d97706;
+        flex-shrink: 0;
+    }
+
+    .memo-title-area {
+        flex: 1;
+    }
+
+    .memo-title {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 .4rem;
+        font-size: .95rem;
+        line-height: 1.4;
+    }
+
+    .memo-badges {
+        display: flex;
+        gap: .35rem;
+        flex-wrap: wrap;
+    }
+
+    .memo-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .35rem .75rem;
+        font-size: .8rem;
+        color: #475569;
+    }
+
+        .memo-meta span {
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+        }
+
+        .memo-meta strong {
+            color: #1e293b;
+        }
+
+    .memo-content-box {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: .75rem;
+        font-size: .82rem;
+        color: #64748b;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .memo-attach {
+        font-size: .78rem;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: .3rem;
+        margin: 0;
+    }
+
+    .memo-actions {
+        display: flex;
+        gap: .4rem;
+        padding-top: .75rem;
+        border-top: 1px solid #f1f5f9;
+    }
+
+        .memo-actions .btn-ghost {
+            margin-right: auto;
+        }
+
+    .badge {
+        font-size: .72rem;
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .badge-blue {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .badge-green {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .badge-amber {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .badge-purple {
+        background: #ede9fe;
+        color: #7c3aed;
+    }
+
+    .badge-slate {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .btn-primary {
+        background: #d97706;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: .5rem 1rem;
+        font-size: .85rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        transition: background .2s;
+    }
+
+        .btn-primary:hover {
+            background: #b45309;
+        }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: .4rem .8rem;
+        font-size: .82rem;
+        cursor: pointer;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        gap: .3rem;
+        transition: all .2s;
+    }
+
+        .btn-outline:hover {
+            border-color: #d97706;
+            color: #d97706;
+        }
+
+    .btn-ghost {
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        padding: .4rem .6rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        transition: opacity .2s;
+    }
+
+        .btn-ghost:hover {
+            opacity: .7;
+        }
+
+    .btn-sm {
+        padding: .3rem .65rem;
+        font-size: .8rem;
+    }
+</style>

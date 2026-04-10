@@ -1,0 +1,496 @@
+﻿@page "/investigation"
+@namespace smartLaywer.Components.Pages
+
+<PageTitle>مرحلة التحقيق</PageTitle>
+
+<div class="inv-page" dir="rtl">
+
+    <!-- Header -->
+    <div class="page-header-row">
+        <div>
+            <h1 class="page-title">مرحلة التحقيق</h1>
+            <p class="page-sub">متابعة تفصيلية لجلسات التحقيق والإجراءات</p>
+        </div>
+        <button class="btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+            إضافة تحقيق جديد
+        </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-body">
+                <div>
+                    <p class="stat-label">إجمالي التحقيقات</p>
+                    <h3 class="stat-value">2</h3>
+                </div>
+                <div class="stat-icon bg-blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div>
+                    <p class="stat-label">جارية</p>
+                    <h3 class="stat-value amber">1</h3>
+                </div>
+                <div class="stat-icon bg-amber">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div>
+                    <p class="stat-label">مكتملة</p>
+                    <h3 class="stat-value green">1</h3>
+                </div>
+                <div class="stat-icon bg-green">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div>
+                    <p class="stat-label">موقوفة</p>
+                    <h3 class="stat-value">0</h3>
+                </div>
+                <div class="stat-icon bg-slate">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+
+        <!-- List -->
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">قائمة التحقيقات</h2></div>
+            <div class="card-body">
+                <div class="inv-list">
+                    <!-- Item 1 - Selected -->
+                    <div class="inv-item inv-selected">
+                        <div class="inv-item-top">
+                            <span class="fw-600">2024/201</span>
+                            <span class="badge badge-amber">جاري</span>
+                        </div>
+                        <p class="inv-client">أحمد محمود</p>
+                        <span class="badge badge-red-soft">جنائي</span>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="inv-item">
+                        <div class="inv-item-top">
+                            <span class="fw-600">2024/189</span>
+                            <span class="badge badge-green">مكتمل</span>
+                        </div>
+                        <p class="inv-client">فاطمة حسن</p>
+                        <span class="badge badge-blue-soft">مدني</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Details -->
+        <div class="card detail-card">
+            <div class="card-header">
+                <h2 class="card-title">تفاصيل التحقيق - 2024/201</h2>
+                <button class="btn-outline">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                    تصدير
+                </button>
+            </div>
+            <div class="card-body">
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab tab-active">المعلومات</button>
+                    <button class="tab">الجلسات</button>
+                    <button class="tab">الشهود</button>
+                    <button class="tab">الأدلة</button>
+                </div>
+
+                <!-- Info Tab Content -->
+                <div class="info-grid">
+                    <div class="info-field">
+                        <p class="field-label">رقم القضية</p>
+                        <p class="field-value">2024/201</p>
+                    </div>
+                    <div class="info-field">
+                        <p class="field-label">اسم العميل</p>
+                        <p class="field-value">أحمد محمود</p>
+                    </div>
+                    <div class="info-field">
+                        <p class="field-label">نوع التحقيق</p>
+                        <span class="badge badge-red-soft">جنائي</span>
+                    </div>
+                    <div class="info-field">
+                        <p class="field-label">الحالة</p>
+                        <span class="badge badge-amber">جاري</span>
+                    </div>
+                    <div class="info-field">
+                        <p class="field-label">تاريخ البدء</p>
+                        <p class="field-value">2024-03-15</p>
+                    </div>
+                    <div class="info-field">
+                        <p class="field-label">المحقق</p>
+                        <p class="field-value">النائب العام الأول</p>
+                    </div>
+                    <div class="info-field info-full">
+                        <p class="field-label">الموقع</p>
+                        <p class="field-value">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-left:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                            النيابة العامة - القاهرة
+                        </p>
+                    </div>
+                    <div class="info-full">
+                        <label class="field-label">ملاحظات إضافية</label>
+                        <textarea class="notes-area" placeholder="أضف ملاحظات حول التحقيق..." rows="4"></textarea>
+                        <button class="btn-primary btn-sm" style="margin-top:.5rem">حفظ الملاحظات</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .inv-page {
+        padding: 1.5rem;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .page-sub {
+        color: #64748b;
+        margin: .25rem 0 0;
+    }
+
+    /* Stats */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+        gap: 1rem;
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+    }
+
+    .stat-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-label {
+        font-size: .85rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: .2rem 0 0;
+    }
+
+        .stat-value.amber {
+            color: #d97706;
+        }
+
+        .stat-value.green {
+            color: #16a34a;
+        }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .bg-blue {
+        background: #2563eb;
+    }
+
+    .bg-amber {
+        background: #d97706;
+    }
+
+    .bg-green {
+        background: #16a34a;
+    }
+
+    .bg-slate {
+        background: #64748b;
+    }
+
+    /* Layout */
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 1.25rem;
+    }
+
+    @@media(max-width:768px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Card */
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        overflow: hidden;
+    }
+
+    .detail-card {
+        overflow: visible;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 1rem 1.25rem;
+    }
+
+    /* Inv List */
+    .inv-list {
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+    }
+
+    .inv-item {
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: border-color .2s;
+    }
+
+        .inv-item:hover {
+            border-color: #d97706;
+        }
+
+    .inv-selected {
+        border-color: #d97706 !important;
+        background: #fffbeb;
+    }
+
+    .inv-item-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: .4rem;
+    }
+
+    .inv-client {
+        font-size: .85rem;
+        color: #64748b;
+        margin: 0 0 .5rem;
+    }
+
+    .fw-600 {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    /* Badges */
+    .badge {
+        font-size: .72rem;
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .badge-amber {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .badge-green {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .badge-red-soft {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .badge-blue-soft {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .badge-outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+    }
+
+    /* Tabs */
+    .tabs {
+        display: flex;
+        gap: .25rem;
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: .3rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .tab {
+        flex: 1;
+        padding: .5rem;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        font-size: .85rem;
+        cursor: pointer;
+        color: #64748b;
+        transition: all .2s;
+    }
+
+    .tab-active {
+        background: #fff;
+        color: #d97706;
+        font-weight: 600;
+        box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+
+    /* Info Grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .info-full {
+        grid-column: 1/-1;
+    }
+
+    .info-field {
+        display: flex;
+        flex-direction: column;
+        gap: .3rem;
+    }
+
+    .field-label {
+        font-size: .8rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .field-value {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        font-size: .95rem;
+    }
+
+    .notes-area {
+        width: 100%;
+        padding: .6rem .75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: .9rem;
+        resize: none;
+        outline: none;
+        font-family: inherit;
+        box-sizing: border-box;
+    }
+
+        .notes-area:focus {
+            border-color: #d97706;
+        }
+
+    /* Buttons */
+    .btn-primary {
+        background: #d97706;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: .55rem 1.1rem;
+        font-size: .9rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        transition: background .2s;
+    }
+
+        .btn-primary:hover {
+            background: #b45309;
+        }
+
+    .btn-sm {
+        padding: .35rem .75rem;
+        font-size: .82rem;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: .4rem .9rem;
+        font-size: .85rem;
+        cursor: pointer;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        transition: all .2s;
+    }
+
+        .btn-outline:hover {
+            border-color: #d97706;
+            color: #d97706;
+        }
+</style>

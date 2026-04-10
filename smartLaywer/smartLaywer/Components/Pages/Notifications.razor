@@ -1,0 +1,364 @@
+﻿@page "/notifications"
+@namespace smartLaywer.Components.Pages
+
+<PageTitle>التنبيهات والإشعارات</PageTitle>
+
+<div class="notif-page" dir="rtl">
+
+    <!-- Header -->
+    <div class="page-header-row">
+        <div>
+            <h1 class="page-title">التنبيهات والإشعارات</h1>
+            <p class="page-sub">لديك <strong>3</strong> إشعار غير مقروء</p>
+        </div>
+        <div class="btn-group">
+            <button class="btn-outline">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                تحديد الكل كمقروء
+            </button>
+            <button class="btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
+                تصفية
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab tab-active">الكل (5)</button>
+        <button class="tab">غير مقروء (3)</button>
+        <button class="tab">الجلسات</button>
+        <button class="tab">عاجل</button>
+        <button class="tab">المستندات</button>
+    </div>
+
+    <!-- Notifications List -->
+    <div class="notif-list">
+        @foreach (var n in notifications)
+        {
+            <div class="notif-card @(!n.IsRead ? "notif-unread" : "")">
+                <div class="notif-icon @n.IconBg">
+                    @((MarkupString)n.Icon)
+                </div>
+                <div class="notif-body">
+                    <div class="notif-top">
+                        <div class="notif-title-row">
+                            <h4 class="notif-title">@n.Title</h4>
+                            @if (!n.IsRead)
+                            {
+                                <span class="badge badge-amber-solid">جديد</span>
+                            }
+                            @if (n.IsUrgent)
+                            {
+                                <span class="badge badge-red-solid">عاجل</span>
+                            }
+                        </div>
+                        <span class="notif-time">@n.Time</span>
+                    </div>
+                    <p class="notif-msg">@n.Message</p>
+                    @if (!string.IsNullOrEmpty(n.CaseNumber))
+                    {
+                        <span class="badge badge-outline">القضية: @n.CaseNumber</span>
+                    }
+                    <div class="notif-actions">
+                        @if (!n.IsRead)
+                        {
+                            <button class="btn-outline btn-xs">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                                تحديد كمقروء
+                            </button>
+                        }
+                        <button class="btn-ghost btn-xs">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /></svg>
+                            حذف
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private record NotifItem(string Title, string Message, string Time, bool IsRead,
+        bool IsUrgent, string CaseNumber, string Icon, string IconBg);
+
+    private List<NotifItem> notifications = new()
+    {
+        new("جلسة قادمة غداً",
+            "جلسة قضية رقم 2024/156 - محكمة القاهرة الابتدائية",
+            "منذ ساعة", false, false, "2024/156", IconCalendar, "icon-blue"),
+
+        new("تذكير: موعد الجلسة خلال ساعتين",
+            "جلسة قضية رقم 2024/142 تبدأ الساعة 11:30 ص",
+            "منذ 30 دقيقة", false, true, "2024/142", IconAlert, "icon-red"),
+
+        new("مستند جديد مضاف",
+            "تم إضافة عقد توكيل جديد للقضية 2024/189",
+            "منذ 3 ساعات", false, false, "2024/189", IconFile, "icon-green"),
+
+        new("موعد دفعة الأتعاب",
+            "موعد استحقاق الدفعة الثانية للقضية 2024/123",
+            "منذ 5 ساعات", true, false, "2024/123", IconClock, "icon-amber"),
+
+        new("جلسة محكمة استئناف",
+            "جلسة الاستئناف للقضية 2024/101 بعد 3 أيام",
+            "منذ يوم", true, false, "2024/101", IconCalendar, "icon-blue"),
+    };
+
+    private const string IconCalendar = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>""";
+    private const string IconAlert = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>""";
+    private const string IconFile = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>""";
+    private const string IconClock = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>""";
+}
+
+<style>
+    .notif-page {
+        padding: 1.5rem;
+        font-family: 'Segoe UI',Tahoma,sans-serif;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .page-sub {
+        color: #64748b;
+        margin: .25rem 0 0;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: .5rem;
+    }
+
+    /* Tabs */
+    .tabs {
+        display: flex;
+        gap: .25rem;
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: .3rem;
+        width: fit-content;
+    }
+
+    .tab {
+        padding: .45rem 1rem;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        font-size: .85rem;
+        cursor: pointer;
+        color: #64748b;
+        transition: all .2s;
+        white-space: nowrap;
+    }
+
+    .tab-active {
+        background: #fff;
+        color: #d97706;
+        font-weight: 600;
+        box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+
+    /* Notifications */
+    .notif-list {
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+    }
+
+    .notif-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        border-right: 4px solid transparent;
+        transition: box-shadow .2s;
+    }
+
+        .notif-card:hover {
+            box-shadow: 0 4px 14px rgba(0,0,0,.1);
+        }
+
+    .notif-unread {
+        border-right-color: #d97706;
+        background: #fffdf5;
+    }
+
+    .notif-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .icon-blue {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .icon-red {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .icon-green {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .icon-amber {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .notif-body {
+        flex: 1;
+    }
+
+    .notif-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: .35rem;
+    }
+
+    .notif-title-row {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        flex-wrap: wrap;
+    }
+
+    .notif-title {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        font-size: .95rem;
+    }
+
+    .notif-time {
+        font-size: .75rem;
+        color: #94a3b8;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .notif-msg {
+        font-size: .875rem;
+        color: #64748b;
+        margin: 0 0 .5rem;
+    }
+
+    .notif-actions {
+        display: flex;
+        gap: .4rem;
+        margin-top: .65rem;
+    }
+
+    /* Badges */
+    .badge {
+        font-size: .72rem;
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .badge-amber-solid {
+        background: #d97706;
+        color: #fff;
+    }
+
+    .badge-red-solid {
+        background: #dc2626;
+        color: #fff;
+    }
+
+    .badge-outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: #d97706;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: .5rem 1rem;
+        font-size: .85rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        transition: background .2s;
+    }
+
+        .btn-primary:hover {
+            background: #b45309;
+        }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: .45rem .9rem;
+        font-size: .85rem;
+        cursor: pointer;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        transition: all .2s;
+    }
+
+        .btn-outline:hover {
+            border-color: #d97706;
+            color: #d97706;
+        }
+
+    .btn-ghost {
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        padding: .35rem .7rem;
+        font-size: .8rem;
+        cursor: pointer;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: .3rem;
+        transition: color .2s;
+    }
+
+        .btn-ghost:hover {
+            color: #dc2626;
+        }
+
+    .btn-xs {
+        padding: .28rem .6rem;
+        font-size: .78rem;
+    }
+</style>

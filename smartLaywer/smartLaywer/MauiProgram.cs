@@ -4,6 +4,9 @@ using smartLaywer.Mapping.FinancialMapping;
 using smartLaywer.Repository.UnitWork;
 using smartLaywer.Services.ClassService;
 
+using smartLaywer.Services;
+
+
 namespace smartLaywer
 {
     public static class MauiProgram
@@ -18,6 +21,8 @@ namespace smartLaywer
                 });
 
             builder.Services.AddMauiBlazorWebView();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+
 
             //  Database
             builder.Services.AddDbContext<LegalManagementContext>(options =>
@@ -43,6 +48,7 @@ namespace smartLaywer
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
             builder.Logging.AddDebug();
+    		builder.Logging.AddDebug();
 #endif
 
             return builder.Build();

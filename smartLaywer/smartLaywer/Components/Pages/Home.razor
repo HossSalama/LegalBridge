@@ -1,0 +1,707 @@
+﻿@page "/"
+@namespace smartLaywer.Components.Pages
+@inject NavigationManager Navigation
+
+<PageTitle>لوحة التحكم - نظام إدارة القضايا</PageTitle>
+
+<div class="dashboard" dir="rtl">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">لوحة التحكم</h1>
+        <p class="page-sub">نظرة عامة على جميع الأنشطة والإحصائيات</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        @foreach (var stat in stats)
+        {
+            <div class="stat-card">
+                <div class="stat-body">
+                    <div>
+                        <p class="stat-label">@stat.Title</p>
+                        <h3 class="stat-value">@stat.Value</h3>
+                        <p class="stat-trend">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                                <polyline points="17 6 23 6 23 12" />
+                            </svg>
+                            @stat.Trend
+                        </p>
+                    </div>
+                    <div class="@stat.IconClass">@((MarkupString)stat.Icon)</div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">القضايا الشهرية</h2></div>
+            <div class="card-body">
+                <div class="bar-chart">
+                    @foreach (var item in monthlyData)
+                    {
+                        <div class="bar-group">
+                            <span class="bar-val">@item.Cases</span>
+                            <div class="bar bar-amber" style="height:@(item.Cases * 8)px"></div>
+                            <p class="bar-label">@item.Month</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">حالة القضايا</h2></div>
+            <div class="card-body">
+                <div class="pie-wrap">
+                    <div class="pie-donut">
+                        <svg viewBox="0 0 36 36" width="130" height="130">
+                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f1f5f9" stroke-width="3.8" />
+                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#3b82f6" stroke-width="3.8"
+                                    stroke-dasharray="59 41" stroke-dashoffset="25" />
+                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#10b981" stroke-width="3.8"
+                                    stroke-dasharray="30 70" stroke-dashoffset="-34" />
+                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f59e0b" stroke-width="3.8"
+                                    stroke-dasharray="11 89" stroke-dashoffset="-64" />
+                            <text x="18" y="17" text-anchor="middle" font-size="5" font-weight="bold" fill="#1e293b">147</text>
+                            <text x="18" y="22" text-anchor="middle" font-size="3.5" fill="#64748b">قضية</text>
+                        </svg>
+                    </div>
+                    <div class="pie-legend">
+                        @foreach (var s in caseStatusData)
+                        {
+                            <div class="pie-leg-item">
+                                <span class="pie-dot" style="background:@s.Color"></span>
+                                <span>@s.Name</span>
+                                <strong>@s.Value</strong>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Hearings -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">الجلسات القادمة</h2>
+            <button class="btn-outline" @onclick='() => Navigation.NavigateTo("/hearings")'>عرض الكل</button>
+        </div>
+        <div class="card-body">
+            <div class="hearings-list">
+                @foreach (var h in upcomingHearings)
+                {
+                    <div class="hearing-item @(h.Status == "urgent" ? "hearing-urgent" : "")">
+                        <div class="hearing-left">
+                            <div class="hearing-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                            </div>
+                            <div>
+                                <div class="hearing-title-row">
+                                    <h4 class="hearing-case">@h.Case</h4>
+                                    @if (h.Status == "urgent")
+                                    {
+                                        <span class="badge badge-urgent">عاجل</span>
+                                    }
+                                </div>
+                                <p class="hearing-client">@h.Client</p>
+                                <p class="hearing-court">@h.Court</p>
+                            </div>
+                        </div>
+                        <div class="hearing-right">
+                            <p class="hearing-date">@h.Date</p>
+                            <p class="hearing-time">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                                @h.Time
+                            </p>
+                            <button class="btn-outline btn-sm" @onclick="() => ShowDetails(h)">التفاصيل</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <div class="action-card" @onclick='() => Navigation.NavigateTo("/cases")'>
+            <div class="action-icon action-blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" /></svg>
+            </div>
+            <div><h4>إضافة قضية جديدة</h4><p>ابدأ قضية جديدة</p></div>
+        </div>
+        <div class="action-card" @onclick='() => Navigation.NavigateTo("/clients")'>
+            <div class="action-icon action-green">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>
+            </div>
+            <div><h4>إضافة عميل جديد</h4><p>تسجيل عميل جديد</p></div>
+        </div>
+        <div class="action-card" @onclick='() => Navigation.NavigateTo("/agenda")'>
+            <div class="action-icon action-amber">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+            </div>
+            <div><h4>جدولة جلسة</h4><p>حدد موعد جلسة جديد</p></div>
+        </div>
+    </div>
+</div>
+
+@* Details Modal *@
+@if (selectedHearing != null)
+{
+    <div class="modal-overlay" @onclick="CloseDetails">
+        <div class="modal" @onclick:stopPropagation="true" dir="rtl">
+            <div class="modal-header">
+                <h3>تفاصيل الجلسة</h3>
+                <button class="modal-close" @onclick="CloseDetails">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-row"><span>القضية</span><strong>@selectedHearing.Case</strong></div>
+                <div class="detail-row"><span>العميل</span><strong>@selectedHearing.Client</strong></div>
+                <div class="detail-row"><span>التاريخ</span><strong>@selectedHearing.Date</strong></div>
+                <div class="detail-row"><span>الوقت</span><strong>@selectedHearing.Time</strong></div>
+                <div class="detail-row"><span>المحكمة</span><strong>@selectedHearing.Court</strong></div>
+                <div class="detail-row">
+                    <span>الحالة</span>
+                    <span class="badge @(selectedHearing.Status == "urgent" ? "badge-urgent" : "badge-pending")">
+                        @(selectedHearing.Status == "urgent" ? "عاجل" : "قيد الانتظار")
+                    </span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" @onclick="CloseDetails">إغلاق</button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .dashboard {
+        width:100% !important;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .page-sub {
+        color: #64748b;
+        margin: .25rem 0 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+        gap: 1rem;
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        transition: box-shadow .2s;
+    }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,.12);
+        }
+
+    .stat-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-label {
+        font-size: .85rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: .25rem 0;
+    }
+
+    .stat-trend {
+        font-size: .8rem;
+        color: #16a34a;
+        display: flex;
+        align-items: center;
+        gap: .25rem;
+        margin: 0;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .bg-blue {
+        background: #2563eb;
+    }
+
+    .bg-green {
+        background: #16a34a;
+    }
+
+    .bg-amber {
+        background: #d97706;
+    }
+
+    .bg-red {
+        background: #dc2626;
+    }
+
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        overflow: hidden;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 1rem 1.25rem;
+    }
+
+    .charts-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+    }
+
+    /* Bar Chart */
+    .bar-chart {
+        display: flex;
+        align-items: flex-end;
+        gap: 1rem;
+        height: 200px;
+        padding-bottom: .5rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .bar-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .3rem;
+        flex: 1;
+    }
+
+    .bar-val {
+        font-size: .75rem;
+        font-weight: 600;
+        color: #d97706;
+    }
+
+    .bar {
+        width: 36px;
+        border-radius: 6px 6px 0 0;
+        min-height: 4px;
+        cursor: pointer;
+        transition: opacity .2s;
+    }
+
+        .bar:hover {
+            opacity: .8;
+        }
+
+    .bar-amber {
+        background: #d97706;
+    }
+
+    .bar-label {
+        font-size: .78rem;
+        color: #64748b;
+    }
+
+    /* Pie */
+    .pie-wrap {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .pie-donut {
+        flex-shrink: 0;
+    }
+
+    .pie-legend {
+        display: flex;
+        flex-direction: column;
+        gap: .65rem;
+    }
+
+    .pie-leg-item {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-size: .85rem;
+        color: #475569;
+    }
+
+    .pie-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .pie-leg-item strong {
+        margin-right: auto;
+        color: #1e293b;
+        font-weight: 700;
+    }
+
+    /* Hearings */
+    .hearings-list {
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+    }
+
+    .hearing-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        transition: border-color .2s;
+    }
+
+        .hearing-item:hover {
+            border-color: #d97706;
+        }
+
+    .hearing-urgent {
+        border-color: #fca5a5;
+        background: #fff7f7;
+    }
+
+    .hearing-left {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .hearing-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: #fef3c7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #d97706;
+        flex-shrink: 0;
+    }
+
+    .hearing-title-row {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .hearing-case {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .hearing-client {
+        font-size: .85rem;
+        color: #64748b;
+        margin: .2rem 0 0;
+    }
+
+    .hearing-court {
+        font-size: .8rem;
+        color: #94a3b8;
+        margin: .15rem 0 0;
+    }
+
+    .hearing-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: .3rem;
+    }
+
+    .hearing-date {
+        font-size: .9rem;
+        font-weight: 500;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .hearing-time {
+        font-size: .75rem;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: .25rem;
+        margin: 0;
+    }
+
+    .badge {
+        font-size: .7rem;
+        padding: .15rem .5rem;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .badge-urgent {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .badge-pending {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+        gap: 1rem;
+    }
+
+    .action-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        cursor: pointer;
+        transition: box-shadow .2s;
+    }
+
+        .action-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,.12);
+        }
+
+        .action-card h4 {
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+            font-size: .95rem;
+        }
+
+        .action-card p {
+            font-size: .8rem;
+            color: #64748b;
+            margin: .15rem 0 0;
+        }
+
+    .action-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .action-blue {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .action-green {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .action-amber {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: .4rem .9rem;
+        font-size: .85rem;
+        cursor: pointer;
+        color: #475569;
+        transition: all .2s;
+    }
+
+        .btn-outline:hover {
+            border-color: #d97706;
+            color: #d97706;
+        }
+
+    .btn-sm {
+        padding: .3rem .7rem;
+        font-size: .8rem;
+    }
+
+    .btn-primary {
+        background: #d97706;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: .5rem 1.1rem;
+        font-size: .9rem;
+        cursor: pointer;
+    }
+
+        .btn-primary:hover {
+            background: #b45309;
+        }
+
+    /* Modal */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal {
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        width: 90%;
+        max-width: 440px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.1rem;
+        cursor: pointer;
+        color: #94a3b8;
+    }
+
+    .modal-body {
+        display: flex;
+        flex-direction: column;
+        gap: .65rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: .5rem 0;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: .9rem;
+    }
+
+        .detail-row span {
+            color: #64748b;
+        }
+
+        .detail-row strong {
+            color: #1e293b;
+        }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+    }
+</style>
+
+@code {
+    private record StatCard(string Title, string Value, string Trend, string IconClass, string Icon);
+    private record HearingItem(string Case, string Client, string Date, string Time, string Court, string Status);
+    private record MonthItem(string Month, int Cases);
+    private record StatusItem(string Name, int Value, string Color);
+
+    private HearingItem? selectedHearing;
+
+    private List<StatCard> stats = new()
+    {
+        new("إجمالي القضايا",     "147", "+12%", "stat-icon bg-blue",  IconBriefcase),
+        new("العملاء النشطين",    "89",  "+8%",  "stat-icon bg-green", IconUsers),
+        new("جلسات هذا الأسبوع", "23",  "+5",   "stat-icon bg-amber", IconCalendar),
+        new("تنبيهات عاجلة",      "7",   "عاجل", "stat-icon bg-red",   IconAlert),
+    };
+
+    private List<HearingItem> upcomingHearings = new()
+    {
+        new("قضية رقم 2024/156", "أحمد محمود", "2026-04-01", "10:00 ص", "محكمة القاهرة الابتدائية", "pending"),
+        new("قضية رقم 2024/142", "سارة علي",   "2026-04-02", "11:30 ص", "محكمة الجيزة الابتدائية",  "pending"),
+        new("قضية رقم 2024/189", "محمد حسن",   "2026-04-03", "09:00 ص", "محكمة الاستئناف",           "urgent"),
+    };
+
+    private List<MonthItem> monthlyData = new()
+    {
+        new("يناير", 12), new("فبراير", 15), new("مارس", 18), new("أبريل", 8),
+    };
+
+    private List<StatusItem> caseStatusData = new()
+    {
+        new("جارية",  87, "#3b82f6"),
+        new("مكتملة", 45, "#10b981"),
+        new("معلقة",  15, "#f59e0b"),
+    };
+
+    private void ShowDetails(HearingItem h) => selectedHearing = h;
+    private void CloseDetails() => selectedHearing = null;
+
+    private const string IconBriefcase = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>""";
+    private const string IconUsers = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>""";
+    private const string IconCalendar = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>""";
+    private const string IconAlert = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>""";
+}

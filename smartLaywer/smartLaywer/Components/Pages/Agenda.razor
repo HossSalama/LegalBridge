@@ -1,0 +1,643 @@
+﻿@page "/agenda"
+@namespace smartLaywer.Components.Pages
+
+<PageTitle>الأجندة القضائية</PageTitle>
+
+<div class="agenda-page" dir="rtl">
+
+    <!-- Header -->
+    <div class="page-header-row">
+        <div>
+            <h1 class="page-title">الأجندة القضائية</h1>
+            <p class="page-sub">جدولة ومتابعة جميع المواعيد والجلسات</p>
+        </div>
+        <div class="btn-group">
+            <button class="btn-outline">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                تصدير
+            </button>
+            <button class="btn-outline">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
+                تصفية
+            </button>
+            <button class="btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                إضافة موعد
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+
+        <!-- Calendar Panel -->
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">التقويم</h2></div>
+            <div class="card-body">
+                <!-- Simple Calendar Grid -->
+                <div class="cal-nav">
+                    <button class="cal-nav-btn">‹</button>
+                    <span class="cal-month">أبريل 2026</span>
+                    <button class="cal-nav-btn">›</button>
+                </div>
+                <div class="cal-grid">
+                    <div class="cal-dow">أح</div><div class="cal-dow">إث</div><div class="cal-dow">ث</div>
+                    <div class="cal-dow">أر</div><div class="cal-dow">خ</div><div class="cal-dow">ج</div><div class="cal-dow">س</div>
+
+                    @for (int i = 1; i <= 2; i++)
+                    {
+                        <div class="cal-day cal-empty"></div>
+                    }
+                    @for (int d = 1; d <= 30; d++)
+                    {
+                        var day = d;
+                        var hasEvent = day == 1 || day == 2 || day == 3 || day == 4 || day == 5;
+                        var isToday = day == 10;
+                        <div class="cal-day @(isToday ? "cal-today" : "") @(hasEvent ? "cal-has-event" : "")">
+                            @day
+                            @if (hasEvent)
+                            {
+                                <span class="cal-dot"></span>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Legend -->
+                <div class="legend">
+                    <div class="legend-item"><span class="legend-dot dot-blue"></span>جلسات محكمة</div>
+                    <div class="legend-item"><span class="legend-dot dot-green"></span>اجتماعات</div>
+                    <div class="legend-item"><span class="legend-dot dot-red"></span>مواعيد نهائية</div>
+                    <div class="legend-item"><span class="legend-dot dot-amber"></span>جلسات تحقيق</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events List -->
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">المواعيد القادمة</h2></div>
+            <div class="card-body">
+                <div class="events-list">
+
+                    @foreach (var ev in events)
+                    {
+                        <div class="event-item event-@ev.TypeColor">
+                            <div class="event-main">
+                                <div class="event-icon">
+                                    @((MarkupString)ev.Icon)
+                                </div>
+                                <div class="event-content">
+                                    <div class="event-title-row">
+                                        <h4 class="event-title">@ev.Title</h4>
+                                        <span class="badge badge-outline">@ev.TypeLabel</span>
+                                        @if (ev.IsHighPriority)
+                                        {
+                                            <span class="badge badge-red">أولوية عالية</span>
+                                        }
+                                    </div>
+                                    <div class="event-meta">
+                                        <span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                                            @ev.Date
+                                        </span>
+                                        <span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                                            @ev.Time
+                                        </span>
+                                        <span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                                            @ev.Location
+                                        </span>
+                                        <span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /></svg>
+                                            القضية: @ev.CaseNumber
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="event-actions">
+                                <button class="btn-outline btn-sm">التفاصيل</button>
+                                <button class="btn-primary btn-sm">تعديل</button>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">جلسات اليوم</p><h3 class="stat-value">3</h3></div>
+                <div class="stat-icon bg-blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">جلسات هذا الأسبوع</p><h3 class="stat-value">12</h3></div>
+                <div class="stat-icon bg-green">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">مواعيد نهائية</p><h3 class="stat-value red">5</h3></div>
+                <div class="stat-icon bg-red">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">جلسات تحقيق</p><h3 class="stat-value amber">2</h3></div>
+                <div class="stat-icon bg-amber">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private record AgendaEvent(string Title, string TypeLabel, string TypeColor, string Date,
+        string Time, string Location, string CaseNumber, bool IsHighPriority, string Icon);
+
+    private List<AgendaEvent> events = new()
+    {
+        new("جلسة محكمة ابتدائية", "جلسة", "blue", "2026-04-01", "10:00 ص",
+            "محكمة القاهرة الابتدائية - قاعة 3", "2024/156", true, IconCalendar),
+        new("اجتماع مع العميل", "اجتماع", "green", "2026-04-01", "02:00 م",
+            "المكتب - غرفة الاجتماعات", "2024/142", false, IconClock),
+        new("جلسة استئناف", "جلسة", "blue", "2026-04-02", "11:30 ص",
+            "محكمة الاستئناف - قاعة 1", "2024/189", true, IconCalendar),
+        new("جلسة تحقيق", "تحقيق", "amber", "2026-04-03", "09:00 ص",
+            "النيابة العامة", "2024/201", true, IconPin),
+        new("موعد تسليم المذكرة", "موعد نهائي", "red", "2026-04-04", "03:00 م",
+            "المحكمة الدستورية", "2024/178", true, IconFile),
+    };
+
+    private const string IconCalendar = """<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>""";
+    private const string IconClock = """<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>""";
+    private const string IconPin = """<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>""";
+    private const string IconFile = """<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>""";
+}
+
+<style>
+    .app-shell {
+        display: flex !important;
+        width: 100% !important;
+        height: 100vh !important;
+        overflow: hidden !important;
+    }
+
+    .main-wrap {
+        flex: 1 !important;
+        min-width: 0 !important;
+        overflow-x: hidden !important;
+    }
+
+    .sidebar {
+        flex-shrink: 0 !important;
+        width: 240px !important;
+    }
+
+    .page-content {
+        flex: 1 !important;
+        width: 100% !important;
+        overflow-y: auto !important;
+        box-sizing: border-box !important;
+    }
+    .agenda-page {
+        padding: 1.5rem;
+        font-family: 'Segoe UI',Tahoma,sans-serif;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .page-sub {
+        color: #64748b;
+        margin: .25rem 0 0;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: .5rem;
+        flex-wrap: wrap;
+    }
+
+    /* Main Grid */
+    .main-grid {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 1.25rem;
+    }
+
+    /* Card */
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 1rem 1.25rem;
+    }
+
+    /* Calendar */
+    .cal-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .cal-month {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .cal-nav-btn {
+        background: none;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        font-size: 1rem;
+        color: #64748b;
+    }
+
+        .cal-nav-btn:hover {
+            border-color: #d97706;
+            color: #d97706;
+        }
+
+    .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7,1fr);
+        gap: 2px;
+    }
+
+    .cal-dow {
+        text-align: center;
+        font-size: .72rem;
+        color: #94a3b8;
+        font-weight: 600;
+        padding: .3rem 0;
+    }
+
+    .cal-day {
+        text-align: center;
+        font-size: .82rem;
+        padding: .4rem .2rem;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        color: #334155;
+        transition: background .15s;
+    }
+
+        .cal-day:hover {
+            background: #f8fafc;
+        }
+
+    .cal-empty {
+        background: transparent;
+        cursor: default;
+    }
+
+    .cal-today {
+        background: #d97706;
+        color: #fff;
+        font-weight: 700;
+    }
+
+        .cal-today:hover {
+            background: #b45309;
+        }
+
+    .cal-has-event {
+        font-weight: 600;
+    }
+
+    .cal-dot {
+        position: absolute;
+        bottom: 2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #2563eb;
+    }
+
+    .cal-today .cal-dot {
+        background: #fff;
+    }
+
+    /* Legend */
+    .legend {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        margin-top: 1.25rem;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-size: .82rem;
+        color: #64748b;
+    }
+
+    .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .dot-blue {
+        background: #2563eb;
+    }
+
+    .dot-green {
+        background: #16a34a;
+    }
+
+    .dot-red {
+        background: #dc2626;
+    }
+
+    .dot-amber {
+        background: #d97706;
+    }
+
+    /* Events */
+    .events-list {
+        display: flex;
+        flex-direction: column;
+        gap: .85rem;
+    }
+
+    .event-item {
+        border-radius: 10px;
+        padding: 1rem;
+        border: 2px solid;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: .75rem;
+        transition: box-shadow .2s;
+    }
+
+        .event-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        }
+
+    .event-blue {
+        background: #eff6ff;
+        border-color: #bfdbfe;
+    }
+
+    .event-green {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+    }
+
+    .event-amber {
+        background: #fffbeb;
+        border-color: #fde68a;
+    }
+
+    .event-red {
+        background: #fff1f2;
+        border-color: #fecdd3;
+    }
+
+    .event-main {
+        display: flex;
+        gap: .85rem;
+        flex: 1;
+    }
+
+    .event-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: rgba(255,255,255,.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: #475569;
+    }
+
+    .event-content {
+        flex: 1;
+    }
+
+    .event-title-row {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        flex-wrap: wrap;
+        margin-bottom: .5rem;
+    }
+
+    .event-title {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        font-size: .95rem;
+    }
+
+    .event-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem .75rem;
+        font-size: .8rem;
+        color: #475569;
+    }
+
+        .event-meta span {
+            display: flex;
+            align-items: center;
+            gap: .25rem;
+        }
+
+    .event-actions {
+        display: flex;
+        flex-direction: column;
+        gap: .4rem;
+        flex-shrink: 0;
+    }
+
+    /* Stats */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+        gap: 1rem;
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+    }
+
+    .stat-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-label {
+        font-size: .85rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: .2rem 0 0;
+    }
+
+        .stat-value.red {
+            color: #dc2626;
+        }
+
+        .stat-value.amber {
+            color: #d97706;
+        }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .bg-blue {
+        background: #2563eb;
+    }
+
+    .bg-green {
+        background: #16a34a;
+    }
+
+    .bg-amber {
+        background: #d97706;
+    }
+
+    .bg-red {
+        background: #dc2626;
+    }
+
+    /* Badges */
+    .badge {
+        font-size: .72rem;
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .badge-outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+    }
+
+    .badge-red {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: #d97706;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: .5rem 1rem;
+        font-size: .85rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        transition: background .2s;
+        white-space: nowrap;
+    }
+
+        .btn-primary:hover {
+            background: #b45309;
+        }
+
+    .btn-sm {
+        padding: .3rem .65rem;
+        font-size: .8rem;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: .45rem .9rem;
+        font-size: .85rem;
+        cursor: pointer;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        transition: all .2s;
+        white-space: nowrap;
+    }
+
+        .btn-outline:hover {
+            border-color: #d97706;
+            color: #d97706;
+        }
+</style>

@@ -1,0 +1,460 @@
+﻿@page "/documents"
+@namespace smartLaywer.Components.Pages
+
+<PageTitle>إدارة المستندات</PageTitle>
+
+<div class="docs-page" dir="rtl">
+
+    <!-- Header -->
+    <div class="page-header-row">
+        <div>
+            <h1 class="page-title">إدارة المستندات</h1>
+            <p class="page-sub">عرض وإدارة جميع المستندات والملفات</p>
+        </div>
+        <button class="btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+            رفع مستند جديد
+        </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">إجمالي المستندات</p><h3 class="stat-value">4</h3></div>
+                <div class="stat-icon bg-blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">مستندات PDF</p><h3 class="stat-value red">3</h3></div>
+                <div class="stat-icon bg-red">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><polyline points="13 2 13 9 20 9" /></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">مستندات Word</p><h3 class="stat-value blue">1</h3></div>
+                <div class="stat-icon bg-blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><polyline points="13 2 13 9 20 9" /></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">الحجم الإجمالي</p><h3 class="stat-value">9.9 MB</h3></div>
+                <div class="stat-icon bg-green">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="card">
+        <div class="card-body">
+            <div class="search-box">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                <input class="search-input" placeholder="ابحث في المستندات (اسم الملف، رقم القضية، العنوان)" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">قائمة المستندات (4)</h2>
+        </div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>اسم الملف</th>
+                        <th>رقم القضية</th>
+                        <th>عنوان القضية</th>
+                        <th>النوع</th>
+                        <th>الحجم</th>
+                        <th>تاريخ الرفع</th>
+                        <th>رفع بواسطة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="file-name">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                                عقد البيع.pdf
+                            </div>
+                        </td>
+                        <td class="fw-600">2024/156</td>
+                        <td>قضية عقارات</td>
+                        <td><span class="badge badge-outline">PDF</span></td>
+                        <td class="text-muted">2.4 MB</td>
+                        <td>2024-01-20</td>
+                        <td>محمد أحمد</td>
+                        <td><div class="action-btns">@ActionBtns</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="file-name">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                                شهادة ميلاد.pdf
+                            </div>
+                        </td>
+                        <td class="fw-600">2024/142</td>
+                        <td>قضية أحوال شخصية</td>
+                        <td><span class="badge badge-outline">PDF</span></td>
+                        <td class="text-muted">1.2 MB</td>
+                        <td>2024-02-25</td>
+                        <td>محمد أحمد</td>
+                        <td><div class="action-btns">@ActionBtns</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="file-name">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                                العقد التجاري.docx
+                            </div>
+                        </td>
+                        <td class="fw-600">2024/189</td>
+                        <td>قضية تجارية</td>
+                        <td><span class="badge badge-outline">DOCX</span></td>
+                        <td class="text-muted">3.8 MB</td>
+                        <td>2024-03-15</td>
+                        <td>محمد أحمد</td>
+                        <td><div class="action-btns">@ActionBtns</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="file-name">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                                محضر الجلسة.pdf
+                            </div>
+                        </td>
+                        <td class="fw-600">2024/142</td>
+                        <td>قضية أحوال شخصية</td>
+                        <td><span class="badge badge-outline">PDF</span></td>
+                        <td class="text-muted">1.5 MB</td>
+                        <td>2026-03-25</td>
+                        <td>محمد أحمد</td>
+                        <td><div class="action-btns">@ActionBtns</div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Upload Zone -->
+    <div class="upload-zone">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+        <h3>رفع مستندات جديدة</h3>
+        <p>اضغط على زر "رفع مستند جديد" لإضافة ملفات جديدة</p>
+        <span class="upload-hint">الأنواع المدعومة: PDF, DOCX, DOC, JPG, PNG (الحد الأقصى: 10 MB)</span>
+    </div>
+
+</div>
+
+@code {
+    private RenderFragment ActionBtns => __builder =>
+    {
+        <button class="icon-btn" title="عرض">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+        </button>
+        <button class="icon-btn" title="تحميل">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+        </button>
+        <button class="icon-btn icon-btn-danger" title="حذف">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>
+        </button>
+    };
+}
+
+<style>
+    .docs-page {
+        padding: 1.5rem;
+        font-family: 'Segoe UI',Tahoma,sans-serif;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .page-sub {
+        color: #64748b;
+        margin: .25rem 0 0;
+    }
+
+    /* Stats */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+        gap: 1rem;
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+    }
+
+    .stat-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-label {
+        font-size: .85rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: .2rem 0 0;
+    }
+
+        .stat-value.red {
+            color: #dc2626;
+        }
+
+        .stat-value.blue {
+            color: #2563eb;
+        }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .bg-blue {
+        background: #2563eb;
+    }
+
+    .bg-red {
+        background: #dc2626;
+    }
+
+    .bg-green {
+        background: #16a34a;
+    }
+
+    /* Card */
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 1rem 1.25rem;
+    }
+
+    /* Search */
+    .search-box {
+        position: relative;
+    }
+
+    .search-icon {
+        position: absolute;
+        right: .75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: .6rem .6rem .6rem 2.2rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: .9rem;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+        .search-input:focus {
+            border-color: #d97706;
+        }
+
+    /* Table */
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .875rem;
+    }
+
+        .data-table th {
+            text-align: right;
+            padding: .75rem 1rem;
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: .75rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover td {
+            background: #fafafa;
+        }
+
+    .fw-600 {
+        font-weight: 600;
+    }
+
+    .text-muted {
+        color: #94a3b8;
+    }
+
+    .file-name {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-weight: 500;
+    }
+
+    /* Badges */
+    .badge {
+        font-size: .72rem;
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .badge-outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+    }
+
+    /* Action Buttons */
+    .action-btns {
+        display: flex;
+        gap: .35rem;
+    }
+
+    .icon-btn {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        transition: all .2s;
+    }
+
+        .icon-btn:hover {
+            border-color: #d97706;
+            color: #d97706;
+        }
+
+    .icon-btn-danger:hover {
+        border-color: #dc2626;
+        color: #dc2626;
+    }
+
+    /* Upload Zone */
+    .upload-zone {
+        border: 2px dashed #e2e8f0;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        background: #fafafa;
+    }
+
+        .upload-zone h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: .75rem 0 .4rem;
+        }
+
+        .upload-zone p {
+            color: #64748b;
+            font-size: .9rem;
+            margin: 0 0 .5rem;
+        }
+
+    .upload-hint {
+        font-size: .78rem;
+        color: #94a3b8;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: #d97706;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: .55rem 1.1rem;
+        font-size: .9rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        transition: background .2s;
+    }
+
+        .btn-primary:hover {
+            background: #b45309;
+        }
+</style>

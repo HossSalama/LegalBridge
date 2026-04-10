@@ -1,0 +1,550 @@
+﻿@page "/legal-library"
+@namespace smartLaywer.Components.Pages
+
+<PageTitle>المكتبة القانونية</PageTitle>
+
+<div class="library-page" dir="rtl">
+
+    <!-- Header -->
+    <div class="page-header-row">
+        <div>
+            <h1 class="page-title">المكتبة القانونية</h1>
+            <p class="page-sub">مكتبة شاملة للقوانين والأحكام والنماذج القانونية</p>
+        </div>
+        <button class="btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+            إضافة مستند
+        </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">إجمالي المستندات</p><h3 class="stat-value">8</h3></div>
+                <div class="stat-icon bg-blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">المفضلة</p><h3 class="stat-value amber">4</h3></div>
+                <div class="stat-icon bg-amber">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">إجمالي التحميلات</p><h3 class="stat-value green">1558</h3></div>
+                <div class="stat-icon bg-green">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                </div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div><p class="stat-label">النماذج</p><h3 class="stat-value">2</h3></div>
+                <div class="stat-icon bg-purple">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+        <input class="search-input" placeholder="البحث في المكتبة القانونية..." />
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab tab-active">الكل (8)</button>
+        <button class="tab">قوانين</button>
+        <button class="tab">أحكام</button>
+        <button class="tab">نماذج</button>
+        <button class="tab">مقالات</button>
+        <button class="tab">المفضلة</button>
+    </div>
+
+    <!-- Documents Grid -->
+    <div class="docs-grid">
+        @foreach (var doc in documents)
+        {
+            <div class="doc-card">
+                <div class="doc-top">
+                    <div class="doc-icon-wrap">
+                        @((MarkupString)doc.Icon)
+                    </div>
+                    <div class="doc-title-area">
+                        <div class="doc-title-row">
+                            <h3 class="doc-title">@doc.Title</h3>
+                            <button class="star-btn @(doc.Favorite ? "star-active" : "")">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="@(doc.Favorite ? "currentColor" : "none")" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                            </button>
+                        </div>
+                        <span class="badge @doc.CategoryBadge">@doc.CategoryLabel</span>
+                    </div>
+                </div>
+
+                <p class="doc-desc">@doc.Description</p>
+
+                <div class="doc-tags">
+                    @foreach (var tag in doc.Tags)
+                    {
+                        <span class="tag">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" /></svg>
+                            @tag
+                        </span>
+                    }
+                </div>
+
+                <div class="doc-footer">
+                    <div class="doc-meta">
+                        <p class="doc-source">@doc.Source</p>
+                        <p class="doc-downloads">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                            @doc.Downloads تحميل
+                        </p>
+                    </div>
+                    <div class="doc-actions">
+                        <button class="btn-outline btn-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                            عرض
+                        </button>
+                        <button class="btn-primary btn-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                            تحميل
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private record DocItem(string Title, string CategoryLabel, string CategoryBadge,
+        string Description, string Source, int Downloads, bool Favorite,
+        List<string> Tags, string Icon);
+
+    private List<DocItem> documents = new()
+    {
+        new("قانون الإجراءات الجنائية المصري", "قوانين", "badge badge-blue",
+            "القانون رقم 150 لسنة 1950 - النص الكامل مع التعديلات الأخيرة",
+            "الجريدة الرسمية", 245, true,
+            new(){"جنائي","إجراءات","قانون"}, IconScale),
+
+        new("حكم النقض في قضية التزوير", "أحكام قضائية", "badge badge-green",
+            "حكم محكمة النقض - الطعن رقم 12345 - تزوير في محررات رسمية",
+            "محكمة النقض", 128, false,
+            new(){"نقض","تزوير","جنائي"}, IconFile),
+
+        new("مبادئ القانون المدني", "مقالات", "badge badge-purple",
+            "مقال تحليلي عن أحكام المسؤولية التقصيرية",
+            "مجلة القانون المصرية", 89, true,
+            new(){"مدني","مسؤولية","تحليل"}, IconBook),
+
+        new("نموذج عقد توكيل", "نماذج", "badge badge-amber",
+            "نموذج قانوني معتمد لعقد التوكيل العام والخاص",
+            "نقابة المحامين", 312, false,
+            new(){"توكيل","نموذج","عقود"}, IconFile),
+
+        new("بحث في الجرائم الإلكترونية", "أبحاث", "badge badge-red",
+            "دراسة قانونية شاملة حول الجرائم الإلكترونية في القانون المصري",
+            "جامعة القاهرة", 167, true,
+            new(){"جرائم إلكترونية","بحث","تكنولوجيا"}, IconBook),
+
+        new("قانون المرافعات المدنية والتجارية", "قوانين", "badge badge-blue",
+            "القانون رقم 13 لسنة 1968 مع التعديلات",
+            "الجريدة الرسمية", 198, false,
+            new(){"مدني","تجاري","مرافعات"}, IconScale),
+
+        new("نموذج صحيفة دعوى مدنية", "نماذج", "badge badge-amber",
+            "نموذج كامل لصحيفة دعوى مدنية مع الشروط والبيانات",
+            "نقابة المحامين", 276, true,
+            new(){"دعوى","نموذج","مدني"}, IconFile),
+
+        new("أحكام المحكمة الدستورية في حقوق الإنسان", "أحكام قضائية", "badge badge-green",
+            "مجموعة من أحكام المحكمة الدستورية المتعلقة بحقوق الإنسان",
+            "المحكمة الدستورية", 143, false,
+            new(){"دستوري","حقوق إنسان","أحكام"}, IconFile),
+    };
+
+    private const string IconScale = """<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="3" x2="12" y2="21"/><path d="M3 9l9-7 9 7"/><path d="M3 9l4.5 9 4.5-9"/><path d="M12 9l4.5 9 4.5-9"/></svg>""";
+    private const string IconFile = """<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>""";
+    private const string IconBook = """<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>""";
+}
+
+<style>
+    .library-page {
+        padding: 1.5rem;
+        font-family: 'Segoe UI',Tahoma,sans-serif;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .page-sub {
+        color: #64748b;
+        margin: .25rem 0 0;
+    }
+
+    /* Stats */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+        gap: 1rem;
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+    }
+
+    .stat-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-label {
+        font-size: .85rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: .2rem 0 0;
+    }
+
+        .stat-value.amber {
+            color: #d97706;
+        }
+
+        .stat-value.green {
+            color: #16a34a;
+        }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .bg-blue {
+        background: #2563eb;
+    }
+
+    .bg-amber {
+        background: #d97706;
+    }
+
+    .bg-green {
+        background: #16a34a;
+    }
+
+    .bg-purple {
+        background: #7c3aed;
+    }
+
+    /* Search */
+    .search-box {
+        position: relative;
+    }
+
+    .search-icon {
+        position: absolute;
+        right: .75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: .6rem .6rem .6rem 2.2rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: .9rem;
+        outline: none;
+        box-sizing: border-box;
+        background: #fff;
+    }
+
+        .search-input:focus {
+            border-color: #d97706;
+        }
+
+    /* Tabs */
+    .tabs {
+        display: flex;
+        gap: .25rem;
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: .3rem;
+        width: fit-content;
+    }
+
+    .tab {
+        padding: .45rem 1rem;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        font-size: .85rem;
+        cursor: pointer;
+        color: #64748b;
+        transition: all .2s;
+        white-space: nowrap;
+    }
+
+    .tab-active {
+        background: #fff;
+        color: #d97706;
+        font-weight: 600;
+        box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+
+    /* Docs Grid */
+    .docs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill,minmax(320px,1fr));
+        gap: 1.25rem;
+    }
+
+    .doc-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        display: flex;
+        flex-direction: column;
+        gap: .85rem;
+        transition: box-shadow .2s;
+    }
+
+        .doc-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,.12);
+        }
+
+    .doc-top {
+        display: flex;
+        gap: .85rem;
+        align-items: flex-start;
+    }
+
+    .doc-icon-wrap {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: #fef3c7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #d97706;
+        flex-shrink: 0;
+    }
+
+    .doc-title-area {
+        flex: 1;
+    }
+
+    .doc-title-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: .4rem;
+        margin-bottom: .4rem;
+    }
+
+    .doc-title {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        font-size: .95rem;
+        line-height: 1.4;
+    }
+
+    .star-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #cbd5e1;
+        padding: .1rem;
+        transition: color .2s;
+    }
+
+    .star-active {
+        color: #d97706;
+    }
+
+    .star-btn:hover {
+        color: #d97706;
+    }
+
+    .doc-desc {
+        font-size: .82rem;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .doc-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .35rem;
+    }
+
+    .tag {
+        display: flex;
+        align-items: center;
+        gap: .25rem;
+        font-size: .72rem;
+        padding: .2rem .55rem;
+        border-radius: 999px;
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+    }
+
+    .doc-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding-top: .75rem;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .doc-meta {
+        display: flex;
+        flex-direction: column;
+        gap: .2rem;
+    }
+
+    .doc-source {
+        font-size: .78rem;
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    .doc-downloads {
+        font-size: .78rem;
+        color: #64748b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: .25rem;
+    }
+
+    .doc-actions {
+        display: flex;
+        gap: .4rem;
+    }
+
+    /* Badges */
+    .badge {
+        font-size: .72rem;
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .badge-blue {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .badge-green {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .badge-amber {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .badge-purple {
+        background: #ede9fe;
+        color: #7c3aed;
+    }
+
+    .badge-red {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: #d97706;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: .5rem 1rem;
+        font-size: .85rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        transition: background .2s;
+    }
+
+        .btn-primary:hover {
+            background: #b45309;
+        }
+
+    .btn-sm {
+        padding: .3rem .65rem;
+        font-size: .8rem;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: .45rem .9rem;
+        font-size: .85rem;
+        cursor: pointer;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        transition: all .2s;
+    }
+
+        .btn-outline:hover {
+            border-color: #d97706;
+            color: #d97706;
+        }
+</style>

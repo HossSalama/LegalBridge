@@ -1,0 +1,567 @@
+﻿@page "/clients"
+@namespace smartLaywer.Components.Pages
+
+<PageTitle>إدارة العملاء - نظام إدارة القضايا</PageTitle>
+
+<div class="clients-page" dir="rtl">
+
+    <!-- Header -->
+    <div class="page-header-row">
+        <div>
+            <h1 class="page-title">إدارة العملاء</h1>
+            <p class="page-sub">عرض وإدارة جميع العملاء</p>
+        </div>
+        <button class="btn-primary" @onclick="OpenAddDialog">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            إضافة عميل جديد
+        </button>
+    </div>
+
+    <!-- Search + Stats -->
+    <div class="top-bar">
+        <div class="search-box">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input class="search-input" placeholder="ابحث عن عميل (الاسم، الهاتف، البريد)"
+                   @bind="searchTerm" @bind:event="oninput" />
+        </div>
+        <div class="mini-stat">
+            <p class="mini-label">إجمالي العملاء</p>
+            <p class="mini-value">@clients.Count</p>
+        </div>
+        <div class="mini-stat">
+            <p class="mini-label">عملاء نشطين</p>
+            <p class="mini-value green">@clients.Count(c => c.Status == "active")</p>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">قائمة العملاء (@FilteredClients.Count())</h2>
+        </div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>الهاتف</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>العنوان</th>
+                        <th>القضايا النشطة</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!FilteredClients.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="empty-row">لا توجد نتائج</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var c in FilteredClients)
+                        {
+                            <tr>
+                                <td class="fw-600">@c.Name</td>
+                                <td>
+                                    <span class="cell-icon-text">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                                             fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.61 19a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 3.09 4.18 2 2 0 0 1 5.07 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L9.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 23 17z" />
+                                        </svg>
+                                        @c.Phone
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="cell-icon-text">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                                             fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                            <polyline points="22,6 12,13 2,6" />
+                                        </svg>
+                                        @(string.IsNullOrEmpty(c.Email) ? "-" : c.Email)
+                                    </span>
+                                </td>
+                                <td>@c.Address</td>
+                                <td>
+                                    <span class="badge @(c.ActiveCases > 0 ? "badge-blue" : "badge-gray")">
+                                        @c.ActiveCases
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @(c.Status == "active" ? "badge-green" : "badge-gray")">
+                                        @(c.Status == "active" ? "نشط" : "غير نشط")
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-btns">
+                                        <button class="icon-btn" title="عرض">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                                 fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                <circle cx="12" cy="12" r="3" />
+                                            </svg>
+                                        </button>
+                                        <button class="icon-btn" title="تعديل">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                                 fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Client Dialog -->
+@if (showDialog)
+{
+    <div class="dialog-overlay" @onclick="CloseDialog">
+        <div class="dialog" @onclick:stopPropagation="true" dir="rtl">
+            <div class="dialog-header">
+                <h3>إضافة عميل جديد</h3>
+                <button class="dialog-close" @onclick="CloseDialog">✕</button>
+            </div>
+            <p class="dialog-sub">أدخل بيانات العميل الجديد</p>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>الاسم الكامل *</label>
+                    <input class="form-input" @bind="newName" placeholder="أدخل الاسم الكامل" />
+                </div>
+                <div class="form-group">
+                    <label>رقم الهاتف *</label>
+                    <input class="form-input" @bind="newPhone" placeholder="01xxxxxxxxx" dir="ltr" />
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input class="form-input" @bind="newEmail" type="email" placeholder="example@email.com" dir="ltr" />
+                </div>
+                <div class="form-group">
+                    <label>الرقم القومي</label>
+                    <input class="form-input" @bind="newNationalId" placeholder="29012011234567" dir="ltr" />
+                </div>
+                <div class="form-group form-full">
+                    <label>العنوان</label>
+                    <input class="form-input" @bind="newAddress" placeholder="أدخل العنوان" />
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(dialogError))
+            {
+                <p class="form-error">@dialogError</p>
+            }
+
+            <div class="dialog-actions">
+                <button class="btn-primary" @onclick="HandleAddClient">حفظ</button>
+                <button class="btn-outline" @onclick="CloseDialog">إلغاء</button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .clients-page {
+        padding: 1.5rem;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .page-sub {
+        color: #64748b;
+        margin: .25rem 0 0;
+    }
+
+    .top-bar {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+        flex-wrap: wrap;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 240px;
+        position: relative;
+    }
+
+    .search-icon {
+        position: absolute;
+        right: .75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: .6rem .6rem .6rem 2.2rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: .9rem;
+        outline: none;
+        background: #fff;
+        box-sizing: border-box;
+    }
+
+        .search-input:focus {
+            border-color: #d97706;
+        }
+
+    .mini-stat {
+        background: #fff;
+        border-radius: 10px;
+        padding: .75rem 1.25rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,.07);
+        text-align: center;
+        min-width: 120px;
+    }
+
+    .mini-label {
+        font-size: .8rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .mini-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: .2rem 0 0;
+    }
+
+        .mini-value.green {
+            color: #16a34a;
+        }
+
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .875rem;
+    }
+
+        .data-table th {
+            text-align: right;
+            padding: .75rem 1rem;
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: .75rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover td {
+            background: #fafafa;
+        }
+
+    .fw-600 {
+        font-weight: 600;
+    }
+
+    .empty-row {
+        text-align: center;
+        padding: 2.5rem !important;
+        color: #94a3b8;
+    }
+
+    .cell-icon-text {
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        color: #475569;
+    }
+
+    .badge {
+        font-size: .72rem;
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .badge-blue {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .badge-green {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .badge-gray {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .action-btns {
+        display: flex;
+        gap: .35rem;
+    }
+
+    .icon-btn {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        transition: all .2s;
+    }
+
+        .icon-btn:hover {
+            border-color: #d97706;
+            color: #d97706;
+        }
+
+    /* Buttons */
+    .btn-primary {
+        background: #d97706;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: .55rem 1.1rem;
+        font-size: .9rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        transition: background .2s;
+    }
+
+        .btn-primary:hover {
+            background: #b45309;
+        }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: .5rem 1rem;
+        font-size: .9rem;
+        cursor: pointer;
+        color: #475569;
+        transition: all .2s;
+    }
+
+        .btn-outline:hover {
+            border-color: #d97706;
+            color: #d97706;
+        }
+
+    /* Dialog */
+    .dialog-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .dialog {
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    }
+
+    .dialog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: .25rem;
+    }
+
+        .dialog-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+    .dialog-close {
+        background: none;
+        border: none;
+        font-size: 1.1rem;
+        cursor: pointer;
+        color: #94a3b8;
+    }
+
+    .dialog-sub {
+        font-size: .85rem;
+        color: #64748b;
+        margin: 0 0 1rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .75rem;
+    }
+
+    .form-full {
+        grid-column: 1 / -1;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: .35rem;
+    }
+
+        .form-group label {
+            font-size: .85rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+    .form-input {
+        padding: .55rem .75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: .9rem;
+        outline: none;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+        .form-input:focus {
+            border-color: #d97706;
+        }
+
+    .form-error {
+        color: #dc2626;
+        font-size: .85rem;
+        margin: .5rem 0 0;
+    }
+
+    .dialog-actions {
+        display: flex;
+        gap: .75rem;
+        margin-top: 1rem;
+    }
+
+        .dialog-actions .btn-primary {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .dialog-actions .btn-outline {
+            flex: 1;
+        }
+</style>
+
+@code {
+    private record Client(int Id, string Name, string Phone, string Email,
+                          string Address, string NationalId, int ActiveCases, string Status);
+
+    private List<Client> clients = new()
+    {
+        new(1, "أحمد محمود السيد",    "01012345678", "ahmed@example.com",  "القاهرة، مصر الجديدة",  "29012011234567", 3, "active"),
+        new(2, "سارة علي حسن",        "01098765432", "sara@example.com",   "الجيزة، المهندسين",     "29103011234568", 1, "active"),
+        new(3, "محمد حسن إبراهيم",    "01155667788", "mohamed@example.com","الإسكندرية، سموحة",     "28512011234569", 2, "active"),
+        new(4, "فاطمة عبد الرحمن",    "01123456789", "fatma@example.com",  "القاهرة، مدينة نصر",   "29206011234570", 0, "inactive"),
+    };
+
+    private string searchTerm = "";
+    private bool showDialog = false;
+    private string dialogError = "";
+    private string newName = "", newPhone = "", newEmail = "", newAddress = "", newNationalId = "";
+
+    private IEnumerable<Client> FilteredClients => clients.Where(c =>
+        c.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+        c.Phone.Contains(searchTerm) ||
+        c.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+
+    private void OpenAddDialog() { showDialog = true; dialogError = ""; }
+    private void CloseDialog()
+    {
+        showDialog = false;
+        newName = newPhone = newEmail = newAddress = newNationalId = "";
+        dialogError = "";
+    }
+
+    private void HandleAddClient()
+    {
+        if (string.IsNullOrWhiteSpace(newName) || string.IsNullOrWhiteSpace(newPhone))
+        {
+            dialogError = "يرجى إدخال الاسم ورقم الهاتف على الأقل";
+            return;
+        }
+        var next = clients.Count + 1;
+        clients.Add(new(next, newName, newPhone, newEmail, newAddress, newNationalId, 0, "active"));
+        CloseDialog();
+    }
+}
