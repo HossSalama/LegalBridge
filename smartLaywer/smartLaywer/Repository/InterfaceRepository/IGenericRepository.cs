@@ -1,5 +1,3 @@
-
-
 namespace smartLaywer.Repository.InterfaceRepository
 {
     public interface IGenericRepository<T> where T : class

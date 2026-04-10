@@ -1,9 +1,3 @@
-
-
-
-global using smartLaywer.Repository.InterfaceRepository;
-global using smartLaywer.Models;
-
 namespace smartLaywer.Repository.ClassRepository
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class

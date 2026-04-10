@@ -1,4 +1,3 @@
-
 namespace smartLaywer.DTO.Finance
 {
     public class ClientFinancialProfileDto

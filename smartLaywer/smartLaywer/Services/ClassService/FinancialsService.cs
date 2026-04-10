@@ -1,6 +1,3 @@
-
-using smartLaywer.Helper;
-
 namespace smartLaywer.Service.ClassService
 {
     public class FinancialsService : IFinancialsService

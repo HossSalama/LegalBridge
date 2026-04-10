@@ -1,13 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace smartLaywer.Enum
 {
-    // 1. ‰Ê⁄ «·Ã·”…
     public enum HearingTypeEnum
     {
         [Display(Name = "Ã·”…")]

@@ -1,4 +1,3 @@
-global using AutoMapper;
 namespace smartLaywer.Helper
 {
     public static class PaginationExtensions

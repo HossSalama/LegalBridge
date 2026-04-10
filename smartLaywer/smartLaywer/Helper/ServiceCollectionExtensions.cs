@@ -1,6 +1,3 @@
-global using ExaminationSystem_API.Repository.UnitWork;
-global using smartLaywer.Repository.ClassRepository;
-using smartLaywer.Service.ClassService;
 
 namespace smartLaywer.Helper
 {

@@ -13,7 +13,7 @@ public partial class Hearing
 
     public int DeptId { get; set; }
 
-    public string HearingType { get; set; } = null!;
+    public HearingTypeEnum HearingType { get; set; } 
 
     public DateTime HearingDateTime { get; set; }
 

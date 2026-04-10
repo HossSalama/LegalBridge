@@ -1,9 +1,3 @@
-
-
-using AutoMapper.QueryableExtensions;
-using smartLaywer.DTO.Finance;
-using smartLaywer.Helper;
-
 namespace smartLaywer.Repository.ClassRepository
 {
     public class FinancialRepository : GenericRepository<Fee>, IFinancialRepository
