@@ -1,3 +1,5 @@
+using smartLaywer.Repository.UnitWork;
+
 namespace smartLaywer.Service.ClassService
 {
     public class FinancialsService : IFinancialsService

@@ -4,6 +4,7 @@ global using Microsoft.EntityFrameworkCore.SqlServer;
 global using smartLaywer.Service.InterfaceService;
 global using smartLaywer.DTO.Finance;
 global using smartLaywer.DTO.Case;
+global using smartLaywer.DTO.Clients;
 global using System.ComponentModel.DataAnnotations;
 global using AutoMapper;
 global using ExaminationSystem_API.Repository.UnitWork;

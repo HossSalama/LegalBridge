@@ -18,6 +18,10 @@ namespace ExaminationSystem_API.Repository.UnitWork
         public IGenericRepository<CaseStatus> CaseStatuses { get; private set; }
         public IGenericRepository<Court> Courts { get; private set; }
         public IGenericRepository<User> Users { get; private set; }
+
+        // Client Domain
+        public IClientRepository Client { get; private set; }
+
         public UnitOfWork(LegalManagementContext context)
         {
             _context = context;
@@ -34,6 +38,8 @@ namespace ExaminationSystem_API.Repository.UnitWork
             CaseStatuses = new GenericRepository<CaseStatus>(_context);
             Courts = new GenericRepository<Court>(_context);
             Users = new GenericRepository<User>(_context);
+            Client = new ClientRepository(context);
+
         }
         public async Task<int> CompleteAsync() => await _context.SaveChangesAsync();
         public void Dispose() { }

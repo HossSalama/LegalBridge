@@ -1,4 +1,6 @@
 
+using smartLaywer.Repository.UnitWork;
+
 namespace smartLaywer.Helper
 {
     public static class ServiceCollectionExtensions
