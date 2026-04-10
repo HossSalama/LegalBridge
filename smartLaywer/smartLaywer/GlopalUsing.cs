@@ -3,6 +3,7 @@ global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.SqlServer;
 global using smartLaywer.Service.InterfaceService;
 global using smartLaywer.DTO.Finance;
+global using smartLaywer.DTO.Case;
 global using System.ComponentModel.DataAnnotations;
 global using AutoMapper;
 global using ExaminationSystem_API.Repository.UnitWork;
@@ -17,3 +18,5 @@ global using smartLaywer.Repository.InterfaceRepository;
 global using smartLaywer.Models;
 global using AutoMapper.QueryableExtensions;
 global using smartLaywer.Helper;
+
+global using smartLaywer.Enum;

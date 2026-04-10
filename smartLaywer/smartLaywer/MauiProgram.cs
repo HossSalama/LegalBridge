@@ -1,4 +1,8 @@
 using Microsoft.Extensions.Logging;
+using smartLaywer.Mapping.CaseMapping;
+using smartLaywer.Mapping.FinancialMapping;
+using smartLaywer.Repository.UnitWork;
+using smartLaywer.Services.ClassService;
 
 namespace smartLaywer
 {
@@ -12,13 +16,33 @@ namespace smartLaywer
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
-          //  builder.Services.AddDbContext<LegalManagementContext>(option =>
-          //option.UseSqlServer("Data Source=.;Initial Catalog=LegalManagementDB;Integrated Security=True;Encrypt=False;Trust Server Certificate=True"));
+
             builder.Services.AddMauiBlazorWebView();
 
+            //  Database
+            builder.Services.AddDbContext<LegalManagementContext>(options =>
+                options
+                    .UseSqlServer("Data Source=.;Initial Catalog=LegalManagementDB;Integrated Security=True;Encrypt=False;Trust Server Certificate=True")
+                    .ConfigureWarnings(w => w.Ignore(
+                        Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
+
+            //  AutoMapper 
+            builder.Services.AddAutoMapper(
+                typeof(CaseProfile),
+                typeof(FinancialProfile));
+
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            //  Services 
+            builder.Services.AddScoped<ICaseService, CaseService>();
+            builder.Services.AddScoped<ILookupService, LookupService>();
+            builder.Services.AddScoped<IClientService, ClientService>();
+            builder.Services.AddScoped<IFinancialsService, FinancialsService>();
+            builder.Services.AddScoped<IHearingService, HearingService>();
+
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
-    		builder.Logging.AddDebug();
+            builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();
