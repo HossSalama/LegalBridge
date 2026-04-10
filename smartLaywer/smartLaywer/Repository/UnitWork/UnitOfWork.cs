@@ -6,16 +6,20 @@ namespace ExaminationSystem_API.Repository.UnitWork
     {
         private readonly LegalManagementContext _context;
         private Hashtable _repositories;
-        //public IBranchRepository Branches { get; private set; }
+        public IFinancialRepository Financials { get; private set; }
+        public IGenericRepository<ActualPayment> ActualPayments { get; private set; }
+        public IGenericRepository<PaymentSchedule> Schedules { get; private set; }
+        public IGenericRepository<AdminExpense> Expenses { get; private set; }
 
         public UnitOfWork(LegalManagementContext context)
         {
             _context = context;
-            //Branches = new BranchRepository(_context);
-  
-        }
-       
-        public async Task<int> CompleteAsync() => await _context.SaveChangesAsync();
+            Financials = new FinancialRepository(_context);
+            ActualPayments = new GenericRepository<ActualPayment>(_context);
+            Expenses = new GenericRepository<AdminExpense>(_context);
 
+        }
+        public async Task<int> CompleteAsync() => await _context.SaveChangesAsync();
+        public void Dispose(){  }
     }
 }

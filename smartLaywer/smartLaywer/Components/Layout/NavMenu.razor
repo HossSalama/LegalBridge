@@ -1,27 +1,45 @@
-Ôªø<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">smartLaywer</a>
+@inject NavigationManager Navigation
+
+<div className="flex flex-col h-full text-white" dir="rtl">
+    <div className="p-6">
+        <div className="flex items-center gap-3 mb-8">
+            <div className="h-10 w-10 rounded-lg bg-amber-600 flex items-center justify-center">
+                <i data-lucide="scale" class="h-6 w-6 text-white"></i>
+            </div>
+            <div>
+                <h1 className="font-bold text-lg">≈œ«—… «·ﬁ÷«Ì«</h1>
+                <p className="text-xs text-slate-400">Legal System</p>
+            </div>
+        </div>
+
+        <div className="space-y-1">
+            <NavLink class="@GetActiveClass("/dashboard")" href="" Match="NavLinkMatch.All">
+                <i data-lucide="layout-dashboard" class="h-5 w-5"></i>
+                <span>·ÊÕ… «· Õﬂ„</span>
+            </NavLink>
+
+            <NavLink class="@GetActiveClass("/clients")" href="clients">
+                <i data-lucide="users" class="h-5 w-5"></i>
+                <span>«·⁄„·«¡</span>
+            </NavLink>
+
+            <NavLink class="@GetActiveClass("/cases")" href="cases">
+                <i data-lucide="briefcase" class="h-5 w-5"></i>
+                <span>«·ﬁ÷«Ì«</span>
+            </NavLink>
+
+        </div>
     </div>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+@code {
+    private string GetActiveClass(string path)
+    {
+        var relativePath = Navigation.ToBaseRelativePath(Navigation.Uri);
+        bool isActive = (path == "/" && string.IsNullOrEmpty(relativePath)) || relativePath == path.TrimStart('/');
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
-</div>
+        return isActive
+            ? "flex items-center gap-3 px-4 py-3 rounded-lg bg-amber-600 text-white transition-colors"
+            : "flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors";
+    }
+}

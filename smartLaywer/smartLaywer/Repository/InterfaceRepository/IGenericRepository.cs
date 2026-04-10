@@ -9,6 +9,7 @@ namespace smartLaywer.Repository.InterfaceRepository
         Task Delete(int id);
         Task<IEnumerable<T>> GetAllAsync();
         Task<T?> GetByIdAsync(int id);
-        IQueryable<T> GetAllQueryable();
+        IQueryable<T> GetAllQueryableNoTracking();
+        IQueryable<T> GetAllQueryableTracking();
     }
 }

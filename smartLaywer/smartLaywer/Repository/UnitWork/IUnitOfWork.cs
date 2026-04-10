@@ -1,9 +1,11 @@
 namespace ExaminationSystem_API.Repository.UnitWork
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork : IDisposable
     {
-        //IBranchRepository Branches { get; }
-
+        IFinancialRepository Financials { get; }
+        IGenericRepository<ActualPayment> ActualPayments { get;}
+         IGenericRepository<PaymentSchedule> Schedules { get; }
+         IGenericRepository<AdminExpense> Expenses { get; }
         Task<int> CompleteAsync();
     }
 }

@@ -16,7 +16,8 @@ namespace smartLaywer.Repository.ClassRepository
             _dbSet = _context.Set<T>();
         }
         public async Task<IEnumerable<T>> GetAllAsync() => await _dbSet.AsNoTracking().ToListAsync();
-        public IQueryable<T> GetAllQueryable() => _dbSet.AsNoTracking().AsQueryable();
+        public IQueryable<T> GetAllQueryableNoTracking() => _dbSet.AsNoTracking().AsQueryable();
+        public IQueryable<T> GetAllQueryableTracking() => _dbSet.AsQueryable();
         public async Task<T?> GetByIdAsync(int id) => await _dbSet.FindAsync(id);
         public async Task AddAsync(T entity) => await _dbSet.AddAsync(entity);
         public void Update(T entity) => _dbSet.Update(entity);

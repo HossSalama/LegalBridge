@@ -3,16 +3,17 @@ namespace smartLaywer.Helper
 {
     public static class PaginationExtensions
     {
-        public static async Task<PaginatedList<TDestination>> ToPaginatedListAsync<TSource, TDestination>(
-            this IQueryable<TSource> query,
-            IMapper mapper,
-            int pageNumber,
-            int pageSize)
+        public static async Task<PaginatedList<TDestination>> ToPaginatedListAsync<TDestination>(
+             this IQueryable<TDestination> query,
+             int pageNumber,
+             int pageSize)
         {
+            var count = await query.CountAsync();
+            var items = await query.Skip((pageNumber - 1) * pageSize)
+                                   .Take(pageSize)
+                                   .ToListAsync();
 
-            var paginatedList = await PaginatedList<TSource>.CreateAsync(query, pageNumber, pageSize);
-            var mappedItems = mapper.Map<List<TDestination>>(paginatedList.Items);
-            return new PaginatedList<TDestination>(mappedItems, paginatedList.TotalCount, pageNumber, pageSize);
+            return new PaginatedList<TDestination>(items, count, pageNumber, pageSize);
         }
     }
 }
