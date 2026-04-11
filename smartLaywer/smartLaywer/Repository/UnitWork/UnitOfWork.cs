@@ -5,6 +5,7 @@ namespace ExaminationSystem_API.Repository.UnitWork
     public class UnitOfWork : IUnitOfWork
     {
         private readonly LegalManagementContext _context;
+        private readonly IMapper _mapper;
         public IFinancialRepository Financials { get; private set; }
         public IGenericRepository<ActualPayment> ActualPayments { get; private set; }
         public IGenericRepository<PaymentSchedule> Schedules { get; private set; }
@@ -22,14 +23,15 @@ namespace ExaminationSystem_API.Repository.UnitWork
         // Client Domain
         public IClientRepository Client { get; private set; }
 
-        public UnitOfWork(LegalManagementContext context)
+        public UnitOfWork(LegalManagementContext context , IMapper mapper)
         {
             _context = context;
-            Financials = new FinancialRepository(_context);
+            _mapper = mapper;
+            Financials = new FinancialRepository(_context , _mapper);
             ActualPayments = new GenericRepository<ActualPayment>(_context);
             Expenses = new GenericRepository<AdminExpense>(_context);
             Schedules = new GenericRepository<PaymentSchedule>(_context);
-            Hearing = new HearingRepository(_context);
+            Hearing = new HearingRepository(_context , _mapper);
 
             // Cases
             Cases = new CaseRepository(_context);

@@ -7,6 +7,9 @@ namespace smartLaywer.Enum
         [Display(Name = "ÛÇÈ")] 
         Absent = 2,
         [Display(Name = "ÃõÌøá")] 
-        Postponed = 3
+        Postponed = 3,
+        [Display(Name = "ãßÊãáå")]
+        Attended = 4
+
     }
 }

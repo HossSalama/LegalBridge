@@ -8,7 +8,6 @@ namespace smartLaywer.Repository.UnitWork
         IGenericRepository<AdminExpense> Expenses { get; }
         IHearingRepository Hearing { get; }
 
-        // Cases domain
         ICaseRepository Cases { get; }
         IGenericRepository<Client> Clients { get; }
         IGenericRepository<CaseType> CaseTypes { get; }
@@ -16,7 +15,6 @@ namespace smartLaywer.Repository.UnitWork
         IGenericRepository<Court> Courts { get; }
         IGenericRepository<User> Users { get; }
 
-        // Client Doman
         IClientRepository Client { get; }
         Task<int> CompleteAsync();
     }

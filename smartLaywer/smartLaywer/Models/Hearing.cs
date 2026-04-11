@@ -25,7 +25,7 @@ public partial class Hearing
 
     public string Result { get; set; } = null!;
 
-    public DateTime NextHearingDate { get; set; }
+    public DateTime? NextHearingDate { get; set; }
 
     public HearingPeriodEnum? NextHearingPeriod { get; set; }
 
