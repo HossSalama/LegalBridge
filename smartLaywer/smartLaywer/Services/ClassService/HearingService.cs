@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 ﻿
 using smartLaywer.DTO.Hearing;
 using smartLaywer.Helper;
+=======
+using smartLaywer.Repository.UnitWork;
+>>>>>>> e259c2948f6b03c8bb58c86d316812b0abf35c97
 
 namespace smartLaywer.Services.ClassService
 {

@@ -1,14 +1,16 @@
+﻿using smartLaywer.Repository.UnitWork;
+
 namespace smartLaywer.Services.ClassService
 {
     public class CaseService : ICaseService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper     _mapper;
+        private readonly IMapper _mapper;
 
         public CaseService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
-            _mapper     = mapper;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -41,7 +43,8 @@ namespace smartLaywer.Services.ClassService
         }
 
         /// <summary>
-        /// Returns a fully-loaded Case entity for the details modal.
+        /// Returns a fully-loaded Case entity for the details view.
+        /// Returns null if not found — caller must handle null.
         /// </summary>
         public async Task<Case?> GetCaseWithDetailsAsync(int id)
             => await _unitOfWork.Cases.GetCaseWithDetailsAsync(id);
@@ -49,23 +52,60 @@ namespace smartLaywer.Services.ClassService
         public async Task<CaseStatsDto> GetCaseStatsAsync()
             => await _unitOfWork.Cases.GetCaseStatsAsync();
 
+        /// <summary>
+        /// Inserts a new case.
+        /// Validates all required FK fields are non-zero before hitting the DB.
+        /// </summary>
         public async Task AddCaseAsync(Case caseEntity)
         {
+            // Guard: required FK fields must be set
+            if (caseEntity.ClientId == 0)
+                throw new InvalidOperationException("ClientId is required.");
+            if (caseEntity.CaseTypeId == 0)
+                throw new InvalidOperationException("CaseTypeId is required.");
+            if (caseEntity.CourtId == 0)
+                throw new InvalidOperationException("CourtId is required.");
+            if (caseEntity.StatusId == 0)
+                throw new InvalidOperationException("StatusId is required.");
+            if (caseEntity.AssignedLawyerId == 0)
+                throw new InvalidOperationException("AssignedLawyerId is required.");
+
             caseEntity.UpdatedAt = DateTime.Now;
             await _unitOfWork.Cases.AddAsync(caseEntity);
             await _unitOfWork.CompleteAsync();
         }
 
-        public async Task UpdateCaseAsync(Case caseEntity)
+        /// <summary>
+        /// Updates ONLY the editable fields from CaseEditDto.
+        /// Loads the tracked entity first so EF only updates what changed.
+        /// Read-only fields (ClientId, CaseTypeId, OpenDate, CaseNumber) are never touched.
+        /// </summary>
+        public async Task UpdateCaseAsync(CaseEditDto dto)
         {
-            caseEntity.UpdatedAt = DateTime.Now;
-            _unitOfWork.Cases.Update(caseEntity);
+            // Load tracked entity — Update() will change only the fields we set
+            var existing = await _unitOfWork.Cases.GetByIdAsync(dto.Id)
+                ?? throw new KeyNotFoundException($"Case {dto.Id} not found.");
+
+            // Apply only editable fields
+            existing.StatusId = dto.StatusId;
+            existing.CourtId = dto.CourtId;
+            existing.DeptId = dto.DeptId;
+            existing.AssignedLawyerId = dto.AssignedLawyerId;
+            existing.Title = dto.Title;
+            existing.Stage = dto.Stage;
+            existing.CloseDate = dto.CloseDate;
+            existing.ArchiveNote = dto.ArchiveNote;
+            existing.UpdatedAt = DateTime.Now;
+
+            // GetByIdAsync uses FindAsync which returns a tracked entity,
+            // so Update() just marks it Modified — no duplicate tracking issue.
+            _unitOfWork.Cases.Update(existing);
             await _unitOfWork.CompleteAsync();
         }
 
         public async Task DeleteCaseAsync(int id)
         {
-            _unitOfWork.Cases.Delete(id);
+            await _unitOfWork.Cases.Delete(id);   // ← was missing await
             await _unitOfWork.CompleteAsync();
         }
     }

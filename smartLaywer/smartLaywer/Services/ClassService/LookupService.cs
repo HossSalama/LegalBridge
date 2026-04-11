@@ -1,3 +1,5 @@
+using smartLaywer.Repository.UnitWork;
+
 namespace smartLaywer.Services.ClassService
 {
     public class LookupService : ILookupService

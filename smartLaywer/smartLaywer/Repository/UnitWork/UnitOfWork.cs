@@ -18,7 +18,15 @@ namespace smartLaywer.Repository.UnitWork
         public IGenericRepository<CaseStatus> CaseStatuses { get; private set; }
         public IGenericRepository<Court> Courts { get; private set; }
         public IGenericRepository<User> Users { get; private set; }
+<<<<<<< HEAD
         public UnitOfWork(LegalManagementContext context , IMapper mapper)
+=======
+
+        // Client Domain
+        public IClientRepository Client { get; private set; }
+
+        public UnitOfWork(LegalManagementContext context)
+>>>>>>> e259c2948f6b03c8bb58c86d316812b0abf35c97
         {
             _context = context;
             _mapper = mapper;
@@ -35,6 +43,8 @@ namespace smartLaywer.Repository.UnitWork
             CaseStatuses = new GenericRepository<CaseStatus>(_context);
             Courts = new GenericRepository<Court>(_context);
             Users = new GenericRepository<User>(_context);
+            Client = new ClientRepository(context);
+
         }
         public async Task<int> CompleteAsync() => await _context.SaveChangesAsync();
         public void Dispose() { }

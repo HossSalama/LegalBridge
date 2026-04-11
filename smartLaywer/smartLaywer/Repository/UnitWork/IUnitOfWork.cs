@@ -16,6 +16,8 @@ namespace smartLaywer.Repository.UnitWork
         IGenericRepository<Court> Courts { get; }
         IGenericRepository<User> Users { get; }
 
+        // Client Doman
+        IClientRepository Client { get; }
         Task<int> CompleteAsync();
     }
 }
