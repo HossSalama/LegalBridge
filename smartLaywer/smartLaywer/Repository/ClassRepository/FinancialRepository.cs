@@ -4,10 +4,12 @@ namespace smartLaywer.Repository.ClassRepository
     {
         private readonly LegalManagementContext _context;
         private readonly IMapper _mapper;
-        public FinancialRepository(LegalManagementContext context) : base(context)
+        public FinancialRepository(LegalManagementContext context, IMapper mapper) : base(context)
         {
             _context = context;
+            _mapper = mapper;
         }
+
         public async Task<FinancialStatDto> GetFinancialSummaryAsync()
         {
             var totalCollected = await _context.ActualPayments.SumAsync(ap => ap.Amount);

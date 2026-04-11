@@ -32,9 +32,7 @@ namespace smartLaywer
                         Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
             //  AutoMapper 
-            builder.Services.AddAutoMapper(
-                typeof(CaseProfile),
-                typeof(FinancialProfile));
+            builder.Services.AddAutoMapper(typeof(MauiProgram).Assembly);
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -44,6 +42,7 @@ namespace smartLaywer
             builder.Services.AddScoped<IClientService, ClientService>();
             builder.Services.AddScoped<IFinancialsService, FinancialsService>();
             builder.Services.AddScoped<IHearingService, HearingService>();
+            builder.Services.AddScoped<IHearingRepository, HearingRepository>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

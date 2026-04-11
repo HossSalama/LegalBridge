@@ -1,6 +1,6 @@
 using smartLaywer.Repository.UnitWork;
 
-namespace ExaminationSystem_API.Repository.UnitWork
+namespace smartLaywer.Repository.UnitWork
 {
     public class UnitOfWork : IUnitOfWork
     {
@@ -10,7 +10,7 @@ namespace ExaminationSystem_API.Repository.UnitWork
         public IGenericRepository<PaymentSchedule> Schedules { get; private set; }
         public IGenericRepository<AdminExpense> Expenses { get; private set; }
         public IHearingRepository Hearing { get; private set; }
-
+        private readonly IMapper _mapper;
         // Cases 
         public ICaseRepository Cases { get; private set; }
         public IGenericRepository<Client> Clients { get; private set; }
@@ -18,14 +18,15 @@ namespace ExaminationSystem_API.Repository.UnitWork
         public IGenericRepository<CaseStatus> CaseStatuses { get; private set; }
         public IGenericRepository<Court> Courts { get; private set; }
         public IGenericRepository<User> Users { get; private set; }
-        public UnitOfWork(LegalManagementContext context)
+        public UnitOfWork(LegalManagementContext context , IMapper mapper)
         {
             _context = context;
-            Financials = new FinancialRepository(_context);
+            _mapper = mapper;
+            Financials = new FinancialRepository(_context, mapper);
             ActualPayments = new GenericRepository<ActualPayment>(_context);
             Expenses = new GenericRepository<AdminExpense>(_context);
             Schedules = new GenericRepository<PaymentSchedule>(_context);
-            Hearing = new HearingRepository(_context);
+            Hearing = new HearingRepository(_context, mapper);
 
             // Cases
             Cases = new CaseRepository(_context);

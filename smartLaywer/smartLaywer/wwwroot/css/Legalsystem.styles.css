@@ -1,15 +1,10 @@
 ﻿/* ============================================================
    LegalSystem.styles.css
-   Covers: Login page + Main Layout (sidebar, header, nav)
-   Direction: RTL  |  Colors: slate-900 + amber-600
    ============================================================ */
 
-/* ── Google Font ── */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap');
 
-/* ── Design Tokens ── */
 :root {
-    --slate-50: #f8fafc;
     --slate-100: #f1f5f9;
     --slate-200: #e2e8f0;
     --slate-300: #cbd5e1;
@@ -22,7 +17,6 @@
     --amber-500: #f59e0b;
     --amber-600: #d97706;
     --amber-700: #b45309;
-    --red-500: #ef4444;
     --red-600: #dc2626;
     --white: #ffffff;
     --radius: 0.625rem;
@@ -51,7 +45,6 @@
     background: var(--slate-900);
 }
 
-/* Layered background */
 .bg-layer {
     position: absolute;
     inset: 0;
@@ -101,7 +94,6 @@
     }
 }
 
-/* Logo */
 .login-logo {
     display: flex;
     justify-content: center;
@@ -125,7 +117,6 @@
         height: 38px;
     }
 
-/* Header text */
 .login-header {
     text-align: center;
     margin-bottom: 2rem;
@@ -144,21 +135,6 @@
         letter-spacing: .05em;
     }
 
-/* Alert */
-.alert-error {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    background: rgba(220,38,38,.15);
-    border: 1px solid rgba(220,38,38,.3);
-    color: #fca5a5;
-    border-radius: var(--radius);
-    padding: .75rem 1rem;
-    font-size: .875rem;
-    margin-bottom: 1rem;
-}
-
-/* Form */
 .login-form {
     display: flex;
     flex-direction: column;
@@ -201,8 +177,8 @@
     color: var(--white);
     font-family: inherit;
     font-size: .9375rem;
-    transition: border-color .2s, background .2s, box-shadow .2s;
     outline: none;
+    transition: border-color .2s, background .2s, box-shadow .2s;
 }
 
     .form-input::placeholder {
@@ -215,7 +191,6 @@
         box-shadow: 0 0 0 3px rgba(245,158,11,.15);
     }
 
-/* Eye toggle */
 .eye-btn {
     position: absolute;
     left: .75rem;
@@ -234,14 +209,12 @@
         color: var(--amber-400);
     }
 
-/* Validation */
 .validation-msg {
     font-size: .8rem;
     color: #fca5a5;
     margin-top: .25rem;
 }
 
-/* Submit button */
 .submit-btn {
     display: flex;
     align-items: center;
@@ -257,9 +230,9 @@
     font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
-    transition: opacity .2s, transform .15s, box-shadow .2s;
     margin-top: .5rem;
     box-shadow: 0 4px 16px rgba(217,119,6,.35);
+    transition: opacity .2s, transform .15s, box-shadow .2s;
 }
 
     .submit-btn:hover:not(:disabled) {
@@ -277,7 +250,6 @@
         cursor: not-allowed;
     }
 
-/* Spinner */
 .spinner {
     width: 18px;
     height: 18px;
@@ -300,21 +272,34 @@
     margin-top: 1.25rem;
 }
 
+.alert-error {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    background: rgba(220,38,38,.15);
+    border: 1px solid rgba(220,38,38,.3);
+    color: #fca5a5;
+    border-radius: var(--radius);
+    padding: .75rem 1rem;
+    font-size: .875rem;
+}
+
 /* ============================================================
    MAIN LAYOUT
    ============================================================ */
 
-/* Shell */
+/* ✅ الإصلاح الأساسي: app-shell يملأ الشاشة كاملة */
 .app-shell {
-    display: flex;
-    width: 100vw; /* ← غير من 100% لـ 100vw */
+    display: block; /* مش flex عشان نتحكم بالـ positioning يدوياً */
+    width: 100vw;
     height: 100vh;
     overflow: hidden;
     background: var(--slate-100);
     direction: rtl;
+    position: relative;
 }
 
-/* ── Sidebar ── */
+/* ── Sidebar: ثابت على اليمين ── */
 .sidebar {
     position: fixed;
     top: 0;
@@ -329,7 +314,6 @@
     transition: transform .3s cubic-bezier(.22,1,.36,1);
 }
 
-/* Sidebar Logo */
 .sidebar-logo {
     display: flex;
     align-items: center;
@@ -371,7 +355,6 @@
     letter-spacing: .06em;
 }
 
-/* Sidebar Nav */
 .sidebar-nav {
     flex: 1;
     overflow-y: auto;
@@ -417,24 +400,24 @@
     flex: 1;
 }
 
-/* ── Main Wrap ── */
+/* ✅ main-wrap: يملأ المساحة من اليسار حتى بداية الـ sidebar */
 .main-wrap {
-    flex: 1;
-    min-width: 0;
-    width: calc(100% - var(--sidebar-w)); /* ← غير ده */
-    overflow-x: hidden;
-    margin-right: var(--sidebar-w);
+    position: fixed;
+    top: 0;
+    left: 0; /* ← يبدأ من أقصى اليسار */
+    right: var(--sidebar-w); /* ← ينتهي عند بداية الـ sidebar (260px من اليمين) */
+    bottom: 0;
     display: flex;
+/*    width:100%;*/
     flex-direction: column;
-    min-height: 100vh;
-    transition: margin .3s;
+    background: var(--slate-100);
+    overflow: hidden;
+    transition: right .3s cubic-bezier(.22,1,.36,1);
 }
 
 /* ── Header ── */
 .app-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    flex-shrink: 0;
     height: var(--header-h);
     background: var(--white);
     border-bottom: 1px solid var(--slate-200);
@@ -478,7 +461,6 @@
     gap: .5rem;
 }
 
-/* Notifications */
 .notif-btn {
     position: relative;
     display: flex;
@@ -515,7 +497,6 @@
     line-height: 1;
 }
 
-/* User avatar */
 .user-menu-wrap {
     position: relative;
 }
@@ -539,7 +520,6 @@
         transform: scale(1.05);
     }
 
-/* Dropdown */
 .user-dropdown {
     position: absolute;
     top: calc(100% + .5rem);
@@ -550,8 +530,8 @@
     border-radius: .75rem;
     box-shadow: 0 8px 24px rgba(0,0,0,.12);
     padding: .5rem;
-    animation: dropIn .18s ease;
     z-index: 300;
+    animation: dropIn .18s ease;
 }
 
 @keyframes dropIn {
@@ -605,14 +585,12 @@
     color: var(--red-600);
 }
 
-/* ── Page Content ── */
+/* ── Page Content: المحتوى يتسكرول داخل المنطقة ── */
 .page-content {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0; /* ← تأكد مفيش padding زيادة */
+    padding: 1.5rem;
 }
 
 /* ── Mobile overlay ── */
@@ -629,6 +607,7 @@
    RESPONSIVE
    ============================================================ */
 @media (max-width: 1024px) {
+    /* الـ sidebar يختفي للجانب */
     .sidebar {
         transform: translateX(100%);
     }
@@ -641,8 +620,9 @@
         display: block;
     }
 
+    /* main-wrap يملأ الشاشة كاملة على موبايل */
     .main-wrap {
-        margin-right: 0;
+        right: 0;
     }
 
     .hamburger {
