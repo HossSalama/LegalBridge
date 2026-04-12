@@ -5,6 +5,7 @@ namespace smartLaywer.Mapping.FinancialMapping
         public FinancialProfile()
         {
             CreateMap<Fee, FeeDetailsDto>()
+            .ForMember(dest=> dest.ClientId , opt => opt.MapFrom(src => src.ClientId))
             .ForMember(dest => dest.CaseNumber, opt => opt.MapFrom(src => src.Case.CaseNumber))
             .ForMember(dest => dest.ClientName, opt => opt.MapFrom(src => src.Client.FullName))
             .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.CreatedAt))

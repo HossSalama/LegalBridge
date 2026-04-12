@@ -9,6 +9,7 @@ namespace smartLaywer.Repository.ClassRepository
             _context = context;
             _mapper = mapper;
         }
+
         public async Task<FinancialStatDto> GetFinancialSummaryAsync()
         {
             var totalCollected = await _context.ActualPayments.SumAsync(ap => ap.Amount);

@@ -7,7 +7,7 @@ global using smartLaywer.DTO.Case;
 global using smartLaywer.DTO.Clients;
 global using System.ComponentModel.DataAnnotations;
 global using AutoMapper;
-global using ExaminationSystem_API.Repository.UnitWork;
+global using smartLaywer.Repository.UnitWork;
 global using smartLaywer.Repository.ClassRepository;
 global using smartLaywer.Service.ClassService;
 

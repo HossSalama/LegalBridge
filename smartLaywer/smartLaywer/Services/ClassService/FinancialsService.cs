@@ -37,7 +37,6 @@ namespace smartLaywer.Service.ClassService
             dto.ReceiptNumber = await GenerateNextReceiptNumberAsync();
             var payment = _mapper.Map<ActualPayment>(dto);
             await _unitOfWork.ActualPayments.AddAsync(payment);
-            // ÇÓÊÏÚÇÁ ÇáÊÓæíÉ áÊÍÏíË ÍÇáÇÊ ÇáÃŞÓÇØ (ãÏİæÚ/ÌÒÆí/ÛíÑ ãÏİæÚ)
             await ReconcilePaymentSchedulesAsync(dto.FeeId);
             return true; 
         }

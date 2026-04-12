@@ -6,7 +6,7 @@ namespace smartLaywer.Services.InterfaceService
         Task<Case?> GetCaseWithDetailsAsync(int id);
         Task<CaseStatsDto> GetCaseStatsAsync();
         Task AddCaseAsync(Case caseEntity);
-        Task UpdateCaseAsync(Case caseEntity);
+        Task UpdateCaseAsync(CaseEditDto dto);
         Task DeleteCaseAsync(int id);
     }
 }

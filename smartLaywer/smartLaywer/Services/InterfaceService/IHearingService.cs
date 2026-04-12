@@ -1,3 +1,6 @@
+using smartLaywer.DTO.Hearing;
+using smartLaywer.Helper;
+
 namespace smartLaywer.Services.InterfaceService
 {
     public interface IHearingService
@@ -5,5 +8,10 @@ namespace smartLaywer.Services.InterfaceService
         Task<HearingSummaryDto> GetHearingsSummaryAsync();
         Task<PaginatedList<HearingDisplayDto>> GetHearingsForGridAsync(int pageNumber, string? statusFilter, string? searchTerm);
         Task<bool> CreateHearingAsync(HearingCreationDto dto);
+        //Task<PaginatedList<HearingListDto>> GetPagedHearingsAsync(
+        //    string? searchTerm, string? statusFilter, int pageNumber);
+        //Task<List<CaseHearingsDto>> GetCasesWithHearingsAsync();
+        //Task<List<HearingListDto>> GetCaseHearingsAsync(int caseId);
+        //Task<bool> CreateHearingAsync(HearingCreateDto dto);
     }
 }

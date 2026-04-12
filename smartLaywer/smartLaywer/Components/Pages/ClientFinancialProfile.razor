@@ -1,0 +1,151 @@
+@page "/financials/client-profile/{ClientId:int}"
+@inject IFinancialsService FinancialsService
+
+<div class="container-fluid py-4" dir="rtl">
+    @if (profile == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Ã«—Ì  Õ„Ì· „·› «·⁄„Ì· «·„«·Ì...</p>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-secondary">«·„·› «·„«·Ì: @profile.ClientName</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/financials">«·√ ⁄«»</a></li>
+                        <li class="breadcrumb-item active">ﬂ‘› Õ”«» «·⁄„Ì·</li>
+                    </ol>
+                </nav>
+            </div>
+            <button class="btn btn-outline-danger" @onclick="ExportToPdf">
+                <i class="bi bi-file-earmark-pdf"></i>  ’œÌ— ﬂ‘› Õ”«» (PDF)
+            </button>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 bg-primary text-white">
+                    <div class="card-body">
+                        <h6>≈Ã„«·Ì «·√ ⁄«» «·„ ›ﬁ ⁄·ÌÂ«</h6>
+                        <h3>@profile.TotalAgreedAmount.ToString("N0") Ã.„</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 bg-success text-white">
+                    <div class="card-body">
+                        <h6>≈Ã„«·Ì «·„œ›Ê⁄ Õ Ï «·¬‰</h6>
+                        <h3>@profile.TotalPaid.ToString("N0") Ã.„</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 bg-danger text-white">
+                    <div class="card-body">
+                        <h6>≈Ã„«·Ì «·„ √Œ—«  «·„” Õﬁ…</h6>
+                        <h3>@profile.TotalOverdue.ToString("N0") Ã.„</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion shadow-sm" id="casesAccordion">
+            @foreach (var caseItem in profile.Cases)
+            {
+                <div class="accordion-item mb-3 border">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#case-@caseItem.CaseId">
+                            <div class="d-flex justify-content-between w-100 px-3">
+                                <span><strong>ﬁ÷Ì… —ﬁ„:</strong> @caseItem.CaseNumber</span>
+                                <span class="text-primary">≈Ã„«·Ì «·ﬁ÷Ì…: @caseItem.CaseTotalFee.ToString("N0") Ã.„</span>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="case-@caseItem.CaseId" class="accordion-collapse collapse" data-bs-parent="#casesAccordion">
+                        <div class="accordion-body bg-white">
+                            <div class="row">
+                                <div class="col-lg-7">
+                                    <h6 class="fw-bold mb-3 border-bottom pb-2">”Ã· «·⁄„·Ì«  (œ›⁄«  Ê„’«—Ì›)</h6>
+                                    <table class="table table-sm table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>«· «—ÌŒ</th>
+                                                <th>«·»Ì«‰</th>
+                                                <th>«·„»·€</th>
+                                                <th>«·‰Ê⁄</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var trans in caseItem.Transactions)
+                                            {
+                                                <tr>
+                                                    <td>@trans.Date.ToShortDateString()</td>
+                                                    <td>@trans.Description</td>
+                                                    <td class="@(trans.Type == "Credit" ? "text-success" : "text-danger")">
+                                                        @(trans.Type == "Credit" ? "+" : "-") @trans.Amount.ToString("N0")
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge @(trans.Type == "Credit" ? "bg-success-subtle text-success" : "bg-danger-subtle text-danger")">
+                                                            @(trans.Type == "Credit" ? " Õ’Ì·" : "„’«—Ì›")
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="col-lg-5">
+                                    <h6 class="fw-bold mb-3 border-bottom pb-2">ÃœÊ· «·√ﬁ”«ÿ</h6>
+                                    <div class="list-group list-group-flush">
+                                        @foreach (var installment in caseItem.Installments)
+                                        {
+                                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <small class="text-muted">ﬁ”ÿ #@installment.InstallmentNumber</small>
+                                                    <p class="mb-0">@installment.DueDate.ToShortDateString()</p>
+                                                </div>
+                                                <div class="text-end">
+                                                    <p class="mb-0 fw-bold">@installment.Amount.ToString("N0") Ã.„</p>
+                                                    <span class="badge @(installment.Status == "Paid" ? "bg-success" : "bg-warning text-dark")">
+                                                        @installment.Status
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+@code {
+    [Parameter] public int ClientId { get; set; }
+    private ClientFinancialProfileDto? profile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            profile = await FinancialsService.GetClientFullFinancialHistoryAsync(ClientId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading client profile: {ex.Message}");
+        }
+    }
+
+    private void ExportToPdf()
+    {
+
+        Console.WriteLine("Ã«—Ì  Õ÷Ì— ﬂ‘› «·Õ”«» »’Ì€… PDF...");
+    }
+}
