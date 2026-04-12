@@ -1,12 +1,9 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using smartLaywer.Mapping.CaseMapping;
 using smartLaywer.Mapping.FinancialMapping;
 using smartLaywer.Repository.UnitWork;
 using smartLaywer.Services.ClassService;
-
 using smartLaywer.Services;
-
-
 namespace smartLaywer
 {
     public static class MauiProgram
@@ -19,37 +16,28 @@ namespace smartLaywer
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
-
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddScoped<IAuthService, AuthService>();
 
-
-            //  Database
+            // Database
             builder.Services.AddDbContext<LegalManagementContext>(options =>
                 options
-                    .UseSqlServer("Data Source=.;Initial Catalog=LegalManagementDB;Integrated Security=True;Encrypt=False;Trust Server Certificate=True")
+                    .UseSqlServer("Data Source=.\\SQLEXPRESS;Initial Catalog=LegalManagementDB;Integrated Security=True;Encrypt=False;Trust Server Certificate=True")
                     .ConfigureWarnings(w => w.Ignore(
                         Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
-
-            //  AutoMapper 
-            builder.Services.AddAutoMapper(typeof(MauiProgram).Assembly);
-
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-            //  Services 
-            builder.Services.AddScoped<ICaseService, CaseService>();
-            builder.Services.AddScoped<ILookupService, LookupService>();
-            builder.Services.AddScoped<IClientService, ClientService>();
-            builder.Services.AddScoped<IFinancialsService, FinancialsService>();
+            // ✅ AutoMapper - حدد الـ assemblies بشكل صريح
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            // Services
+            //builder.Services.AddScoped<ICaseService, CaseService>();
+            //builder.Services.AddScoped<ILookupService, LookupService>();
+            //builder.Services.AddScoped<IClientService, ClientService>();
+            //builder.Services.AddScoped<IFinancialsService, FinancialsService>();
             builder.Services.AddScoped<IHearingService, HearingService>();
-            builder.Services.AddScoped<IHearingRepository, HearingRepository>();
-
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
-            builder.Logging.AddDebug();
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug(); // ← واحدة بس كفاية
 #endif
-
             return builder.Build();
         }
     }

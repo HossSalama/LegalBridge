@@ -1,10 +1,7 @@
-<<<<<<< HEAD
 ﻿
 using smartLaywer.DTO.Hearing;
 using smartLaywer.Helper;
-=======
 using smartLaywer.Repository.UnitWork;
->>>>>>> e259c2948f6b03c8bb58c86d316812b0abf35c97
 
 namespace smartLaywer.Services.ClassService
 {
@@ -44,31 +41,31 @@ namespace smartLaywer.Services.ClassService
         /// <summary>
         /// الجلسات مقسمة لصفحات مع بحث وفلتر
         /// </summary>
-        public async Task<PaginatedList<HearingListDto>> GetPagedHearingsAsync(
-            string? searchTerm, string? statusFilter, int pageNumber) =>
-            await _unitOfWork.Hearing.GetPagedHearingsAsync(searchTerm, statusFilter, pageNumber, PageSize);
+        //public async Task<PaginatedList<HearingListDto>> GetPagedHearingsAsync(
+        //    string? searchTerm, string? statusFilter, int pageNumber) =>
+        //    await _unitOfWork.Hearing.GetPagedHearingsAsync(searchTerm, statusFilter, pageNumber, PageSize);
 
-        /// <summary>
-        /// كل القضايا اللي عندها جلسات (للصفحة التفصيلية)
-        /// </summary>
-        public async Task<List<CaseHearingsDto>> GetCasesWithHearingsAsync() =>
-            await _unitOfWork.Hearing.GetCasesWithHearingsAsync();
+        ///// <summary>
+        ///// كل القضايا اللي عندها جلسات (للصفحة التفصيلية)
+        ///// </summary>
+        //public async Task<List<CaseHearingsDto>> GetCasesWithHearingsAsync() =>
+        //    await _unitOfWork.Hearing.GetCasesWithHearingsAsync();
 
-        /// <summary>
-        /// جلسات قضية واحدة مرتبة
-        /// </summary>
-        public async Task<List<HearingListDto>> GetCaseHearingsAsync(int caseId) =>
-            await _unitOfWork.Hearing.GetCaseHearingsAsync(caseId);
+        ///// <summary>
+        ///// جلسات قضية واحدة مرتبة
+        ///// </summary>
+        //public async Task<List<HearingListDto>> GetCaseHearingsAsync(int caseId) =>
+        //    await _unitOfWork.Hearing.GetCaseHearingsAsync(caseId);
 
-        /// <summary>
-        /// إضافة جلسة جديدة
-        /// </summary>
-        public async Task<bool> CreateHearingAsync(HearingCreateDto dto)
-        {
-            var hearing = _mapper.Map<Hearing>(dto);
-            hearing.CreatedAt = DateTime.Now;
-            await _unitOfWork.Hearing.AddAsync(hearing);
-            return await _unitOfWork.CompleteAsync() > 0;
-        }
+        ///// <summary>
+        ///// إضافة جلسة جديدة
+        ///// </summary>
+        //public async Task<bool> CreateHearingAsync(HearingCreateDto dto)
+        //{
+        //    var hearing = _mapper.Map<Hearing>(dto);
+        //    hearing.CreatedAt = DateTime.Now;
+        //    await _unitOfWork.Hearing.AddAsync(hearing);
+        //    return await _unitOfWork.CompleteAsync() > 0;
+        //}
     }
 }

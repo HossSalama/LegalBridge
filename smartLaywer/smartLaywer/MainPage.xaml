@@ -4,11 +4,9 @@
              xmlns:local="clr-namespace:smartLaywer"
              xmlns:components="clr-namespace:smartLaywer.Components"
              x:Class="smartLaywer.MainPage">
-
     <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
         <BlazorWebView.RootComponents>
             <RootComponent Selector="#app" ComponentType="{x:Type components:Routes}" />
         </BlazorWebView.RootComponents>
     </BlazorWebView>
-
 </ContentPage>
