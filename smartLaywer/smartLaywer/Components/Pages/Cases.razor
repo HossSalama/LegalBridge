@@ -1,5 +1,12 @@
 ﻿@page "/cases"
 @namespace smartLaywer.Components.Pages
+@using smartLaywer.DTO.Case
+@using smartLaywer.Services.ClassService
+@using smartLaywer.Models
+@using smartLaywer.Enum
+@inject ICaseService CaseService
+@inject IClientService ClientService
+@inject ILookupService LookupService
 
 <PageTitle>إدارة القضايا</PageTitle>
 
@@ -11,7 +18,7 @@
             <h1 class="page-title">إدارة القضايا</h1>
             <p class="page-sub">عرض وإدارة جميع القضايا</p>
         </div>
-        <button class="btn-primary" @onclick="() => showModal = true">
+        <button class="btn-primary" @onclick="OpenAddModal">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                  fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -27,7 +34,7 @@
             <div class="stat-body">
                 <div>
                     <p class="stat-label">إجمالي القضايا</p>
-                    <h3 class="stat-value">4</h3>
+                    <h3 class="stat-value">@(stats?.Total ?? 0)</h3>
                 </div>
                 <div class="stat-icon bg-blue">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
@@ -42,7 +49,7 @@
             <div class="stat-body">
                 <div>
                     <p class="stat-label">قضايا جارية</p>
-                    <h3 class="stat-value blue">2</h3>
+                    <h3 class="stat-value blue">@(stats?.Active ?? 0)</h3>
                 </div>
                 <div class="stat-icon bg-blue">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
@@ -57,7 +64,7 @@
             <div class="stat-body">
                 <div>
                     <p class="stat-label">قضايا معلقة</p>
-                    <h3 class="stat-value amber">1</h3>
+                    <h3 class="stat-value amber">@(stats?.Pending ?? 0)</h3>
                 </div>
                 <div class="stat-icon bg-amber">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
@@ -72,7 +79,7 @@
             <div class="stat-body">
                 <div>
                     <p class="stat-label">قضايا مغلقة</p>
-                    <h3 class="stat-value green">1</h3>
+                    <h3 class="stat-value green">@(stats?.Closed ?? 0)</h3>
                 </div>
                 <div class="stat-icon bg-green">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
@@ -93,194 +100,485 @@
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <input type="text" placeholder="ابحث برقم القضية أو العنوان أو اسم العميل" class="search-input" />
+            <input type="text" placeholder="ابحث برقم القضية أو العنوان أو اسم العميل"
+                   class="search-input"
+                   value="@searchTerm"
+                   @oninput="OnSearchChanged" />
         </div>
-        <select class="filter-select">
-            <option value="all">جميع الحالات</option>
-            <option value="open">جارية</option>
-            <option value="pending">معلقة</option>
-            <option value="closed">مغلقة</option>
+        <select class="filter-select" @bind="statusFilter" @bind:after="ApplyFilters">
+            <option value="">جميع الحالات</option>
+            <option value="جارية">جارية</option>
+            <option value="معلقة">معلقة</option>
+            <option value="مغلقة">مغلقة</option>
+            <option value="خسرت">خسرت</option>
+            <option value="ربحت">ربحت</option>
+            <option value="مؤرشفة">مؤرشفة</option>
         </select>
     </div>
 
-    <!-- Table -->
-    <div class="table-card">
-        <div class="table-header">
-            <h2 class="table-title">قائمة القضايا (4)</h2>
-        </div>
-        <div class="table-wrap">
-            <table class="cases-table">
-                <thead>
-                    <tr>
-                        <th>رقم القضية</th>
-                        <th>العنوان</th>
-                        <th>العميل</th>
-                        <th>النوع</th>
-                        <th>الحالة</th>
-                        <th>تاريخ البدء</th>
-                        <th>الجلسة القادمة</th>
-                        <th>الإجراءات</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="font-med">2024/156</td>
-                        <td>قضية عقارات</td>
-                        <td>
-                            <div class="client-cell">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                    <circle cx="12" cy="7" r="4" />
-                                </svg>
-                                أحمد محمود السيد
-                            </div>
-                        </td>
-                        <td><span class="badge badge-outline">مدني</span></td>
-                        <td><span class="badge badge-open">جارية</span></td>
-                        <td>2024-01-15</td>
-                        <td>
-                            <div class="date-cell">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
-                                2026-04-01
-                            </div>
-                        </td>
-                        <td><div class="action-btns"><button class="icon-btn">👁</button><button class="icon-btn">✏️</button></div></td>
-                    </tr>
-                    <tr>
-                        <td class="font-med">2024/142</td>
-                        <td>قضية أحوال شخصية</td>
-                        <td>
-                            <div class="client-cell">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                    <circle cx="12" cy="7" r="4" />
-                                </svg>
-                                سارة علي حسن
-                            </div>
-                        </td>
-                        <td><span class="badge badge-outline">أسري</span></td>
-                        <td><span class="badge badge-open">جارية</span></td>
-                        <td>2024-02-20</td>
-                        <td>
-                            <div class="date-cell">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
-                                2026-04-02
-                            </div>
-                        </td>
-                        <td><div class="action-btns"><button class="icon-btn">👁</button><button class="icon-btn">✏️</button></div></td>
-                    </tr>
-                    <tr>
-                        <td class="font-med">2024/189</td>
-                        <td>قضية تجارية</td>
-                        <td>
-                            <div class="client-cell">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                    <circle cx="12" cy="7" r="4" />
-                                </svg>
-                                محمد حسن إبراهيم
-                            </div>
-                        </td>
-                        <td><span class="badge badge-outline">تجاري</span></td>
-                        <td><span class="badge badge-pending">معلقة</span></td>
-                        <td>2024-03-10</td>
-                        <td>
-                            <div class="date-cell">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
-                                2026-04-03
-                            </div>
-                        </td>
-                        <td><div class="action-btns"><button class="icon-btn">👁</button><button class="icon-btn">✏️</button></div></td>
-                    </tr>
-                    <tr>
-                        <td class="font-med">2023/289</td>
-                        <td>قضية عمالية</td>
-                        <td>
-                            <div class="client-cell">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                    <circle cx="12" cy="7" r="4" />
-                                </svg>
-                                فاطمة عبد الرحمن
-                            </div>
-                        </td>
-                        <td><span class="badge badge-outline">عمالي</span></td>
-                        <td><span class="badge badge-closed">مغلقة</span></td>
-                        <td>2023-11-05</td>
-                        <td>-</td>
-                        <td><div class="action-btns"><button class="icon-btn">👁</button><button class="icon-btn">✏️</button></div></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <!-- Loading indicator -->
+    @if (isLoading)
+    {
+        <div class="loading-msg">جاري التحميل...</div>
+    }
 
+    <!-- Load error (dismissible) — table still shows below if data was loaded -->
+    @if (!string.IsNullOrEmpty(loadErrorMsg))
+    {
+        <div class="error-msg" style="cursor:pointer" @onclick="() => loadErrorMsg = string.Empty">
+            ⚠️ @loadErrorMsg &nbsp;<small>(اضغط للإغلاق)</small>
+        </div>
+    }
+
+    @if (!isLoading)
+    {
+        <div class="table-card">
+            <div class="table-header">
+                <h2 class="table-title">قائمة القضايا (@filteredCases.Count)</h2>
+            </div>
+            <div class="table-wrap">
+                <table class="cases-table">
+                    <thead>
+                        <tr>
+                            <th>رقم القضية</th>
+                            <th>العنوان</th>
+                            <th>العميل</th>
+                            <th>النوع</th>
+                            <th>الحالة</th>
+                            <th>تاريخ البدء</th>
+                            <th>الجلسة القادمة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (filteredCases.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="8" style="text-align:center;color:#94a3b8;padding:2rem;">
+                                    لا توجد قضايا مطابقة للبحث
+                                </td>
+                            </tr>
+                        }
+                        @foreach (var c in filteredCases)
+                        {
+                            <tr>
+                                <td class="font-med">@c.CaseNumber</td>
+                                <td>@c.Title</td>
+                                <td>
+                                    <div class="client-cell">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                             fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                            <circle cx="12" cy="7" r="4" />
+                                        </svg>
+                                        @c.ClientName
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-outline">@c.CaseType</span></td>
+                                <td><span class="badge @GetStatusBadgeClass(c.Status)">@c.Status</span></td>
+                                <td>@c.OpenDate.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    @if (c.NextHearingDate.HasValue)
+                                    {
+                                        <div class="date-cell">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                                 fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="3" y="4" width="18" height="18" rx="2" />
+                                                <line x1="16" y1="2" x2="16" y2="6" />
+                                                <line x1="8" y1="2" x2="8" y2="6" />
+                                                <line x1="3" y1="10" x2="21" y2="10" />
+                                            </svg>
+                                            @c.NextHearingDate.Value.ToString("yyyy-MM-dd")
+                                        </div>
+                                    }
+                                    else
+                                    {
+
+                                        <span>-</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="action-btns">
+                                        <button class="icon-btn" title="عرض التفاصيل" @onclick="() => OpenDetailsModal(c.Id)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                                 fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                <circle cx="12" cy="12" r="3" />
+                                            </svg>
+                                        </button>
+                                        <button class="icon-btn" title="تعديل" @onclick="() => OpenEditModal(c.Id)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                                 fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
 </div>
 
-<!-- Modal -->
-@if (showModal)
+<!-- ==================== ADD MODAL ==================== -->
+@if (showAddModal)
 {
-    <div class="modal-overlay" @onclick="() => showModal = false">
-        <div class="modal-box" @onclick:stopPropagation="true">
+    <div class="modal-overlay" @onclick="CloseAddModal">
+        <div class="modal-box modal-lg" @onclick:stopPropagation="true">
             <div class="modal-header">
                 <h3 class="modal-title">إضافة قضية جديدة</h3>
-                <button class="modal-close" @onclick="() => showModal = false">✕</button>
+                <button class="modal-close" @onclick="CloseAddModal">✕</button>
             </div>
             <p class="modal-sub">أدخل بيانات القضية الجديدة</p>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>رقم القضية *</label>
-                    <input type="text" placeholder="2024/xxx" class="form-input" dir="ltr" />
+
+                <!-- Client type toggle -->
+                <div class="toggle-group">
+                    <button class="toggle-btn @(isNewClient ? "" : "active")" @onclick="() => isNewClient = false">
+                        عميل موجود
+                    </button>
+                    <button class="toggle-btn @(isNewClient ? "active" : "")" @onclick="() => isNewClient = true">
+                        عميل جديد
+                    </button>
+                </div>
+
+                @if (!isNewClient)
+                {
+                    <div class="form-group">
+                        <label>اختر العميل *</label>
+                        <select class="form-input" @bind="newCase.ClientId">
+                            <option value="0">-- اختر عميلاً --</option>
+                            @foreach (var cl in existingClients)
+                            {
+                                <option value="@cl.Id">@cl.FullName — @cl.Phone</option>
+                            }
+                        </select>
+                    </div>
+                }
+                else
+                {
+                    <div class="section-divider">بيانات العميل الجديد</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>الاسم الكامل *</label>
+                            <input type="text" class="form-input" placeholder="أدخل الاسم" @bind="newClient.FullName" />
+                        </div>
+                        <div class="form-group">
+                            <label>نوع العميل *</label>
+                            <select class="form-input" @bind="newClient.ClientType">
+                                <option value="@ClientTypeEnum.Individual">فرد</option>
+                                <option value="@ClientTypeEnum.Company">شركة</option>
+                                <option value="@ClientTypeEnum.Government">جهة حكومية</option>
+                                <option value="@ClientTypeEnum.Other">أخرى</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>رقم الهاتف *</label>
+                            <input type="text" class="form-input" placeholder="01xxxxxxxxx" @bind="newClient.Phone" dir="ltr" />
+                        </div>
+                        <div class="form-group">
+                            <label>رقم هاتف ثانوي</label>
+                            <input type="text" class="form-input" placeholder="اختياري" @bind="newClient.SecondaryPhone" dir="ltr" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>الرقم القومي / رقم التسجيل</label>
+                            <input type="text" class="form-input" @bind="newClient.NationalId" dir="ltr" />
+                        </div>
+                        <div class="form-group">
+                            <label>البريد الإلكتروني</label>
+                            <input type="email" class="form-input" @bind="newClient.Email" dir="ltr" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>العنوان *</label>
+                        <input type="text" class="form-input" placeholder="أدخل العنوان" @bind="newClient.Address" />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>المسمى الوظيفي</label>
+                            <input type="text" class="form-input" @bind="newClient.JobTitle" />
+                        </div>
+                        <div class="form-group">
+                            <label>الجنس</label>
+                            <select class="form-input" @bind="newClient.Gender">
+                                <option value="">-- اختر --</option>
+                                <option value="ذكر">ذكر</option>
+                                <option value="أنثى">أنثى</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="section-divider">بيانات القضية</div>
+                }
+
+                <!-- Case fields always shown -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>رقم القضية *</label>
+                        <input type="text" class="form-input" placeholder="2024/xxx" @bind="newCase.CaseNumber" dir="ltr" />
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ البدء *</label>
+                        <input type="date" class="form-input" @bind="newCase.OpenDate" />
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>عنوان القضية *</label>
-                    <input type="text" placeholder="أدخل عنوان القضية" class="form-input" />
+                    <input type="text" class="form-input" placeholder="أدخل عنوان القضية" @bind="newCase.Title" />
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>نوع القضية *</label>
+                        <select class="form-input" @bind="newCase.CaseTypeId">
+                            <option value="0">-- اختر النوع --</option>
+                            @foreach (var ct in caseTypes)
+                            {
+                                <option value="@ct.Id">@ct.TypeName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الحالة *</label>
+                        <select class="form-input" @bind="newCase.StatusId">
+                            <option value="0">-- اختر الحالة --</option>
+                            @foreach (var st in caseStatuses)
+                            {
+                                <option value="@st.Id">@st.StatusName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>المحكمة *</label>
+                        <select class="form-input" @bind="newCase.CourtId">
+                            <option value="0">-- اختر المحكمة --</option>
+                            @foreach (var court in courts)
+                            {
+                                <option value="@court.Id">@court.CourtName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المحامي المسؤول *</label>
+                        <select class="form-input" @bind="newCase.AssignedLawyerId">
+                            <option value="0">-- اختر المحامي --</option>
+                            @foreach (var lawyer in lawyers)
+                            {
+                                <option value="@lawyer.Id">@lawyer.FullName</option>
+                            }
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label>اسم العميل *</label>
-                    <input type="text" placeholder="أدخل اسم العميل" class="form-input" />
+                    <label>مرحلة القضية</label>
+                    <input type="text" class="form-input" placeholder="مثال: ابتدائي، استئناف..." @bind="newCase.Stage" />
                 </div>
-                <div class="form-group">
-                    <label>نوع القضية</label>
-                    <select class="form-input">
-                        <option value="">اختر نوع القضية</option>
-                        <option>مدني</option>
-                        <option>جنائي</option>
-                        <option>تجاري</option>
-                        <option>أسري</option>
-                        <option>عمالي</option>
-                        <option>إداري</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>تاريخ البدء</label>
-                    <input type="date" class="form-input" />
-                </div>
+
+                @if (!string.IsNullOrEmpty(addErrorMsg))
+                {
+                    <div class="error-msg">@addErrorMsg</div>
+                }
+
                 <div class="modal-actions">
-                    <button class="btn-primary" style="flex:1">حفظ</button>
-                    <button class="btn-outline" style="flex:1" @onclick="() => showModal = false">إلغاء</button>
+                    <button class="btn-primary" style="flex:1" @onclick="SaveNewCase" disabled="@isSaving">
+                        @(isSaving ? "جاري الحفظ..." : "حفظ القضية")
+                    </button>
+                    <button class="btn-outline" style="flex:1" @onclick="CloseAddModal">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- ==================== DETAILS MODAL ==================== -->
+@if (showDetailsModal)
+{
+    <div class="modal-overlay" @onclick="() => showDetailsModal = false">
+        <div class="modal-box modal-lg" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    تفاصيل القضية @(selectedCase != null ? $"— {selectedCase.CaseNumber}" : "")
+                </h3>
+                <button class="modal-close" @onclick="() => showDetailsModal = false">✕</button>
+            </div>
+            <div class="modal-body">
+                @if (selectedCase == null)
+                {
+                    <div class="loading-msg">جاري تحميل التفاصيل...</div>
+                }
+                else
+                {
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">رقم القضية</span>
+                            <span class="detail-value">@selectedCase.CaseNumber</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">العنوان</span>
+                            <span class="detail-value">@selectedCase.Title</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">العميل</span>
+                            <span class="detail-value">@selectedCase.Client?.FullName</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">نوع القضية</span>
+                            <span class="detail-value">@selectedCase.CaseType?.TypeName</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">الحالة</span>
+                            <span class="detail-value">@selectedCase.Status?.StatusName</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">المحكمة</span>
+                            <span class="detail-value">@selectedCase.Court?.CourtName</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">المحامي المسؤول</span>
+                            <span class="detail-value">@selectedCase.AssignedLawyer?.FullName</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">مرحلة القضية</span>
+                            <span class="detail-value">@(selectedCase.Stage ?? "—")</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">تاريخ الفتح</span>
+                            <span class="detail-value">@selectedCase.OpenDate.ToString("yyyy-MM-dd")</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">تاريخ الإغلاق</span>
+                            <span class="detail-value">@(selectedCase.CloseDate?.ToString("yyyy-MM-dd") ?? "—")</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">مؤرشفة</span>
+                            <span class="detail-value">@(selectedCase.IsArchived ? "نعم" : "لا")</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(selectedCase.ArchiveNote))
+                        {
+                            <div class="detail-item" style="grid-column:span 2">
+                                <span class="detail-label">ملاحظة الأرشفة</span>
+                                <span class="detail-value">@selectedCase.ArchiveNote</span>
+                            </div>
+                        }
+                    </div>
+
+                    @if (selectedCase.Hearings?.Any() == true)
+                    {
+                        <div class="section-divider">الجلسات (@selectedCase.Hearings.Count)</div>
+                        <div class="mini-table-wrap">
+                            <table class="cases-table">
+                                <thead>
+                                    <tr>
+                                        <th>التاريخ</th>
+                                        <th>النوع</th>
+                                        <th>النتيجة</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var h in selectedCase.Hearings.OrderByDescending(x => x.HearingDateTime))
+                                    {
+                                        <tr>
+                                            <td>@h.HearingDateTime.ToString("yyyy-MM-dd")</td>
+                                            <td>@h.HearingType</td>
+                                            <td>@(string.IsNullOrEmpty(h.Result) ? "—" : h.Result)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                    <div class="modal-actions">
+                        <button class="btn-outline" style="flex:1" @onclick="() => showDetailsModal = false">إغلاق</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<!-- ==================== EDIT MODAL ==================== -->
+@if (showEditModal && editDto != null)
+{
+    <div class="modal-overlay" @onclick="CloseEditModal">
+        <div class="modal-box modal-lg" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h3 class="modal-title">تعديل القضية</h3>
+                <button class="modal-close" @onclick="CloseEditModal">✕</button>
+            </div>
+            <p class="modal-sub">يمكنك تعديل الحقول المسموح بتغييرها فقط</p>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>عنوان القضية *</label>
+                    <input type="text" class="form-input" @bind="editDto.Title" />
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>الحالة *</label>
+                        <select class="form-input" @bind="editDto.StatusId">
+                            <option value="0">-- اختر الحالة --</option>
+                            @foreach (var st in caseStatuses)
+                            {
+                                <option value="@st.Id">@st.StatusName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المحكمة *</label>
+                        <select class="form-input" @bind="editDto.CourtId">
+                            <option value="0">-- اختر المحكمة --</option>
+                            @foreach (var court in courts)
+                            {
+                                <option value="@court.Id">@court.CourtName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>المحامي المسؤول *</label>
+                        <select class="form-input" @bind="editDto.AssignedLawyerId">
+                            <option value="0">-- اختر المحامي --</option>
+                            @foreach (var lawyer in lawyers)
+                            {
+                                <option value="@lawyer.Id">@lawyer.FullName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>مرحلة القضية</label>
+                        <input type="text" class="form-input" @bind="editDto.Stage" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>تاريخ الإغلاق</label>
+                        <input type="date" class="form-input" @bind="editDto.CloseDate" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>ملاحظة الأرشفة</label>
+                    <textarea class="form-input" rows="3" @bind="editDto.ArchiveNote"></textarea>
+                </div>
+
+                @if (!string.IsNullOrEmpty(editErrorMsg))
+                {
+                    <div class="error-msg">@editErrorMsg</div>
+                }
+
+                <div class="modal-actions">
+                    <button class="btn-primary" style="flex:1" @onclick="SaveEditCase" disabled="@isSaving">
+                        @(isSaving ? "جاري الحفظ..." : "حفظ التعديلات")
+                    </button>
+                    <button class="btn-outline" style="flex:1" @onclick="CloseEditModal">إلغاء</button>
                 </div>
             </div>
         </div>
@@ -405,6 +703,7 @@
         top: 50%;
         transform: translateY(-50%);
         color: #94a3b8;
+        pointer-events: none;
     }
 
     .search-input {
@@ -415,6 +714,7 @@
         font-family: inherit;
         font-size: .9rem;
         outline: none;
+        box-sizing: border-box;
     }
 
         .search-input:focus {
@@ -436,6 +736,21 @@
         .filter-select:focus {
             border-color: #d97706;
         }
+
+    .loading-msg {
+        padding: 2rem;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .error-msg {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        border-radius: 8px;
+        padding: .75rem 1rem;
+        font-size: .875rem;
+    }
 
     .table-card {
         background: #fff;
@@ -521,12 +836,15 @@
         cursor: pointer;
         padding: .3rem .4rem;
         border-radius: 6px;
-        font-size: .9rem;
         transition: background .15s;
+        display: flex;
+        align-items: center;
+        color: #475569;
     }
 
         .icon-btn:hover {
             background: #f1f5f9;
+            color: #d97706;
         }
 
     .badge {
@@ -558,6 +876,21 @@
         color: #16a34a;
     }
 
+    .badge-lost {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .badge-won {
+        background: #d1fae5;
+        color: #059669;
+    }
+
+    .badge-archived {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
     .btn-primary {
         display: inline-flex;
         align-items: center;
@@ -576,6 +909,11 @@
 
         .btn-primary:hover {
             background: #b45309;
+        }
+
+        .btn-primary:disabled {
+            opacity: .6;
+            cursor: not-allowed;
         }
 
     .btn-outline {
@@ -618,6 +956,12 @@
         max-width: 460px;
         box-shadow: 0 20px 60px rgba(0,0,0,.2);
         animation: modalIn .2s ease;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-lg {
+        max-width: 680px;
     }
 
     @@keyframes modalIn {
@@ -636,7 +980,12 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 1.25rem 1.5rem .25rem;
+        padding: 1.25rem 1.5rem .75rem;
+        position: sticky;
+        top: 0;
+        background: #fff;
+        z-index: 1;
+        border-bottom: 1px solid #f1f5f9;
     }
 
     .modal-title {
@@ -662,22 +1011,59 @@
         }
 
     .modal-sub {
-        padding: 0 1.5rem .75rem;
+        padding: .5rem 1.5rem .25rem;
         font-size: .85rem;
         color: #64748b;
     }
 
     .modal-body {
-        padding: 0 1.5rem 1.5rem;
+        padding: 1rem 1.5rem 1.5rem;
         display: flex;
         flex-direction: column;
         gap: 1rem;
     }
 
+    /* Toggle */
+    .toggle-group {
+        display: flex;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .toggle-btn {
+        flex: 1;
+        padding: .55rem 1rem;
+        background: transparent;
+        border: none;
+        font-family: inherit;
+        font-size: .875rem;
+        color: #64748b;
+        cursor: pointer;
+        transition: all .15s;
+    }
+
+        .toggle-btn.active {
+            background: #d97706;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .toggle-btn:not(.active):hover {
+            background: #f8fafc;
+        }
+
+    /* Form */
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .75rem;
+    }
+
     .form-group {
         display: flex;
         flex-direction: column;
-        gap: .4rem;
+        gap: .35rem;
     }
 
         .form-group label {
@@ -694,6 +1080,7 @@
         font-size: .9rem;
         outline: none;
         width: 100%;
+        box-sizing: border-box;
     }
 
         .form-input:focus {
@@ -704,10 +1091,320 @@
     .modal-actions {
         display: flex;
         gap: .75rem;
-        margin-top: .5rem;
+        margin-top: .25rem;
+    }
+
+    .section-divider {
+        font-size: .8rem;
+        font-weight: 700;
+        color: #d97706;
+        border-bottom: 1px solid #fde68a;
+        padding-bottom: .4rem;
+        margin-top: .25rem;
+    }
+
+    /* Details */
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .75rem;
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: .2rem;
+        padding: .6rem .75rem;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+
+    .detail-label {
+        font-size: .75rem;
+        font-weight: 700;
+        color: #64748b;
+    }
+
+    .detail-value {
+        font-size: .9rem;
+        color: #1e293b;
+    }
+
+    .mini-table-wrap {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    @@media (max-width: 500px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
 @code {
-    private bool showModal = false;
+    // ── Data
+    private List<CaseSummaryDto> allCases = new();
+    private List<CaseSummaryDto> filteredCases = new();
+    private CaseStatsDto? stats;
+
+    // Lookups
+    private List<Client> existingClients = new();
+    private List<CaseType> caseTypes = new();
+    private List<CaseStatus> caseStatuses = new();
+    private List<Court> courts = new();
+    private List<User> lawyers = new();
+
+    // ── UI State 
+    private bool isLoading = true;
+    private bool isSaving = false;
+
+    // Separate error states 
+    private string loadErrorMsg = string.Empty;  
+    private string addErrorMsg = string.Empty;  
+    private string editErrorMsg = string.Empty;  
+    private string modalErrorMsg = string.Empty;  
+
+    // Filter
+    private string searchTerm = string.Empty;
+    private string statusFilter = string.Empty;
+
+    // Add modal
+    private bool showAddModal = false;
+    private bool isNewClient = false;
+    private Case newCase = new();
+    private Client newClient = new();
+
+    // Details modal
+    private bool showDetailsModal = false;
+    private Case? selectedCase;
+
+    // Edit modal
+    private bool showEditModal = false;
+    private CaseEditDto? editDto;
+
+    // ── Lifecycle 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    // ── Data Loading 
+    private async Task LoadDataAsync()
+    {
+        isLoading = true;
+        loadErrorMsg = string.Empty;
+        StateHasChanged();
+        try
+        {
+            // Lookups first so dropdowns are ready
+            await LoadLookupsAsync();
+
+            // Then cases & stats (sequential — same DbContext)
+            allCases = await CaseService.GetAllCasesAsync();
+            stats = await CaseService.GetCaseStatsAsync();
+            ApplyFilters();
+        }
+        catch (Exception ex)
+        {
+            loadErrorMsg = $"حدث خطأ أثناء تحميل البيانات: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadLookupsAsync()
+    {
+        // Sequential — EF Core DbContext is NOT thread-safe.
+        // Task.WhenAll on the same scoped context causes:
+        // "A second operation was started on this context before a previous operation completed."
+        existingClients = await LookupService.GetActiveClientsAsync();
+        caseTypes = await LookupService.GetCaseTypesAsync();
+        caseStatuses = await LookupService.GetCaseStatusesAsync();
+        courts = await LookupService.GetCourtsAsync();
+        lawyers = await LookupService.GetActiveLawyersAsync();
+    }
+
+    // ── Filter / Search 
+    private void OnSearchChanged(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? string.Empty;
+        ApplyFilters();
+    }
+
+    private void ApplyFilters()
+    {
+        filteredCases = allCases.Where(c =>
+        {
+            bool matchSearch = string.IsNullOrWhiteSpace(searchTerm) ||
+                (c.CaseNumber?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (c.Title?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (c.ClientName?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false);
+
+            bool matchStatus = string.IsNullOrEmpty(statusFilter) ||
+                (c.Status?.Equals(statusFilter, StringComparison.OrdinalIgnoreCase) ?? false);
+
+            return matchSearch && matchStatus;
+        }).ToList();
+    }
+
+    // ── Add Modal
+    private void OpenAddModal()
+    {
+        newCase = new Case { OpenDate = DateTime.Today };
+        newClient = new Client { ClientType = ClientTypeEnum.Individual };
+        isNewClient = false;
+        addErrorMsg = string.Empty;
+        showAddModal = true;
+    }
+
+    private void CloseAddModal()
+    {
+        showAddModal = false;
+        addErrorMsg = string.Empty;
+    }
+
+    private async Task SaveNewCase()
+    {
+        addErrorMsg = string.Empty;
+
+        // Validate case
+        if (string.IsNullOrWhiteSpace(newCase.CaseNumber)) { addErrorMsg = "رقم القضية مطلوب."; return; }
+        if (string.IsNullOrWhiteSpace(newCase.Title)) { addErrorMsg = "عنوان القضية مطلوب."; return; }
+        if (newCase.CaseTypeId == 0) { addErrorMsg = "نوع القضية مطلوب."; return; }
+        if (newCase.StatusId == 0) { addErrorMsg = "حالة القضية مطلوبة."; return; }
+        if (newCase.CourtId == 0) { addErrorMsg = "المحكمة مطلوبة."; return; }
+        if (newCase.AssignedLawyerId == 0) { addErrorMsg = "المحامي المسؤول مطلوب."; return; }
+
+        isSaving = true;
+        try
+        {
+            if (isNewClient)
+            {
+                if (string.IsNullOrWhiteSpace(newClient.FullName)) { addErrorMsg = "اسم العميل مطلوب."; isSaving = false; return; }
+                if (string.IsNullOrWhiteSpace(newClient.Phone)) { addErrorMsg = "رقم الهاتف مطلوب."; isSaving = false; return; }
+                if (string.IsNullOrWhiteSpace(newClient.Address)) { addErrorMsg = "العنوان مطلوب."; isSaving = false; return; }
+
+                // AddClientAsync must return the saved Client with DB-generated Id
+                var saved = await ClientService.AddClientAsync(newClient);
+                newCase.ClientId = saved.Id;
+            }
+            else
+            {
+                if (newCase.ClientId == 0) { addErrorMsg = "يجب اختيار عميل."; isSaving = false; return; }
+            }
+
+            await CaseService.AddCaseAsync(newCase);
+            CloseAddModal();
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            addErrorMsg = $"فشل الحفظ: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    // ── Details Modal
+    private async Task OpenDetailsModal(int caseId)
+    {
+        selectedCase = null;
+        showDetailsModal = true;
+        StateHasChanged();  
+        try
+        {
+            selectedCase = await CaseService.GetCaseWithDetailsAsync(caseId);
+        }
+        catch (Exception ex)
+        {
+            modalErrorMsg = $"فشل تحميل التفاصيل: {ex.Message}";
+            showDetailsModal = false;
+        }
+    }
+
+    // ── Edit Modal 
+    private async Task OpenEditModal(int caseId)
+    {
+        editErrorMsg = string.Empty;
+        try
+        {
+            var c = await CaseService.GetCaseWithDetailsAsync(caseId);
+            if (c == null) return;
+
+            editDto = new CaseEditDto
+            {
+                Id = c.Id,
+                Title = c.Title,
+                StatusId = c.StatusId,
+                CourtId = c.CourtId,
+                DeptId = c.DeptId,
+                AssignedLawyerId = c.AssignedLawyerId,
+                Stage = c.Stage,
+                CloseDate = c.CloseDate,
+                ArchiveNote = c.ArchiveNote
+            };
+            showEditModal = true;
+        }
+        catch (Exception ex)
+        {
+            modalErrorMsg = $"فشل تحميل بيانات التعديل: {ex.Message}";
+        }
+    }
+
+    private void CloseEditModal()
+    {
+        showEditModal = false;
+        editDto = null;
+        editErrorMsg = string.Empty;
+    }
+
+    private async Task SaveEditCase()
+    {
+        if (editDto == null) return;
+        editErrorMsg = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(editDto.Title)) { editErrorMsg = "عنوان القضية مطلوب."; return; }
+        if (editDto.StatusId == 0) { editErrorMsg = "الحالة مطلوبة."; return; }
+        if (editDto.CourtId == 0) { editErrorMsg = "المحكمة مطلوبة."; return; }
+        if (editDto.AssignedLawyerId == 0) { editErrorMsg = "المحامي مطلوب."; return; }
+
+        isSaving = true;
+        try
+        {
+            await CaseService.UpdateCaseAsync(editDto);
+            CloseEditModal();
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            editErrorMsg = $"فشل الحفظ: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────
+    private static string GetStatusBadgeClass(string? status) => status switch
+    {
+        "جارية" => "badge-open",
+        "معلقة" => "badge-pending",
+        "مغلقة" => "badge-closed",
+        "خاسرة" => "badge-lost",
+        "رابحة" => "badge-won",
+        "مؤرشفة" => "badge-archived",
+        _ => "badge-outline"
+    };
 }

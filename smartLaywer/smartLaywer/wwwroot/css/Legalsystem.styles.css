@@ -174,7 +174,7 @@
     border: 1px solid rgba(255,255,255,.12);
     border-radius: var(--radius);
     padding: .75rem 2.75rem .75rem .75rem;
-    color: var(--white);
+    color: #333;
     font-family: inherit;
     font-size: .9375rem;
     outline: none;

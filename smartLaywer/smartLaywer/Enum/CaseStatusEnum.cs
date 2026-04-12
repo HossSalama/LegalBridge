@@ -2,7 +2,7 @@ namespace smartLaywer.Enum
 {
     public enum CaseStatusEnum
     {
-        [Display(Name = "„› ÊÕ…")]
+        [Display(Name = "Ã«—Ì…")]
         Open = 1,
 
         [Display(Name = "„⁄·ﬁ…")]
@@ -11,10 +11,10 @@ namespace smartLaywer.Enum
         [Display(Name = "„€·ﬁ…")]
         Closed = 3,
 
-        [Display(Name = "«·Œ«”—…")]
+        [Display(Name = "Œ«”—…")]
         Lost = 4,
 
-        [Display(Name = "«·—«»Õ…")]
+        [Display(Name = "—«»Õ…")]
         Won = 5,
 
         [Display(Name = "„ƒ—‘›…")]
