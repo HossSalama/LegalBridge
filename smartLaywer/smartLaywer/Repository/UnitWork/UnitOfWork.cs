@@ -1,6 +1,6 @@
 using smartLaywer.Repository.UnitWork;
 
-namespace ExaminationSystem_API.Repository.UnitWork
+namespace smartLaywer.Repository.UnitWork
 {
     public class UnitOfWork : IUnitOfWork
     {
