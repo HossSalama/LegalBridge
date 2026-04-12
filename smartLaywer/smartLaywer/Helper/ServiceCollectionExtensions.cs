@@ -1,5 +1,7 @@
 
+using smartLaywer.Mapping.FinancialMapping;
 using smartLaywer.Repository.UnitWork;
+using smartLaywer.Services.ClassService;
 
 namespace smartLaywer.Helper
 {
@@ -11,20 +13,26 @@ namespace smartLaywer.Helper
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IFinancialRepository, FinancialRepository>();
+            services.AddScoped<ICaseRepository, CaseRepository>();
+            services.AddScoped<IClientRepository, ClientRepository>();
+            services.AddScoped<IHearingRepository, HearingRepository>();
             
-
-
             return services;
         }
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<IFinancialsService, FinancialsService>();
+            services.AddScoped<ICaseService, CaseService>();
+            services.AddScoped<ILookupService, LookupService>();
+            services.AddScoped<IClientService, ClientService>();
+            services.AddScoped<IFinancialsService, FinancialsService>();
+            services.AddScoped<IHearingService, HearingService>();
 
             return services;
         }
         public static IServiceCollection AddMapping(this IServiceCollection services)
         {
-            services.AddAutoMapper(typeof(ServiceCollectionExtensions).Assembly);
+            services.AddAutoMapper(typeof(FinancialProfile).Assembly);
             return services;
         }
 
