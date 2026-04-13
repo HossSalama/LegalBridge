@@ -1,5 +1,7 @@
 ﻿@page "/hearings"
 @namespace smartLaywer.Components.Pages
+@using smartLaywer.DTO.Court
+@using smartLaywer.DTO.Department
 
 <PageTitle>إدارة الجلسات</PageTitle>
 
@@ -27,7 +29,7 @@
             <div class="stat-body">
                 <div>
                     <p class="stat-label">جلسات قادمة</p>
-                    <h3 class="stat-value blue">3</h3>
+                    <h3 class="stat-value blue">@summary.UpcomingHearingsCount</h3>
                 </div>
                 <div class="stat-icon bg-blue">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
@@ -44,7 +46,7 @@
             <div class="stat-body">
                 <div>
                     <p class="stat-label">جلسات اليوم</p>
-                    <h3 class="stat-value amber">0</h3>
+                    <h3 class="stat-value amber">@summary.TodayHearingsCount</h3>
                 </div>
                 <div class="stat-icon bg-amber">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
@@ -59,7 +61,7 @@
             <div class="stat-body">
                 <div>
                     <p class="stat-label">جلسات مكتملة</p>
-                    <h3 class="stat-value green">1</h3>
+                    <h3 class="stat-value green">@summary.CompletedHearingsCount</h3>
                 </div>
                 <div class="stat-icon bg-green">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
@@ -71,22 +73,26 @@
             </div>
         </div>
     </div>
-
-    <!-- Filter -->
     <div class="filter-bar">
-        <label class="filter-label">تصفية حسب الحالة:</label>
-        <select class="filter-select">
-            <option value="all">جميع الجلسات</option>
-            <option value="upcoming">قادمة</option>
-            <option value="completed">مكتملة</option>
-            <option value="cancelled">ملغية</option>
-        </select>
+        <div style="display:flex; gap:1rem; align-items:center; width:100%;">
+            <label class="filter-label">تصفية حسب الحالة:</label>
+            <select class="filter-select" @onchange="OnStatusChanged">
+                <option value="الكل">جميع الجلسات</option>
+                <option value="قادم">قادمة</option>
+                <option value="مكتمله">مكتملة</option>
+                <option value="غائب">غائب</option>
+            </select>
+
+            @* إضافة حقل بحث *@
+            <input type="text" placeholder="ابحث برقم القضية أو اسم العميل..."
+                   class="filter-select" style="margin-right:auto; width:300px;"
+                   @oninput="OnSearchChanged" />
+        </div>
     </div>
 
-    <!-- Table -->
     <div class="table-card">
         <div class="table-header">
-            <h2 class="table-title">قائمة الجلسات (4)</h2>
+            <h2 class="table-title">قائمة الجلسات (@(pagedHearings?.TotalCount ?? 0))</h2>
         </div>
         <div class="table-wrap">
             <table class="hearings-table">
@@ -96,188 +102,138 @@
                         <th>عنوان القضية</th>
                         <th>العميل</th>
                         <th>التاريخ والوقت</th>
-                        <th>المحكمة</th>
+                        <th>المحكمة / الدائرة</th>
                         <th>الحالة</th>
                         <th>النتيجة</th>
                         <th>الملاحظات</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Row 1: upcoming -->
-                    <tr>
-                        <td class="font-med">2024/156</td>
-                        <td>قضية عقارات</td>
-                        <td>أحمد محمود السيد</td>
-                        <td>
-                            <div class="datetime-cell">
-                                <span class="dt-date">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" />
-                                        <line x1="16" y1="2" x2="16" y2="6" />
-                                        <line x1="8" y1="2" x2="8" y2="6" />
-                                        <line x1="3" y1="10" x2="21" y2="10" />
-                                    </svg>
-                                    2026-04-01
-                                </span>
-                                <span class="dt-time">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10" />
-                                        <polyline points="12 6 12 12 16 14" />
-                                    </svg>
-                                    10:00
-                                </span>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="court-cell">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                                    <circle cx="12" cy="10" r="3" />
-                                </svg>
-                                محكمة القاهرة الابتدائية
-                            </span>
-                        </td>
-                        <td><span class="badge badge-upcoming">قادمة</span></td>
-                        <td><span class="muted">-</span></td>
-                        <td><span class="note-text">جلسة مهمة - إحضار المستندات</span></td>
-                    </tr>
-
-                    <!-- Row 2: upcoming -->
-                    <tr>
-                        <td class="font-med">2024/142</td>
-                        <td>قضية أحوال شخصية</td>
-                        <td>سارة علي حسن</td>
-                        <td>
-                            <div class="datetime-cell">
-                                <span class="dt-date">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" />
-                                        <line x1="16" y1="2" x2="16" y2="6" />
-                                        <line x1="8" y1="2" x2="8" y2="6" />
-                                        <line x1="3" y1="10" x2="21" y2="10" />
-                                    </svg>
-                                    2026-04-02
-                                </span>
-                                <span class="dt-time">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10" />
-                                        <polyline points="12 6 12 12 16 14" />
-                                    </svg>
-                                    11:30
-                                </span>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="court-cell">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                                    <circle cx="12" cy="10" r="3" />
-                                </svg>
-                                محكمة الجيزة الابتدائية
-                            </span>
-                        </td>
-                        <td><span class="badge badge-upcoming">قادمة</span></td>
-                        <td><span class="muted">-</span></td>
-                        <td><span class="muted">-</span></td>
-                    </tr>
-
-                    <!-- Row 3: upcoming urgent -->
-                    <tr>
-                        <td class="font-med">2024/189</td>
-                        <td>قضية تجارية</td>
-                        <td>محمد حسن إبراهيم</td>
-                        <td>
-                            <div class="datetime-cell">
-                                <span class="dt-date">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" />
-                                        <line x1="16" y1="2" x2="16" y2="6" />
-                                        <line x1="8" y1="2" x2="8" y2="6" />
-                                        <line x1="3" y1="10" x2="21" y2="10" />
-                                    </svg>
-                                    2026-04-03
-                                </span>
-                                <span class="dt-time">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10" />
-                                        <polyline points="12 6 12 12 16 14" />
-                                    </svg>
-                                    09:00
-                                </span>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="court-cell">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                                    <circle cx="12" cy="10" r="3" />
-                                </svg>
-                                محكمة الاستئناف
-                            </span>
-                        </td>
-                        <td><span class="badge badge-upcoming">قادمة</span></td>
-                        <td><span class="muted">-</span></td>
-                        <td><span class="note-text urgent-note">جلسة عاجلة</span></td>
-                    </tr>
-
-                    <!-- Row 4: completed -->
-                    <tr>
-                        <td class="font-med">2024/142</td>
-                        <td>قضية أحوال شخصية</td>
-                        <td>سارة علي حسن</td>
-                        <td>
-                            <div class="datetime-cell">
-                                <span class="dt-date">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" />
-                                        <line x1="16" y1="2" x2="16" y2="6" />
-                                        <line x1="8" y1="2" x2="8" y2="6" />
-                                        <line x1="3" y1="10" x2="21" y2="10" />
-                                    </svg>
-                                    2026-03-25
-                                </span>
-                                <span class="dt-time">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                         fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10" />
-                                        <polyline points="12 6 12 12 16 14" />
-                                    </svg>
-                                    10:00
-                                </span>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="court-cell">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                     fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                                    <circle cx="12" cy="10" r="3" />
-                                </svg>
-                                محكمة الجيزة الابتدائية
-                            </span>
-                        </td>
-                        <td><span class="badge badge-completed">مكتملة</span></td>
-                        <td><span class="result-text">تأجيل للجلسة القادمة</span></td>
-                        <td><span class="note-text">تم التأجيل بسبب غياب الطرف الآخر</span></td>
-                    </tr>
+                    @if (pagedHearings?.Items != null)
+                    {
+                        @foreach (var hearing in pagedHearings.Items)
+                        {
+                            <tr>
+                                <td class="font-med">@hearing.CaseNumber</td>
+                                <td>@hearing.CaseTitle</td>
+                                <td>@hearing.ClientName</td>
+                                <td>
+                                    <div class="datetime-cell">
+                                        <span class="dt-date">
+                                            <i class="bi bi-calendar3"></i> @hearing.HearingDateTime.ToString("yyyy-MM-dd")
+                                        </span>
+                                        <span class="dt-time">
+                                            <i class="bi bi-clock"></i> @hearing.HearingDateTime.ToString("HH:mm")
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="court-cell">
+                                        <i class="bi bi-geo-alt"></i> @hearing.CourtName - @hearing.DepartmentName
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @(GetBadgeClass(hearing.Status))">@hearing.Status</span>
+                                </td>
+                                <td>
+                                    <span class="@(string.IsNullOrEmpty(hearing.Result) ? "muted" : "result-text")">
+                                        @(string.IsNullOrEmpty(hearing.Result) ? "-" : hearing.Result)
+                                    </span>
+                                </td>
+                                <td><span class="note-text">@hearing.Notes</span></td>
+                                <td>
+                                    <div class="action-btns">
+                                        <button class="icon-btn" title="عرض التفاصيل" @onclick="() => OpenViewDialog(hearing.Id)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                                 fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                <circle cx="12" cy="12" r="3" />
+                                            </svg>
+                                        </button>
+                                        <button class="icon-btn" title="تعديل" @onclick="() => OpenEditDialog(hearing.Id)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                                 fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
         </div>
+
+        @* إضافة أزرار التنقل (Pagination) *@
+        @if (pagedHearings != null && pagedHearings.TotalPages > 1)
+        {
+            <div class="pagination-bar" style="padding: 1rem; display: flex; justify-content: center; gap: 0.5rem;">
+                <button class="btn-outline" disabled="@(!pagedHearings.HasPreviousPage)"
+                        @onclick="() => ChangePage(currentPage - 1)">
+                    السابق
+                </button>
+                <span style="align-self: center;">صفحة @currentPage من @pagedHearings.TotalPages</span>
+                <button class="btn-outline" disabled="@(!pagedHearings.HasNextPage)"
+                        @onclick="() => ChangePage(currentPage + 1)">
+                    التالي
+                </button>
+            </div>
+        }
     </div>
-
 </div>
+@if (showViewModal && selectedHearing != null)
+{
+    <div class="modal-overlay" @onclick="() => showViewModal = false">
+        <div class="modal-box details-modal" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title">تفاصيل الجلسة</h3>
+                    <small class="text-muted">قضية رقم: @selectedHearing.CaseNumber</small>
+                </div>
+                <button class="modal-close" @onclick="() => showViewModal = false">✕</button>
+            </div>
 
-<!-- Modal -->
+            <div class="modal-body">
+                <div class="info-section">
+                    <h5 class="section-title"><i class="bi bi-briefcase"></i> بيانات الدعوى</h5>
+                    <div class="details-grid">
+                        <div class="info-item"><strong>اسم الدعوى:</strong> <span>@selectedHearing.CaseTitle</span></div>
+                        <div class="info-item"><strong>الموكل:</strong> <span>@selectedHearing.ClientName</span></div>
+                        <div class="info-item"><strong>تليفون الموكل:</strong> <span>@selectedHearing.ClientPhone</span></div>
+                        <div class="info-item"><strong>المرحلة:</strong> <span>@selectedHearing.CaseStage</span></div>
+                    </div>
+                </div>
+
+                <div class="info-section mt-3">
+                    <h5 class="section-title"><i class="bi bi-geo-alt"></i> مكان وموعد الجلسة</h5>
+                    <div class="details-grid">
+                        <div class="info-item"><strong>المحكمة:</strong> <span>@selectedHearing.CourtName</span></div>
+                        <div class="info-item"><strong>الدائرة:</strong> <span>@selectedHearing.DepartmentName</span></div>
+                        <div class="info-item"><strong>التاريخ:</strong> <span>@selectedHearing.HearingDateTime.ToString("dd/MM/yyyy")</span></div>
+                        <div class="info-item"><strong>الوقت:</strong> <span>@selectedHearing.HearingDateTime.ToString("hh:mm tt") (@selectedHearing.Period)</span></div>
+                    </div>
+                </div>
+
+                <div class="info-section mt-3">
+                    <h5 class="section-title"><i class="bi bi-journal-text"></i> ما تم في الجلسة</h5>
+                    <div class="result-display-box">
+                        <label>القرار / النتيجة:</label>
+                        <p class="@(string.IsNullOrEmpty(selectedHearing.Result) ? "text-muted" : "")">
+                            @(string.IsNullOrEmpty(selectedHearing.Result) ? "لا يوجد نتيجة مسجلة بعد" : selectedHearing.Result)
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-outline" @onclick="() => showViewModal = false">إغلاق</button>
+                <button class="btn-primary" @onclick="() => OpenEditDialog(selectedHearing.Id)">تعديل النتيجة</button>
+            </div>
+        </div>
+    </div>
+}
 @if (showModal)
 {
     <div class="modal-overlay" @onclick="() => showModal = false">
@@ -287,56 +243,166 @@
                 <button class="modal-close" @onclick="() => showModal = false">✕</button>
             </div>
             <p class="modal-sub">أدخل بيانات الجلسة الجديدة</p>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>رقم القضية *</label>
-                    <input type="text" placeholder="2024/xxx" class="form-input" dir="ltr" />
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>التاريخ *</label>
-                        <input type="date" class="form-input" />
-                    </div>
-                    <div class="form-group">
-                        <label>الوقت *</label>
-                        <input type="time" class="form-input" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>المحكمة</label>
-                    <input type="text" placeholder="اسم المحكمة" class="form-input" />
-                </div>
-                <div class="form-group">
-                    <label>ملاحظات</label>
-                    <textarea placeholder="أي ملاحظات مهمة..." class="form-textarea" rows="3"></textarea>
-                </div>
 
-                <!-- Alert info -->
-                <div class="alert-info">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px">
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="8" x2="12" y2="12" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" />
-                    </svg>
-                    <div>
-                        <p class="alert-title">سيتم إنشاء تنبيهات تلقائية:</p>
-                        <ul class="alert-list">
-                            <li>قبل الجلسة بـ 24 ساعة</li>
-                            <li>قبل الجلسة بساعتين</li>
-                        </ul>
+            <EditForm Model="hearingModel" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>القضية المرتبطة *</label>
+                        <InputSelect @bind-Value="hearingModel.CaseId" class="form-input">
+                            <option value="0">-- اختر القضية --</option>
+                            @foreach (var c in casesList)
+                            {
+                                <option value="@c.Id">@c.CaseNumber - @c.ClientName</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="form-row" style="display:flex; gap:1rem;">
+                        <div class="form-group" style="flex:1">
+                            <label>المحكمة *</label>
+                            <select class="form-input" @onchange="OnCourtSelectionChanged">
+                                <option value="0">-- اختر المحكمة --</option>
+                                @foreach (var court in courtsList)
+                                {
+                                    <option value="@court.Id">@court.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="flex:1">
+                            <label>الدائرة *</label>
+                            <InputSelect @bind-Value="hearingModel.DeptId" class="form-input">
+                                <option value="0">-- اختر الدائرة --</option>
+                                @foreach (var dept in departmentsList)
+                                {
+                                    <option value="@dept.Id">@dept.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="display:flex; gap:1rem;">
+                        <div class="form-group" style="flex:1">
+                            <label>نوع الجلسة *</label>
+                            <InputSelect @bind-Value="hearingModel.HearingType" class="form-input">
+                                @foreach (var type in Enum.GetValues(typeof(smartLaywer.Enum.HearingTypeEnum)))
+                                {
+                                    <option value="@type">@GetDisplayName((Enum)type)</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-group" style="flex:1">
+                            <label>الفترة *</label>
+                            <InputSelect @bind-Value="hearingModel.Period" class="form-input">
+                                @foreach (var period in Enum.GetValues(typeof(smartLaywer.Enum.HearingPeriodEnum)))
+                                {
+                                    <option value="@period">@GetDisplayName((Enum)period)</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>التاريخ والوقت *</label>
+                        <InputDate Type="InputDateType.DateTimeLocal"
+                                   @bind-Value="hearingModel.HearingDateTime"
+                                   class="form-input" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>اسم القاضي</label>
+                        <InputText @bind-Value="hearingModel.JudgeName" placeholder="اسم القاضي" class="form-input" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>النتيجة / ملاحظات</label>
+                        <InputTextArea @bind-Value="hearingModel.Result" placeholder="أي ملاحظات أو نتائج..." class="form-textarea" rows="3"></InputTextArea>
+                    </div>
+
+                    <div class="alert-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        <div>
+                            <p class="alert-title">سيتم إنشاء تنبيهات تلقائية:</p>
+                            <ul class="alert-list">
+                                <li>قبل الجلسة بـ 24 ساعة</li>
+                                <li>قبل الجلسة بساعتين</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="submit" class="btn-primary" style="flex:1">حفظ</button>
+                        <button type="button" class="btn-outline" style="flex:1" @onclick="() => showModal = false">إلغاء</button>
                     </div>
                 </div>
-
-                <div class="modal-actions">
-                    <button class="btn-primary" style="flex:1">حفظ</button>
-                    <button class="btn-outline" style="flex:1" @onclick="() => showModal = false">إلغاء</button>
-                </div>
-            </div>
+            </EditForm>
         </div>
     </div>
 }
 
+@if (showUpdateModal)
+{
+    <div class="modal-overlay" @onclick="() => showUpdateModal = false">
+        <div class="modal-box" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h3 class="modal-title">تحديث نتيجة الجلسة</h3>
+                <button class="modal-close" @onclick="() => showUpdateModal = false">✕</button>
+            </div>
+
+            <EditForm Model="updateModel" OnValidSubmit="HandleUpdateSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>حالة الجلسة *</label>
+                        <InputSelect @bind-Value="updateModel.Status" class="form-input">
+                            @foreach (var status in Enum.GetValues(typeof(smartLaywer.Enum.AttendanceStatusEnum)))
+                            {
+                                <option value="@status">@GetDisplayName((Enum)status)</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="form-group">
+                        <label>قرار المحكمة / النتيجة</label>
+                        <InputTextArea @bind-Value="updateModel.Result" class="form-textarea" rows="3" placeholder="اكتب ما تم في الجلسة..." />
+                    </div>
+
+                    <hr />
+                    <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 0.5rem;">جدولة جلسة قادمة (اختياري)</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>تاريخ الجلسة القادمة</label>
+                            <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="updateModel.NextHearingDate" class="form-input" />
+                        </div>
+                        <div class="form-group">
+                            <label>الفترة</label>
+                            <InputSelect @bind-Value="updateModel.NextHearingPeriod" class="form-input">
+                                <option value="">-- اختر الفترة --</option>
+                                @foreach (var period in Enum.GetValues(typeof(smartLaywer.Enum.HearingPeriodEnum)))
+                                {
+                                    <option value="@period">@GetDisplayName((Enum)period)</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="submit" class="btn-primary" style="flex:1">حفظ النتيجة والجدولة</button>
+                        <button type="button" class="btn-outline" style="flex:1" @onclick="() => showUpdateModal = false">إلغاء</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
 <style>
     .hearings-page {
         display: flex;
@@ -725,6 +791,51 @@
         width: 100%;
     }
 
+    .details-modal {
+        max-width: 700px; /* أكبر شوية من مودال التعديل */
+    }
+
+    .info-section {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+    }
+
+    .section-title {
+        color: var(--primary-color);
+        font-size: 1rem;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        font-size: 0.9rem;
+    }
+
+    .info-item strong {
+        color: #666;
+        margin-left: 5px;
+    }
+
+    .result-display-box {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 8px;
+        border-right: 4px solid var(--primary-color); /* حركت شيك للغة العربية */
+    }
+
+        .result-display-box label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+        }
+
         .form-input:focus {
             border-color: #d97706;
             box-shadow: 0 0 0 3px rgba(217,119,6,.1);
@@ -779,5 +890,139 @@
 </style>
 
 @code {
+    [Inject] private IHearingService HearingService { get; set; }
+    [Inject] private ICourtService CourtService { get; set; }
+    [Inject] private IDepartmentService DepartmentService { get; set; }
+    [Inject] private ICaseService CaseService { get; set; } 
+
+    private HearingCreationDto hearingModel = new();
     private bool showModal = false;
+    private HearingSummaryDto summary = new();
+    private IEnumerable<CaseViewDto> casesList = new List<CaseViewDto>();
+    private IEnumerable<CourtViewDto> courtsList = new List<CourtViewDto>();
+    private IEnumerable<DeptViewDto> departmentsList = new List<DeptViewDto>();
+    private PaginatedList<HearingDisplayDto> pagedHearings;
+    private string selectedStatus = "الكل";
+    private string searchTerm = "";
+    private int currentPage = 1;
+    private bool showUpdateModal = false;
+    private UpdateHearingResultDto updateModel = new();
+    private bool showViewModal = false;
+    private HearingDetailsDto? selectedHearing;
+
+    private async Task OpenViewDialog(int id)
+    {
+       selectedHearing = await HearingService.GetHearingDetailsAsync(id);
+
+        if (selectedHearing != null)
+        {
+            showViewModal = true;
+            StateHasChanged();
+        }
+    }
+    private void OpenEditDialog(int hearingId)
+    {
+        updateModel = new UpdateHearingResultDto 
+        { 
+            Id = hearingId,
+            Status = AttendanceStatusEnum.Attended 
+        };
+        showUpdateModal = true;
+    }
+    private async Task HandleUpdateSubmit()
+    {
+        var result = await HearingService.UpdateHearingAndScheduleNextAsync(updateModel);
+        if (result)
+        {
+            showUpdateModal = false;
+            await LoadHearings();
+            summary = await HearingService.GetHearingsSummaryAsync(); 
+            StateHasChanged();
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        casesList = await CaseService.GetAllCasesForDropdownAsync();
+        courtsList = await CourtService.GetAllCourtsAsync();
+        summary = await HearingService.GetHearingsSummaryAsync();
+        await LoadHearings();
+    }
+    private async Task LoadHearings()
+    {
+        pagedHearings = await HearingService.GetHearingsForGridAsync(currentPage, selectedStatus, searchTerm);
+    }
+
+    private async Task ChangePage(int newPage)
+    {
+        currentPage = newPage;
+        await LoadHearings();
+    }
+
+    private string GetBadgeClass(string status)
+    {
+        if (string.IsNullOrEmpty(status)) return "badge-upcoming";
+        return status switch
+        {
+            "قادمة" => "badge-upcoming", 
+            "مكتملة" => "badge-completed",
+            "ملغية" => "badge-cancelled", 
+            _ => "badge-outline"
+        };
+    }
+
+    private async Task OnStatusChanged(ChangeEventArgs e)
+    {
+        selectedStatus = e.Value?.ToString() ?? "الكل";
+        currentPage = 1; 
+        await LoadHearings();
+    }
+
+    private async Task OnSearchChanged(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? "";
+        currentPage = 1;
+        await LoadHearings();
+    }
+
+
+    private async Task OnCourtSelectionChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int courtId))
+        {
+            hearingModel.CourtId = courtId;
+            if (courtId > 0)
+            {
+                departmentsList = await DepartmentService.GetDeptsByCourtIdAsync(courtId);
+            }
+            else
+            {
+                departmentsList = new List<DeptViewDto>();
+                hearingModel.DeptId = 0;
+            }
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (hearingModel.CaseId == 0 || hearingModel.CourtId == 0 || hearingModel.DeptId == 0)
+        {
+            return;
+        }
+        hearingModel.AttendanceStatus = AttendanceStatusEnum.Incoming;
+        var result = await HearingService.CreateHearingAsync(hearingModel);
+        if (result)
+        {
+            showModal = false;
+            await LoadHearings(); 
+            StateHasChanged();
+        }
+    }
+
+    private string GetDisplayName(Enum value)
+    {
+        var field = value.GetType().GetField(value.ToString());
+        var attribute = (System.ComponentModel.DataAnnotations.DisplayAttribute)
+            Attribute.GetCustomAttribute(field, typeof(System.ComponentModel.DataAnnotations.DisplayAttribute));
+        return attribute?.Name ?? value.ToString();
+    }
 }

@@ -1,4 +1,5 @@
-ï»¿using smartLaywer.Repository.UnitWork;
+using smartLaywer.DTO.Cases;
+using smartLaywer.Repository.UnitWork;
 
 namespace smartLaywer.Services.ClassService
 {
@@ -12,6 +13,9 @@ namespace smartLaywer.Services.ClassService
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
+
+
+    
 
         /// <summary>
         /// Returns a flat list of CaseSummaryDto for the cases table.
@@ -44,7 +48,7 @@ namespace smartLaywer.Services.ClassService
 
         /// <summary>
         /// Returns a fully-loaded Case entity for the details view.
-        /// Returns null if not found â€” caller must handle null.
+        /// Returns null if not found — caller must handle null.
         /// </summary>
         public async Task<Case?> GetCaseWithDetailsAsync(int id)
             => await _unitOfWork.Cases.GetCaseWithDetailsAsync(id);
@@ -66,26 +70,26 @@ namespace smartLaywer.Services.ClassService
             if (client.ClientType == ClientTypeEnum.Individual)
             {
                 if (string.IsNullOrWhiteSpace(client.NationalId))
-                    throw new InvalidOperationException("Ø§Ù„Ø±Ù‚Ù… Ø§Ù„Ù‚ÙˆÙ…ÙŠ Ù…Ø·Ù„ÙˆØ¨ Ù„Ù„Ø£ÙØ±Ø§Ø¯.");
+                    throw new InvalidOperationException("ÇáÑÞã ÇáÞæãí ãØáæÈ ááÃÝÑÇÏ.");
 
                 var duplicate = await _unitOfWork.Clients
                     .GetAllQueryableNoTracking()
                     .AnyAsync(c => c.NationalId == client.NationalId.Trim());
 
                 if (duplicate)
-                    throw new InvalidOperationException($"Ø§Ù„Ø±Ù‚Ù… Ø§Ù„Ù‚ÙˆÙ…ÙŠ '{client.NationalId}' Ù…Ø³Ø¬Ù„ Ù…Ø³Ø¨Ù‚Ø§Ù‹ Ù„Ø¹Ù…ÙŠÙ„ Ø¢Ø®Ø±.");
+                    throw new InvalidOperationException($"ÇáÑÞã ÇáÞæãí '{client.NationalId}' ãÓÌá ãÓÈÞÇð áÚãíá ÂÎÑ.");
             }
             else
             {
                 if (string.IsNullOrWhiteSpace(client.CommercialReg))
-                    throw new InvalidOperationException("Ø±Ù‚Ù… Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ø§Ù„ØªØ¬Ø§Ø±ÙŠ Ù…Ø·Ù„ÙˆØ¨ Ù„Ù„Ø´Ø±ÙƒØ§Øª ÙˆØ§Ù„Ø¬Ù‡Ø§Øª Ø§Ù„Ø­ÙƒÙˆÙ…ÙŠØ©.");
+                    throw new InvalidOperationException("ÑÞã ÇáÊÓÌíá ÇáÊÌÇÑí ãØáæÈ ááÔÑßÇÊ æÇáÌåÇÊ ÇáÍßæãíÉ.");
 
                 var duplicate = await _unitOfWork.Clients
                     .GetAllQueryableNoTracking()
                     .AnyAsync(c => c.CommercialReg == client.CommercialReg.Trim());
 
                 if (duplicate)
-                    throw new InvalidOperationException($"Ø±Ù‚Ù… Ø§Ù„ØªØ³Ø¬ÙŠÙ„ '{client.CommercialReg}' Ù…Ø³Ø¬Ù„ Ù…Ø³Ø¨Ù‚Ø§Ù‹ Ù„Ø¹Ù…ÙŠÙ„ Ø¢Ø®Ø±.");
+                    throw new InvalidOperationException($"ÑÞã ÇáÊÓÌíá '{client.CommercialReg}' ãÓÌá ãÓÈÞÇð áÚãíá ÂÎÑ.");
             }
         }
 
@@ -115,7 +119,7 @@ namespace smartLaywer.Services.ClassService
         /// </summary>
         public async Task UpdateCaseAsync(CaseEditDto dto)
         {
-            // Load tracked entity â€” Update() will change only the fields we set
+            // Load tracked entity — Update() will change only the fields we set
             var existing = await _unitOfWork.Cases.GetByIdAsync(dto.Id)
                 ?? throw new KeyNotFoundException($"Case {dto.Id} not found.");
 
@@ -131,7 +135,7 @@ namespace smartLaywer.Services.ClassService
             existing.UpdatedAt = DateTime.Now;
 
             // GetByIdAsync uses FindAsync which returns a tracked entity,
-            // so Update() just marks it Modified â€” no duplicate tracking issue.
+            // so Update() just marks it Modified — no duplicate tracking issue.
             _unitOfWork.Cases.Update(existing);
             await _unitOfWork.CompleteAsync();
         }
@@ -156,6 +160,22 @@ namespace smartLaywer.Services.ClassService
                 await _unitOfWork.Financials.AddFeeAsync(fee);
                 await _unitOfWork.CompleteAsync();   
             }
+            }
+
+            public async Task<IEnumerable<CaseViewDto>> GetAllCasesForDropdownAsync()
+            {
+                var cases = await _unitOfWork.Cases
+                    .GetAllQueryableNoTracking()
+                    .Where(c => c.StatusId == (int)CaseStatusEnum.Open)
+                    .Select(c => new CaseViewDto
+                    {
+                        Id = c.Id,
+                        CaseNumber = c.CaseNumber,
+                        ClientName = c.Client.FullName 
+                    })
+                    .ToListAsync();
+
+                return cases;
             }
     }
 }

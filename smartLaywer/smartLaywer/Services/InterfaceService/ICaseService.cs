@@ -1,3 +1,5 @@
+ global using smartLaywer.DTO.Cases;
+
 namespace smartLaywer.Services.InterfaceService
 {
     public interface ICaseService
@@ -9,5 +11,6 @@ namespace smartLaywer.Services.InterfaceService
         Task UpdateCaseAsync(CaseEditDto dto);
         Task DeleteCaseAsync(int id);
         Task ValidateClientIdentifierUniquenessAsync(Client client);
+        Task<IEnumerable<CaseViewDto>> GetAllCasesForDropdownAsync();
     }
 }

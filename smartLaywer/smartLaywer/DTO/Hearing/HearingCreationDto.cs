@@ -20,5 +20,6 @@ namespace smartLaywer.DTO.Hearing
         public DateTime? NextHearingDate { get; set; } 
         public HearingPeriodEnum? NextHearingPeriod { get; set; }
         public int CreatedBy { get; set; }
+
     }
 }

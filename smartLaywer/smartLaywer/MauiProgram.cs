@@ -19,7 +19,6 @@ namespace smartLaywer
             builder.Services.AddMapping();
             builder.Services.AddAuthorizationCore();
             builder.Services.AddSingleton<HostAuthenticationStateProvider>();
-
             builder.Services.AddSingleton<AuthenticationStateProvider>(sp =>
                 sp.GetRequiredService<HostAuthenticationStateProvider>());
 

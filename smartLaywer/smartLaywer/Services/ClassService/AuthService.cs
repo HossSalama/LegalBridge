@@ -36,6 +36,13 @@ namespace smartLaywer.Services.ClassService
 
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_currentUser)));
         }
+        public async Task<int> GetCurrentUserIdAsync()
+        {
+            var authState = await GetAuthenticationStateAsync();
+            var user = authState.User;
+            var claim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim.Value) : 0;
+        }
 
         public void Logout()
         {

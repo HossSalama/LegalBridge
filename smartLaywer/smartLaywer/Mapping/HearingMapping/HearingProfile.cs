@@ -32,6 +32,8 @@ namespace smartLaywer.Mapping.HearingMapping
                 .ForMember(dest => dest.Court, opt => opt.Ignore())
                 .ForMember(dest => dest.Dept, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedByNavigation, opt => opt.Ignore());
+
+
             CreateMap<UpdateHearingResultDto, Hearing>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
@@ -50,6 +52,18 @@ namespace smartLaywer.Mapping.HearingMapping
                 .ForMember(dest => dest.Court, opt => opt.Ignore())
                 .ForMember(dest => dest.Dept, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedByNavigation, opt => opt.Ignore());
+
+
+            CreateMap<Hearing, HearingDetailsDto>()
+                .ForMember(dest => dest.CaseNumber, opt => opt.MapFrom(src => src.Case.CaseNumber))
+                .ForMember(dest => dest.CaseTitle, opt => opt.MapFrom(src => src.Case.Title))
+                .ForMember(dest => dest.CaseStage, opt => opt.MapFrom(src => src.Case.Stage))
+                .ForMember(dest => dest.ClientName, opt => opt.MapFrom(src => src.Case.Client.FullName))
+                .ForMember(dest => dest.ClientPhone, opt => opt.MapFrom(src => src.Case.Client.Phone))
+                .ForMember(dest => dest.CourtName, opt => opt.MapFrom(src => src.Court.CourtName))
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Dept.DeptName))
+                .ForMember(dest => dest.CourtLocation, opt => opt.MapFrom(src => src.Court.Location))
+                .ForMember(dest => dest.CreatedByUserName, opt => opt.MapFrom(src => src.CreatedByNavigation.FullName));
         }
 
         

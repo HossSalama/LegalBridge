@@ -1,7 +1,9 @@
 
+using Microsoft.AspNetCore.Components.Authorization;
 using smartLaywer.DTO.Hearing;
 using smartLaywer.Helper;
 using smartLaywer.Repository.UnitWork;
+using System.Security.Claims;
 
 namespace smartLaywer.Services.ClassService
 {
@@ -10,43 +12,45 @@ namespace smartLaywer.Services.ClassService
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         const int pageSize = 10;
+        private readonly AuthenticationStateProvider _authStateProvider;
 
-
-        public HearingService(IUnitOfWork unitOfWork, IMapper mapper)
+        public HearingService(IUnitOfWork unitOfWork, IMapper mapper , AuthenticationStateProvider authenticationStateProvider )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _authStateProvider = authenticationStateProvider;
         }
 
-        /// <summary>
-        /// „·Œ’ «·≈Õ’«∆Ì«  ··ÂÌœ— (ﬁ«œ„… / «·ÌÊ„ / „ﬂ „·…)
-        /// </summary>
         public async Task<HearingSummaryDto> GetHearingsSummaryAsync()
         {
             var today = DateTime.Today;
             var now = DateTime.Now;
 
-            var data = await _unitOfWork.Hearing
-                .GetAllQueryableNoTracking()
-                .Select(h => new { h.HearingDateTime, h.AttendanceStatus })
-                .ToListAsync();
+            var query = _unitOfWork.Hearing.GetAllQueryableNoTracking();
 
             return new HearingSummaryDto
             {
-                UpcomingHearingsCount = data.Count(h => h.HearingDateTime > now),
-                TodayHearingsCount = data.Count(h => h.HearingDateTime.Date == today),
-                CompletedHearingsCount = data.Count(h => h.AttendanceStatus == AttendanceStatusEnum.Incoming)
+                UpcomingHearingsCount = await query.CountAsync(h => h.HearingDateTime > now),
+                TodayHearingsCount = await query.CountAsync(h => h.HearingDateTime.Date == today),
+                CompletedHearingsCount = await query.CountAsync(h => h.AttendanceStatus == AttendanceStatusEnum.Attended)
             };
         }
 
-        public async Task<PaginatedList<HearingDisplayDto>> GetHearingsForGridAsync(int pageNumber, string? statusFilter , string? searchTerm)
-        {
-            return await _unitOfWork.Hearing.GetPagedHearingsAsync(pageNumber, pageSize, statusFilter , searchTerm);
-        }
+        public async Task<PaginatedList<HearingDisplayDto>> GetHearingsForGridAsync(int pageNumber, string? statusFilter , string? searchTerm) =>
+            await _unitOfWork.Hearing.GetPagedHearingsAsync(pageNumber, pageSize, statusFilter , searchTerm);
+
         public async Task<bool> CreateHearingAsync(HearingCreationDto dto)
         {
-            var hearing = _mapper.Map<Hearing>(dto);
+            var authState = await _authStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
 
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (int.TryParse(userIdClaim, out int userId))
+                dto.CreatedBy = userId;
+
+            var hearing = _mapper.Map<Hearing>(dto);
+           
             await _unitOfWork.Hearing.AddAsync(hearing);
 
             return await _unitOfWork.CompleteAsync() > 0;
@@ -68,34 +72,22 @@ namespace smartLaywer.Services.ClassService
 
             return await _unitOfWork.CompleteAsync() > 0;
         }
-        /// <summary>
-        /// «·Ã·”«  „ﬁ”„… ·’›Õ«  „⁄ »ÕÀ Ê›· —
-        /// </summary>
-        //public async Task<PaginatedList<HearingListDto>> GetPagedHearingsAsync(
-        //    string? searchTerm, string? statusFilter, int pageNumber) =>
-        //    await _unitOfWork.Hearing.GetPagedHearingsAsync(searchTerm, statusFilter, pageNumber, PageSize);
 
-        ///// <summary>
-        ///// ﬂ· «·ﬁ÷«Ì« «··Ì ⁄‰œÂ« Ã·”«  (··’›Õ… «· ›’Ì·Ì…)
-        ///// </summary>
-        //public async Task<List<CaseHearingsDto>> GetCasesWithHearingsAsync() =>
-        //    await _unitOfWork.Hearing.GetCasesWithHearingsAsync();
 
-        ///// <summary>
-        ///// Ã·”«  ﬁ÷Ì… Ê«Õœ… „— »…
-        ///// </summary>
-        //public async Task<List<HearingListDto>> GetCaseHearingsAsync(int caseId) =>
-        //    await _unitOfWork.Hearing.GetCaseHearingsAsync(caseId);
+        public async Task<HearingDetailsDto?> GetHearingDetailsAsync(int id)
+        {
+            var hearing = await _unitOfWork.Hearing.GetAllQueryableNoTracking()
+                .Include(h => h.Case)
+                    .ThenInclude(c => c.Client)
+                .Include(h => h.Court)
+                .Include(h => h.Dept)
+                .Include(h => h.CreatedByNavigation)
+                .FirstOrDefaultAsync(h => h.Id == id);
 
-        ///// <summary>
-        ///// ≈÷«›… Ã·”… ÃœÌœ…
-        ///// </summary>
-        //public async Task<bool> CreateHearingAsync(HearingCreateDto dto)
-        //{
-        //    var hearing = _mapper.Map<Hearing>(dto);
-        //    hearing.CreatedAt = DateTime.Now;
-        //    await _unitOfWork.Hearing.AddAsync(hearing);
-        //    return await _unitOfWork.CompleteAsync() > 0;
-        //}
+            if (hearing == null) return null;
+
+            return _mapper.Map<HearingDetailsDto>(hearing);
+        }
+
     }
 }
