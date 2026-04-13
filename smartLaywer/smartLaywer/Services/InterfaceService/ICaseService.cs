@@ -5,7 +5,7 @@ namespace smartLaywer.Services.InterfaceService
         Task<List<CaseSummaryDto>> GetAllCasesAsync(string? searchTerm = null);
         Task<Case?> GetCaseWithDetailsAsync(int id);
         Task<CaseStatsDto> GetCaseStatsAsync();
-        Task AddCaseAsync(Case caseEntity);
+        Task AddCaseAsync(Case newCase, Fee? fee = null);
         Task UpdateCaseAsync(CaseEditDto dto);
         Task DeleteCaseAsync(int id);
         Task ValidateClientIdentifierUniquenessAsync(Client client);

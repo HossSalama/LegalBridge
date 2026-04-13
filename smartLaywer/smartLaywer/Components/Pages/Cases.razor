@@ -394,6 +394,23 @@
                     <label>مرحلة القضية</label>
                     <input type="text" class="form-input" placeholder="مثال: ابتدائي، استئناف..." @bind="newCase.Stage" />
                 </div>
+                <div class="section-divider">الأتعاب</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>إجمالي الأتعاب</label>
+                        <input type="number" class="form-input" placeholder="0.00" min="0" step="0.01"
+                               @bind="newCaseFeeAmount" dir="ltr" />
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ الاستحقاق</label>
+                        <input type="date" class="form-input" @bind="newCaseFeeDueDate" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>ملاحظات الأتعاب</label>
+                    <textarea class="form-input" rows="2" placeholder="اختياري..." @bind="newCaseFeeNotes"></textarea>
+                </div>
 
                 @if (!string.IsNullOrEmpty(addErrorMsg))
                 {
@@ -481,7 +498,34 @@
                                 <span class="detail-value">@selectedCase.ArchiveNote</span>
                             </div>
                         }
-                    </div>
+                    </div> 
+
+                    @* Adding Fees *@
+                    @if (selectedCase.Fees?.Any() == true)
+                    {
+                        <div class="section-divider">الأتعاب</div>
+                        <div class="mini-table-wrap">
+                            <table class="cases-table">
+                                <thead>
+                                    <tr>
+                                        <th>إجمالي الأتعاب</th>
+                                        <th>تاريخ الاستحقاق</th>
+                                        <th>ملاحظات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var f in selectedCase.Fees)
+                                    {
+                                        <tr>
+                                            <td class="font-med">@f.TotalAmount.ToString("N2") ج.م</td>
+                                            <td>@f.DueDate.ToString("yyyy-MM-dd")</td>
+                                            <td>@(string.IsNullOrEmpty(f.Notes) ? "—" : f.Notes)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
 
                     @if (selectedCase.Hearings?.Any() == true)
                     {
@@ -1201,6 +1245,11 @@
     private bool showEditModal = false;
     private CaseEditDto? editDto;
 
+    // Fee for the new case
+    private decimal newCaseFeeAmount = 0;
+    private string newCaseFeeNotes = string.Empty;
+    private DateTime newCaseFeeDueDate = DateTime.Today.AddMonths(1);
+
     // ── Lifecycle
     protected override async Task OnInitializedAsync()
     {
@@ -1276,6 +1325,10 @@
         newClient = new Client { ClientType = ClientTypeEnum.Individual };
         isNewClient = false;
         addErrorMsg = string.Empty;
+        newCaseFeeAmount = 0;
+        newCaseFeeNotes = string.Empty;
+        newCaseFeeDueDate = DateTime.Today.AddMonths(1);
+        showAddModal = true;
         showAddModal = true;
     }
 
@@ -1339,7 +1392,19 @@
                 if (newCase.ClientId == 0) { addErrorMsg = "يجب اختيار عميل."; isSaving = false; return; }
             }
 
-            await CaseService.AddCaseAsync(newCase);
+            Fee? feeToSave = null;
+            if (newCaseFeeAmount > 0)
+            {
+                feeToSave = new Fee
+                {
+                    TotalAmount = newCaseFeeAmount,
+                    DueDate = newCaseFeeDueDate,
+                    Notes = string.IsNullOrWhiteSpace(newCaseFeeNotes) ? null : newCaseFeeNotes.Trim(),
+                    CreatedBy = newCase.AssignedLawyerId   
+                };
+            }
+
+            await CaseService.AddCaseAsync(newCase, feeToSave);
             CloseAddModal();
             await LoadDataAsync();
         }

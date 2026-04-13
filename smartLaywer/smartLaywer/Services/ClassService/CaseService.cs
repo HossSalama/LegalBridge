@@ -138,8 +138,24 @@ namespace smartLaywer.Services.ClassService
 
         public async Task DeleteCaseAsync(int id)
         {
-            await _unitOfWork.Cases.Delete(id);   // ← was missing await
+            await _unitOfWork.Cases.Delete(id);  
             await _unitOfWork.CompleteAsync();
         }
+
+            public async Task AddCaseAsync(Case newCase, Fee? fee = null)
+        {
+            newCase.UpdatedAt = DateTime.Now;
+            await _unitOfWork.Cases.AddAsync(newCase);
+            await _unitOfWork.CompleteAsync();   
+
+            if (fee != null && fee.TotalAmount > 0)
+            {
+                fee.CaseId = newCase.Id;          
+                fee.ClientId = newCase.ClientId;
+                fee.CreatedAt = DateTime.Now;
+                await _unitOfWork.Financials.AddFeeAsync(fee);
+                await _unitOfWork.CompleteAsync();   
+            }
+            }
     }
 }
