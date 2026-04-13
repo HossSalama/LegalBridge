@@ -8,5 +8,6 @@ namespace smartLaywer.Services.InterfaceService
         Task AddCaseAsync(Case caseEntity);
         Task UpdateCaseAsync(CaseEditDto dto);
         Task DeleteCaseAsync(int id);
+        Task ValidateClientIdentifierUniquenessAsync(Client client);
     }
 }

@@ -110,8 +110,8 @@
             <option value="جارية">جارية</option>
             <option value="معلقة">معلقة</option>
             <option value="مغلقة">مغلقة</option>
-            <option value="خسرت">خسرت</option>
-            <option value="ربحت">ربحت</option>
+            <option value="خسرت">خاسرة</option>
+            <option value="ربحت">رابحة</option>
             <option value="مؤرشفة">مؤرشفة</option>
         </select>
     </div>
@@ -154,7 +154,8 @@
                         @if (filteredCases.Count == 0)
                         {
                             <tr>
-                                <td colspan="8" style="text-align:center;color:#94a3b8;padding:2rem;">
+                                <td colspan="8" style="text-align:center;color:
+                #94a3b8;padding:2rem;">
                                     لا توجد قضايا مطابقة للبحث
                                 </td>
                             </tr>
@@ -288,10 +289,22 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>الرقم القومي / رقم التسجيل</label>
-                            <input type="text" class="form-input" @bind="newClient.NationalId" dir="ltr" />
-                        </div>
+                        @if (newClient.ClientType == ClientTypeEnum.Individual)
+                        {
+                            <div class="form-group">
+                                <label>الرقم القومي *</label>
+                                <input type="text" class="form-input" placeholder="14 رقماً" maxlength="14"
+                                       @bind="newClient.NationalId" dir="ltr" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="form-group">
+                                <label>رقم التسجيل التجاري *</label>
+                                <input type="text" class="form-input" placeholder="رقم السجل التجاري"
+                                       @bind="newClient.CommercialReg" dir="ltr" />
+                            </div>
+                        }
                         <div class="form-group">
                             <label>البريد الإلكتروني</label>
                             <input type="email" class="form-input" @bind="newClient.Email" dir="ltr" />
@@ -340,7 +353,7 @@
                             <option value="0">-- اختر النوع --</option>
                             @foreach (var ct in caseTypes)
                             {
-                                <option value="@ct.Id">@ct.TypeName</option>
+                                <option value="@ct.Id">@ct.TypeName.GetDisplayName()</option>
                             }
                         </select>
                     </div>
@@ -350,7 +363,7 @@
                             <option value="0">-- اختر الحالة --</option>
                             @foreach (var st in caseStatuses)
                             {
-                                <option value="@st.Id">@st.StatusName</option>
+                                <option value="@st.Id">@st.StatusName.GetDisplayName()</option>
                             }
                         </select>
                     </div>
@@ -431,11 +444,11 @@
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">نوع القضية</span>
-                            <span class="detail-value">@selectedCase.CaseType?.TypeName</span>
+                            <span class="detail-value">@selectedCase.CaseType?.TypeName.GetDisplayName()</span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">الحالة</span>
-                            <span class="detail-value">@selectedCase.Status?.StatusName</span>
+                            <span class="detail-value">@selectedCase.Status?.StatusName.GetDisplayName()</span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">المحكمة</span>
@@ -527,7 +540,7 @@
                             <option value="0">-- اختر الحالة --</option>
                             @foreach (var st in caseStatuses)
                             {
-                                <option value="@st.Id">@st.StatusName</option>
+                                <option value="@st.Id">@st.StatusName.GetDisplayName()</option>
                             }
                         </select>
                     </div>
@@ -1160,15 +1173,15 @@
     private List<Court> courts = new();
     private List<User> lawyers = new();
 
-    // ── UI State 
+    // ── UI State
     private bool isLoading = true;
     private bool isSaving = false;
 
-    // Separate error states 
-    private string loadErrorMsg = string.Empty;  
-    private string addErrorMsg = string.Empty;  
-    private string editErrorMsg = string.Empty;  
-    private string modalErrorMsg = string.Empty;  
+    // Separate error states
+    private string loadErrorMsg = string.Empty;
+    private string addErrorMsg = string.Empty;
+    private string editErrorMsg = string.Empty;
+    private string modalErrorMsg = string.Empty;
 
     // Filter
     private string searchTerm = string.Empty;
@@ -1188,13 +1201,13 @@
     private bool showEditModal = false;
     private CaseEditDto? editDto;
 
-    // ── Lifecycle 
+    // ── Lifecycle
     protected override async Task OnInitializedAsync()
     {
         await LoadDataAsync();
     }
 
-    // ── Data Loading 
+    // ── Data Loading
     private async Task LoadDataAsync()
     {
         isLoading = true;
@@ -1233,7 +1246,7 @@
         lawyers = await LookupService.GetActiveLawyersAsync();
     }
 
-    // ── Filter / Search 
+    // ── Filter / Search
     private void OnSearchChanged(ChangeEventArgs e)
     {
         searchTerm = e.Value?.ToString() ?? string.Empty;
@@ -1283,6 +1296,21 @@
         if (newCase.StatusId == 0) { addErrorMsg = "حالة القضية مطلوبة."; return; }
         if (newCase.CourtId == 0) { addErrorMsg = "المحكمة مطلوبة."; return; }
         if (newCase.AssignedLawyerId == 0) { addErrorMsg = "المحامي المسؤول مطلوب."; return; }
+        if (isNewClient)
+        {
+            if (newClient.ClientType == ClientTypeEnum.Individual &&
+                string.IsNullOrWhiteSpace(newClient.NationalId))
+            {
+                addErrorMsg = "الرقم القومي مطلوب للأفراد.";
+                return;
+            }
+            if (newClient.ClientType != ClientTypeEnum.Individual &&
+                string.IsNullOrWhiteSpace(newClient.CommercialReg))
+            {
+                addErrorMsg = "رقم التسجيل التجاري مطلوب للشركات والجهات.";
+                return;
+            }
+        }
 
         isSaving = true;
         try
@@ -1293,7 +1321,16 @@
                 if (string.IsNullOrWhiteSpace(newClient.Phone)) { addErrorMsg = "رقم الهاتف مطلوب."; isSaving = false; return; }
                 if (string.IsNullOrWhiteSpace(newClient.Address)) { addErrorMsg = "العنوان مطلوب."; isSaving = false; return; }
 
-                // AddClientAsync must return the saved Client with DB-generated Id
+                newClient.NationalId = string.IsNullOrWhiteSpace(newClient.NationalId) ? null : newClient.NationalId.Trim();
+                newClient.CommercialReg = string.IsNullOrWhiteSpace(newClient.CommercialReg) ? null : newClient.CommercialReg.Trim();
+                newClient.Email = string.IsNullOrWhiteSpace(newClient.Email) ? null : newClient.Email.Trim();
+                newClient.SecondaryPhone = string.IsNullOrWhiteSpace(newClient.SecondaryPhone) ? null : newClient.SecondaryPhone.Trim();
+                newClient.JobTitle = string.IsNullOrWhiteSpace(newClient.JobTitle) ? null : newClient.JobTitle.Trim();
+                newClient.Gender = string.IsNullOrWhiteSpace(newClient.Gender) ? null : newClient.Gender.Trim();
+
+                newClient.Phone = newClient.Phone.Trim();
+
+                await CaseService.ValidateClientIdentifierUniquenessAsync(newClient);
                 var saved = await ClientService.AddClientAsync(newClient);
                 newCase.ClientId = saved.Id;
             }
@@ -1321,7 +1358,7 @@
     {
         selectedCase = null;
         showDetailsModal = true;
-        StateHasChanged();  
+        StateHasChanged();
         try
         {
             selectedCase = await CaseService.GetCaseWithDetailsAsync(caseId);
@@ -1333,7 +1370,7 @@
         }
     }
 
-    // ── Edit Modal 
+    // ── Edit Modal
     private async Task OpenEditModal(int caseId)
     {
         editErrorMsg = string.Empty;
@@ -1396,7 +1433,7 @@
         }
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────
+    // ── Helpers 
     private static string GetStatusBadgeClass(string? status) => status switch
     {
         "جارية" => "badge-open",

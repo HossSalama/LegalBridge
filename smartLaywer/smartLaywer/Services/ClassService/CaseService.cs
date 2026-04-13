@@ -56,6 +56,39 @@ namespace smartLaywer.Services.ClassService
         /// Inserts a new case.
         /// Validates all required FK fields are non-zero before hitting the DB.
         /// </summary>
+        /// <summary>
+        /// Validates that NationalId (for Individual) or CommercialReg (for others) is unique
+        /// across all existing clients. Throws InvalidOperationException if a duplicate is found.
+        /// Call this from ClientService.AddClientAsync before persisting the new client.
+        /// </summary>
+        public async Task ValidateClientIdentifierUniquenessAsync(Client client)
+        {
+            if (client.ClientType == ClientTypeEnum.Individual)
+            {
+                if (string.IsNullOrWhiteSpace(client.NationalId))
+                    throw new InvalidOperationException("الرقم القومي مطلوب للأفراد.");
+
+                var duplicate = await _unitOfWork.Clients
+                    .GetAllQueryableNoTracking()
+                    .AnyAsync(c => c.NationalId == client.NationalId.Trim());
+
+                if (duplicate)
+                    throw new InvalidOperationException($"الرقم القومي '{client.NationalId}' مسجل مسبقاً لعميل آخر.");
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(client.CommercialReg))
+                    throw new InvalidOperationException("رقم التسجيل التجاري مطلوب للشركات والجهات الحكومية.");
+
+                var duplicate = await _unitOfWork.Clients
+                    .GetAllQueryableNoTracking()
+                    .AnyAsync(c => c.CommercialReg == client.CommercialReg.Trim());
+
+                if (duplicate)
+                    throw new InvalidOperationException($"رقم التسجيل '{client.CommercialReg}' مسجل مسبقاً لعميل آخر.");
+            }
+        }
+
         public async Task AddCaseAsync(Case caseEntity)
         {
             // Guard: required FK fields must be set
