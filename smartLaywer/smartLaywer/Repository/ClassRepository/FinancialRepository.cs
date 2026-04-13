@@ -4,7 +4,7 @@ namespace smartLaywer.Repository.ClassRepository
     {
         private readonly LegalManagementContext _context;
         private readonly IMapper _mapper;
-        public FinancialRepository(LegalManagementContext context , IMapper mapper) : base(context)
+        public FinancialRepository(LegalManagementContext context, IMapper mapper) : base(context)
         {
             _context = context;
             _mapper = mapper;
@@ -44,7 +44,7 @@ namespace smartLaywer.Repository.ClassRepository
 
             return await query
                 .OrderByDescending(f => f.CreatedAt)
-                .ProjectTo<FeeDetailsDto>(_mapper.ConfigurationProvider) 
+                .ProjectTo<FeeDetailsDto>(_mapper.ConfigurationProvider)
                 .ToPaginatedListAsync(pageNumber, pageSize);
         }
 
@@ -54,6 +54,11 @@ namespace smartLaywer.Repository.ClassRepository
                 .Where(ps => ps.FeeId == feeId && ps.Status != PaymentStatusEnum.Paid)
                 .OrderBy(ps => ps.DueDate)
                 .ToListAsync();
+        }
+
+        public async Task AddFeeAsync(Fee fee)
+        {
+            await _context.Fees.AddAsync(fee);
         }
     }
 }
