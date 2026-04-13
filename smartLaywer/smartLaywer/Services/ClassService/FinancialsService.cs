@@ -1,4 +1,5 @@
 using smartLaywer.Repository.UnitWork;
+using System.Globalization;
 
 namespace smartLaywer.Service.ClassService
 {
@@ -219,6 +220,50 @@ namespace smartLaywer.Service.ClassService
                              ps.DueDate < DateTime.Now &&
                              ps.Status != PaymentStatusEnum.Paid)
                 .SumAsync(ps => ps.PlannedAmount);
+        }
+
+        public async Task<List<RevenueSummaryDto>> GetUpcomingRevenueAsync()
+        {
+            var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var endDate = startDate.AddMonths(4);
+
+            var revenues = await _unitOfWork.Schedules.GetAllQueryableNoTracking()
+                .Where(t => t.DueDate >= startDate && t.DueDate < endDate&& t.Status != PaymentStatusEnum.Paid)
+                .GroupBy(t => new { t.DueDate.Year, t.DueDate.Month })
+                .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
+                .Select(g => new RevenueSummaryDto
+                {
+                    MonthName = new DateTime(g.Key.Year, g.Key.Month, 1).ToString("MMMM", new CultureInfo("ar-EG")),
+                    TotalValue = g.Sum(t => t.PlannedAmount),
+                })
+                .ToListAsync();
+
+            return revenues;
+        }
+
+        /// <summary>
+        /// ≈÷«›… ÃœÊ· √ﬁ”«ÿ ÃœÌœ ·ﬁ÷Ì… „⁄Ì‰….
+        /// </summary>
+        public async Task<bool> CreatePaymentSchedulesAsync(int feeId, List<InstallmentCreationDto> newSchedules)
+        {
+            if (newSchedules == null || !newSchedules.Any()) return false;
+
+            foreach (var dto in newSchedules)
+            {
+                var schedule = new PaymentSchedule
+                {
+                    FeeId = feeId,
+                    PlannedAmount = dto.Amount,
+                    DueDate = dto.DueDate,
+                    Status = PaymentStatusEnum.Unpaid, // «·Õ«·… «·«› —«÷Ì…
+                };
+                await _unitOfWork.Schedules.AddAsync(schedule);
+            }
+
+            // »⁄œ «·≈÷«›…° »‰«œÌ „ÌÀÊœ «· ”ÊÌ… ⁄‘«‰ ·Ê ›ÌÂ „»«·€ „œ›Ê⁄… “Ì«œ…   Ê“⁄ ⁄ «·√ﬁ”«ÿ «·ÃœÌœ…
+            await ReconcilePaymentSchedulesAsync(feeId);
+
+            return await _unitOfWork.CompleteAsync() > 0;
         }
     }
 }

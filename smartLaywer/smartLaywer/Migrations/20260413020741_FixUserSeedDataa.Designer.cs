@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using smartLaywer.Models;
 
@@ -11,9 +12,11 @@ using smartLaywer.Models;
 namespace smartLaywer.Migrations
 {
     [DbContext(typeof(LegalManagementContext))]
-    partial class LegalManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20260413020741_FixUserSeedDataa")]
+    partial class FixUserSeedDataa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

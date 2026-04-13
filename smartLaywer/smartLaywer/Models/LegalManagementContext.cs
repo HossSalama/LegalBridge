@@ -630,15 +630,14 @@ public partial class LegalManagementContext : DbContext
 
             entity.HasData(new User
             {
-                Id = 1,
+                Id = 2,
                 FullName = "√œ„‰ «·‰Ÿ«„",
                 Email = "admin@lawyer.com",
                 PhoneNumber = "01012345678",
                 NationalId = "29001011234567", 
                 RoleId = 1,
                 IsActive = true,
-                // œÂ Â«‘ ·»«”Ê—œ «› —«÷Ì („À·«: Admin@123) »«” Œœ«„ BCrypt
-                PasswordHash = "$2a$11$mC8769zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
                 LastLoginAt = DateTime.Now
             });
         });

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using smartLaywer.Models;
 
@@ -11,9 +12,11 @@ using smartLaywer.Models;
 namespace smartLaywer.Migrations
 {
     [DbContext(typeof(LegalManagementContext))]
-    partial class LegalManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20260413015459_FixUserSeedData")]
+    partial class FixUserSeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1157,13 +1160,13 @@ namespace smartLaywer.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 2,
+                            Id = 1,
                             Email = "admin@lawyer.com",
                             FullName = "أدمن النظام",
                             IsActive = true,
-                            LastLoginAt = new DateTime(2026, 4, 13, 4, 7, 37, 497, DateTimeKind.Local).AddTicks(6060),
+                            LastLoginAt = new DateTime(2026, 4, 13, 3, 54, 55, 848, DateTimeKind.Local).AddTicks(7750),
                             NationalId = "29001011234567",
-                            PasswordHash = "$2a$11$kaqHoyNMTwzuvqARUXSKjOLl.Mfwc6is2w4mVeJyaMCbGoFUsi/dS",
+                            PasswordHash = "$2a$11$Fdny20UP3dmshlwtiIJwduLTW7N16vrqf/J42ElcFZbsRLamKAp4K",
                             PhoneNumber = "01012345678",
                             RoleId = 1
                         });

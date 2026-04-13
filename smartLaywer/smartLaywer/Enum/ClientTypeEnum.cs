@@ -8,11 +8,6 @@ namespace smartLaywer.Enum
             [Display(Name = "‘—ﬂ…")]
             Company = 2,
 
-            [Display(Name = "ÃÂ… ÕﬂÊ„Ì…")]
-            Government = 3,
-
-            [Display(Name = "√Œ—Ï")]
-            Other = 4
         }
     }
 

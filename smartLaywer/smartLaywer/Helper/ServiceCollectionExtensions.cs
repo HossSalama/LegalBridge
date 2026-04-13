@@ -25,8 +25,8 @@ namespace smartLaywer.Helper
             services.AddScoped<ICaseService, CaseService>();
             services.AddScoped<ILookupService, LookupService>();
             services.AddScoped<IClientService, ClientService>();
-            services.AddScoped<IFinancialsService, FinancialsService>();
             services.AddScoped<IHearingService, HearingService>();
+            services.AddScoped<IAuthService, AuthService>();
 
             return services;
         }

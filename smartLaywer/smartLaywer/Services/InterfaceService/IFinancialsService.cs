@@ -10,5 +10,7 @@ namespace smartLaywer.Service.InterfaceService
         Task<ClientFinancialProfileDto> GetClientFullFinancialHistoryAsync(int clientId);
         Task<decimal> GetTotalOverdueAmountAsync();
         Task<string> GenerateNextReceiptNumberAsync();
+        Task<bool> CreatePaymentSchedulesAsync(int feeId, List<InstallmentCreationDto> newSchedules);
+        Task<List<RevenueSummaryDto>> GetUpcomingRevenueAsync();
     }
 }

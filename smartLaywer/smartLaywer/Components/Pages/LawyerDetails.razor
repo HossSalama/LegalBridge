@@ -1,0 +1,227 @@
+@page "/lawyers/details/{Id:int}"
+@using smartLaywer.DTO.User
+@using smartLaywer.Services.InterfaceService
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="details-page" dir="rtl">
+    <div class="page-header">
+        <button class="btn-back" @onclick='() => Navigation.NavigateTo("/lawyers")'>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            «·⁄Êœ… ··ﬁ«∆„…
+        </button>
+        <h1 class="page-title">„·› «·„Õ«„Ì</h1>
+    </div>
+
+    @if (lawyer == null)
+    {
+        <div class="loader-box">Ã«—Ì  Õ„Ì· «·»Ì«‰« ...</div>
+    }
+    else
+    {
+        <div class="details-grid">
+            <div class="detail-card main-info">
+                <div class="user-avatar">
+                    @(lawyer.FullName.Substring(0, 1))
+                </div>
+                <h2 class="user-name">@lawyer.FullName</h2>
+                <span class="badge badge-blue">@lawyer.RoleName</span>
+                <hr />
+                <div class="info-row">
+                    <span class="label">«·»—Ìœ «·≈·ﬂ —Ê‰Ì:</span>
+                    <span class="value">@lawyer.Email</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">—ﬁ„ «·Â« ›:</span>
+                    <span class="value">@lawyer.PhoneNumber</span>
+                </div>
+                @if (@lawyer.SecondNumber != null)
+                {
+                    <div class="info-row">
+                        <span class="label">—ﬁ„ «·Â« › «·À«‰Ì:</span>
+                        <span class="value">@lawyer.SecondNumber</span>
+                    </div>
+                }
+            
+                <div class="info-row">
+                    <span class="label">«·—ﬁ„ «·ﬁÊ„Ì:</span>
+                    <span class="value">@lawyer.NationalId</span>
+                </div>
+            </div>
+
+            <div class="detail-card cases-info">
+                <h3>«·ﬁ÷«Ì« «·„Êﬂ·… ≈·ÌÂ (@lawyer.AssignedCases?.Count() ?? 0)</h3>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>—ﬁ„ «·ﬁ÷Ì…</th>
+                                <th>«”„ «·ﬁ÷Ì…</th>
+                                <th>«”„ «·⁄„Ì·</th>
+                                <th>Õ«·Â «·ﬁ÷ÌÂ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (lawyer.AssignedCases != null && lawyer.AssignedCases.Any())
+                            {
+                                @foreach (var caseItem in lawyer.AssignedCases)
+                                {
+                                    <tr>
+                                        
+                                        <td>@caseItem.CaseNumber</td>
+                                        <td>@caseItem.Title</td>
+                                        <td>@caseItem.ClientName</td>
+                                        <td>
+                                            @{
+                                                var info = GetCaseTypeInfo(caseItem.CaseType);
+                                            }
+                                            <span class="badge @info.Class">@info.Text</span>
+                                        </td>
+                                        
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3" class="empty-row">·«  ÊÃœ ﬁ÷«Ì« Õ«·Ì«</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .badge-blue {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+    /* „œ‰Ì */
+    .badge-red {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    /* Ã‰«∆Ì */
+    .badge-orange {
+        background: #ffedd5;
+        color: #ea580c;
+    }
+    /*  Ã«—Ì */
+    .badge-purple {
+        background: #f3e8ff;
+        color: #9333ea;
+    }
+    /* √”—… */
+    .badge-green {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+    /* ≈œ«—Ì */
+    .badge-gray {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+    .details-page {
+        padding: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .btn-back {
+        background: none;
+        border: 1px solid #e2e8f0;
+        padding: .5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        color: #64748b;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 1.5rem;
+    }
+
+    .detail-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+    }
+
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        background: #d97706;
+        color: #fff;
+        font-size: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+    }
+
+    .user-name {
+        text-align: center;
+        margin-bottom: .5rem;
+        color: #1e293b;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: .75rem;
+        font-size: .9rem;
+    }
+
+        .info-row .label {
+            color: #64748b;
+        }
+
+        .info-row .value {
+            font-weight: 600;
+            color: #334155;
+        }
+
+    .main-info {
+        text-align: center;
+    }
+</style>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private UserDetailDTO? lawyer;
+  private (string Text, string Class) GetCaseTypeInfo(string type) => type switch
+    {
+        "Civil" => ("„œ‰Ì", "badge-blue"),
+        "Criminal" => ("Ã‰«∆Ì", "badge-red"),
+        "Administrative" => ("≈œ«—Ì", "badge-green"),
+        _ => ("√Œ—Ï", "badge-gray")
+    };
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            lawyer = await AuthService.GetUserDetailsAsync(Id);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+}

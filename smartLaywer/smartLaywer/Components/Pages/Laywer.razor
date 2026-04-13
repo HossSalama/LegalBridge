@@ -1,0 +1,565 @@
+﻿@page "/lawyers"
+@using Microsoft.AspNetCore.Authorization
+@using smartLaywer.DTO.User
+@using smartLaywer.Services.InterfaceService
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+
+<PageTitle>إدارة المحاميين - نظام إدارة القضايا</PageTitle>
+
+<div class="clients-page" dir="rtl">
+
+    <div class="page-header-row">
+        <div>
+            <h1 class="page-title">إدارة المحاميين</h1>
+            <p class="page-sub">عرض وإدارة جميع المحاميين والموظفين في النظام</p>
+        </div>
+        <button class="btn-primary" @onclick="OpenAddDialog">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            إضافة محامي جديد
+        </button>
+    </div>
+
+    <div class="top-bar">
+        <div class="search-box">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input class="search-input" placeholder="ابحث بالاسم أو البريد..."
+                   @bind="searchTerm" @bind:event="oninput" />
+        </div>
+        <div class="mini-stat">
+            <p class="mini-label">إجمالي الفريق</p>
+            <p class="mini-value">@lawyers.Count()</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>الهاتف</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>الدور</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!FilteredLawyers.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="empty-row">لا يوجد محاميين مسجلين حالياً</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var user in FilteredLawyers)
+                        {
+                            <tr>
+                                <td class="fw-600">@user.FullName</td>
+                                <td>@user.PhoneNumber</td>
+                                <td dir="ltr">@user.Email</td>
+                                <td>
+                                    <span class="badge badge-blue">@user.RoleName</span>
+                                </td>
+                                <td>
+                                    <span class="badge @(user.IsActive ? "badge-green" : "badge-gray")">
+                                        @(user.IsActive ? "نشط" : "معطل")
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-btns">
+                                        <button class="icon-btn" @onclick="() => NavigateToDetails(user.Id)" title="عرض التفاصيل">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                <circle cx="12" cy="12" r="3" />
+                                            </svg>
+                                        </button>
+                                        <button class="icon-btn" @onclick="() => HandleDelete(user.Id)" title="حذف"><svg>...</svg></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (showDialog)
+{
+    <div class="dialog-overlay">
+        <div class="dialog">
+            <div class="dialog-header">
+                <h3>إضافة عضو فريق جديد</h3>
+                <button class="dialog-close" @onclick="CloseDialog">✕</button>
+            </div>
+
+            <EditForm Model="registerModel" OnValidSubmit="HandleAddLawyer">
+                <DataAnnotationsValidator />
+
+                <div class="form-grid">
+                    <div class="form-group form-full">
+                        <label>الاسم الكامل *</label>
+                        <InputText class="form-input" @bind-Value="registerModel.FullName" placeholder="الاسم ثلاثي" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>البريد الإلكتروني *</label>
+                        <InputText class="form-input" @bind-Value="registerModel.Email" dir="ltr" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>كلمة المرور *</label>
+                        <InputText type="password" class="form-input" @bind-Value="registerModel.Password" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>رقم الهاتف *</label>
+                        <InputText class="form-input" @bind-Value="registerModel.PhoneNumber" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>الرقم القومي *</label>
+                        <InputText class="form-input" @bind-Value="registerModel.NationalId" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>الدور الوظيفي *</label>
+                        <InputSelect class="form-input" @bind-Value="registerModel.RoleId">
+                            <option value="">-- اختر الرتبة --</option>
+                            <option value="1">مدير نظام</option>
+                            <option value="2">محامي</option>
+                            <option value="3">سكرتير</option>
+                        </InputSelect>
+                        <ValidationMessage For="@(() => registerModel.RoleId)" />
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(dialogError))
+                {
+                    <p class="form-error">@dialogError</p>
+                }
+
+                <div class="dialog-actions">
+                    <button type="submit" class="btn-primary">حفظ البيانات</button>
+                    <button type="button" class="btn-outline" @onclick="CloseDialog">إلغاء</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    private IEnumerable<UserViewDTO> lawyers = new List<UserViewDTO>();
+    private RegisterDto registerModel = new();
+    private string searchTerm = "";
+    private bool showDialog = false;
+    private string dialogError = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadLawyers();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading lawyers: {ex.Message}");
+            // لو خرجك بره هنا، يبقى المشكلة في الداتا مش في الصلاحيات
+        }
+    }
+
+    private async Task LoadLawyers()
+    {
+        lawyers = await AuthService.GetAllUsersAsync();
+    }
+
+    private IEnumerable<UserViewDTO> FilteredLawyers => lawyers.Where(l =>
+        l.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+        l.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+
+    private void OpenAddDialog() { registerModel = new(); showDialog = true; }
+    private void CloseDialog() { showDialog = false; dialogError = ""; }
+
+    private async Task HandleAddLawyer()
+    {
+        try
+        {
+            await AuthService.CreateUserByAdminAsync(registerModel);
+            await LoadLawyers();
+            CloseDialog();
+        }
+        catch (Exception ex)
+        {
+            dialogError = ex.Message;
+        }
+    }
+
+    private async Task HandleDelete(int id)
+    {
+        await AuthService.DeleteUserAsync(id);
+        await LoadLawyers();
+    }
+    private void NavigateToDetails(int lawyerId)
+    {
+        Navigation.NavigateTo($"/lawyers/details/{lawyerId}");
+    }
+}
+
+<style>
+    .clients-page {
+        padding: 1.5rem;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .page-sub {
+        color: #64748b;
+        margin: .25rem 0 0;
+    }
+
+    .top-bar {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+        flex-wrap: wrap;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 240px;
+        position: relative;
+    }
+
+    .search-icon {
+        position: absolute;
+        right: .75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: .6rem .6rem .6rem 2.2rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: .9rem;
+        outline: none;
+        background: #fff;
+        box-sizing: border-box;
+    }
+
+        .search-input:focus {
+            border-color: #d97706;
+        }
+
+    .mini-stat {
+        background: #fff;
+        border-radius: 10px;
+        padding: .75rem 1.25rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,.07);
+        text-align: center;
+        min-width: 120px;
+    }
+
+    .mini-label {
+        font-size: .8rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .mini-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: .2rem 0 0;
+    }
+
+        .mini-value.green {
+            color: #16a34a;
+        }
+
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .875rem;
+    }
+
+        .data-table th {
+            text-align: right;
+            padding: .75rem 1rem;
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: .75rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover td {
+            background: #fafafa;
+        }
+
+    .fw-600 {
+        font-weight: 600;
+    }
+
+    .empty-row {
+        text-align: center;
+        padding: 2.5rem !important;
+        color: #94a3b8;
+    }
+
+    .cell-icon-text {
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        color: #475569;
+    }
+
+    .badge {
+        font-size: .72rem;
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .badge-blue {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .badge-green {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .badge-gray {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .action-btns {
+        display: flex;
+        gap: .35rem;
+    }
+
+    .icon-btn {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        transition: all .2s;
+    }
+
+        .icon-btn:hover {
+            border-color: #d97706;
+            color: #d97706;
+        }
+
+    /* Buttons */
+    .btn-primary {
+        background: #d97706;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: .55rem 1.1rem;
+        font-size: .9rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        transition: background .2s;
+    }
+
+        .btn-primary:hover {
+            background: #b45309;
+        }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: .5rem 1rem;
+        font-size: .9rem;
+        cursor: pointer;
+        color: #475569;
+        transition: all .2s;
+    }
+
+        .btn-outline:hover {
+            border-color: #d97706;
+            color: #d97706;
+        }
+
+    /* Dialog */
+    .dialog-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .dialog {
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    }
+
+    .dialog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: .25rem;
+    }
+
+        .dialog-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+    .dialog-close {
+        background: none;
+        border: none;
+        font-size: 1.1rem;
+        cursor: pointer;
+        color: #94a3b8;
+    }
+
+    .dialog-sub {
+        font-size: .85rem;
+        color: #64748b;
+        margin: 0 0 1rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .75rem;
+    }
+
+    .form-full {
+        grid-column: 1 / -1;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: .35rem;
+    }
+
+        .form-group label {
+            font-size: .85rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+    .form-input {
+        padding: .55rem .75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: .9rem;
+        outline: none;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+        .form-input:focus {
+            border-color: #d97706;
+        }
+
+    .form-error {
+        color: #dc2626;
+        font-size: .85rem;
+        margin: .5rem 0 0;
+    }
+
+    .dialog-actions {
+        display: flex;
+        gap: .75rem;
+        margin-top: 1rem;
+    }
+
+        .dialog-actions .btn-primary {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .dialog-actions .btn-outline {
+            flex: 1;
+        }
+</style>

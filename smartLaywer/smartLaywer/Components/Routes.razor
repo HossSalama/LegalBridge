@@ -1,13 +1,22 @@
-ï»¿@using smartLaywer.Components.Layout
-<Router AppAssembly="@typeof(MauiProgram).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData"
-                   DefaultLayout="@typeof(MainLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <h1>Ø§Ù„ØµÙØ­Ø© ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯Ø©</h1>
-        </LayoutView>
-    </NotFound>
-</Router>
+@using Microsoft.AspNetCore.Components.Authorization
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(MauiProgram).Assembly" AdditionalAssemblies="new[] { typeof(smartLaywer.Components.Pages.Laywer).Assembly }">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)">
+                <NotAuthorized>
+                    @* áæ ÇáãÔßáÉ İí ÇáÕáÇÍíÇÊ ÇáÑÓÇáÉ Ïí åÊÙåÑ *@
+                    <p>áíÓ áÏíß ÕáÇÍíÉ (Role Issue). ÇáÏæÑ ÇáÍÇáí: @context.User.Identity.Name</p>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(Layout.MainLayout)">
+                @* ÇáÑÓÇáÉ Çááí ÈÊÙåÑáß ÍÇáíÇğ *@
+                <p role="alert">ÚĞÑÇğ¡ ÇáÜ Router ãÔ ÔÇíİ ÇáÕİÍÉ Ïí ÎÇáÕ.</p>
+                <p>ÊÃßÏ ãä ÇáÜ Namespace: @typeof(MauiProgram).Namespace</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

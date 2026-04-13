@@ -1,900 +1,966 @@
-@page "/fees"
-@namespace smartLaywer.Components.Pages
-@inject IFinancialsService FinancialsService
+    @page "/fees"
+    @namespace smartLaywer.Components.Pages
+    @inject IFinancialsService FinancialsService
 
-<PageTitle>«·√ ⁄«» Ê«·œ›⁄« </PageTitle>
+    <PageTitle>«·√ ⁄«» Ê«·œ›⁄« </PageTitle>
 
-<div class="fees-page" dir="rtl">
+    <div class="fees-page" dir="rtl">
 
-    <div class="page-header">
-        <div>
-            <h1 class="page-title">«·√ ⁄«» Ê«·œ›⁄« </h1>
-            <p class="page-sub">≈œ«—… √ ⁄«» «·ﬁ÷«Ì« Ê„ «»⁄… «·œ›⁄« </p>
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">«·√ ⁄«» Ê«·œ›⁄« </h1>
+                <p class="page-sub">≈œ«—… √ ⁄«» «·ﬁ÷«Ì« Ê„ «»⁄… «·œ›⁄« </p>
+            </div>
+            @* <button class="btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                 ”ÃÌ· œ›⁄… ÃœÌœ…
+            </button> *@
         </div>
-        @* <button class="btn-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-             ”ÃÌ· œ›⁄… ÃœÌœ…
-        </button> *@
-    </div>
 
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-body">
-                <div>
-                    <p class="stat-label">≈Ã„«·Ì «·„Õ’·</p>
-                    <h3 class="stat-value green">@stats.TotalCollected.ToString("N0") Ã.„</h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-body">
+                    <div>
+                        <p class="stat-label">≈Ã„«·Ì «·„Õ’·</p>
+                        <h3 class="stat-value green">@stats.TotalCollected.ToString("N0") Ã.„</h3>
+                    </div>
+                    <div class="stat-icon bg-green">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23" />
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                    </div>
                 </div>
-                <div class="stat-icon bg-green">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="1" x2="12" y2="23" />
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                    </svg>
+            </div>
+            <div class="stat-card">
+                <div class="stat-body">
+                    <div>
+                        <p class="stat-label">«·„»«·€ «·„” Õﬁ…</p>
+                        <h3 class="stat-value amber">@stats.TotalOutstanding.ToString("N0") Ã.„</h3>
+                    </div>
+                    <div class="stat-icon bg-amber">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-body">
+                    <div>
+                        <p class="stat-label">„œ›Ê⁄… »«·ﬂ«„·</p>
+                        <h3 class="stat-value">@stats.FullyPaidCount</h3>
+                    </div>
+                    <div class="stat-icon bg-blue">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                            <polyline points="22 4 12 14.01 9 11.01" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-body">
+                    <div>
+                        <p class="stat-label">„ √Œ—…</p>
+                        <h3 class="stat-value red">@stats.TotalOverdue.ToString("N0") Ã.„</h3>
+                    </div>
+                    <div class="stat-icon bg-red">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                            <line x1="12" y1="9" x2="12" y2="13" />
+                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-body">
-                <div>
-                    <p class="stat-label">«·„»«·€ «·„” Õﬁ…</p>
-                    <h3 class="stat-value amber">@stats.TotalOutstanding.ToString("N0") Ã.„</h3>
-                </div>
-                <div class="stat-icon bg-amber">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10" />
-                        <polyline points="12 6 12 12 16 14" />
-                    </svg>
-                </div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-body">
-                <div>
-                    <p class="stat-label">„œ›Ê⁄… »«·ﬂ«„·</p>
-                    <h3 class="stat-value">@stats.FullyPaidCount</h3>
-                </div>
-                <div class="stat-icon bg-blue">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                        <polyline points="22 4 12 14.01 9 11.01" />
-                    </svg>
-                </div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-body">
-                <div>
-                    <p class="stat-label">„ √Œ—…</p>
-                    <h3 class="stat-value red">@stats.TotalOverdue.ToString("N0") Ã.„</h3>
-                </div>
-                <div class="stat-icon bg-red">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                        <line x1="12" y1="9" x2="12" y2="13" />
-                        <line x1="12" y1="17" x2="12.01" y2="17" />
-                    </svg>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="search-bar">
-        <div class="search-wrap">
-            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input type="text" placeholder="«·»ÕÀ »—ﬁ„ «·ﬁ÷Ì… √Ê «”„ «·⁄„Ì·..." class="search-input" @oninput="OnSearchInput" />
+        <div class="search-bar">
+            <div class="search-wrap">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input type="text" placeholder="«·»ÕÀ »—ﬁ„ «·ﬁ÷Ì… √Ê «”„ «·⁄„Ì·..." class="search-input" @oninput="OnSearchInput" />
+            </div>
+            @* <button class="btn-outline">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                 ’œÌ— «· ﬁ—Ì—
+            </button> *@
         </div>
-        @* <button class="btn-outline">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-             ’œÌ— «· ﬁ—Ì—
-        </button> *@
-    </div>
-    <div class="fees-list">
-        @if (fees != null && fees.Any())
-        {
-            @foreach (var fee in fees)
+        <div class="fees-list">
+            @if (fees != null && fees.Any())
             {
-                <div class="fee-card @(fee.Status == "„ √Œ—…" ? "fee-overdue" : "")">
-                    <div class="fee-top">
-                        <div class="fee-left">
-                            <div class="fee-info">
-                                <div class="fee-title-row">
-                                    <h3 class="fee-case">«·ﬁ÷Ì…: @fee.CaseNumber</h3>
-                                    <span class="badge @GetStatusClass(fee.Status)">@fee.Status</span>
-                                </div>
-                                <p class="fee-client">@fee.ClientName</p>
-                                <div class="fee-dates">
-                                    <span>«·»œ«Ì…: @fee.StartDate.ToString("yyyy-MM-dd")</span>
-                                    <span>«·«” Õﬁ«ﬁ: @fee.DueDate.ToString("yyyy-MM-dd")</span>
+                @foreach (var fee in fees)
+                {
+                    <div class="fee-card @(fee.Status == "„ √Œ—…" ? "fee-overdue" : "")">
+                        <div class="fee-top">
+                            <div class="fee-left">
+                                <div class="fee-info">
+                                    <div class="fee-title-row">
+                                        <h3 class="fee-case">«·ﬁ÷Ì…: @fee.CaseNumber</h3>
+                                        <span class="badge @GetStatusClass(fee.Status)">@fee.Status</span>
+                                    </div>
+                                    <p class="fee-client">@fee.ClientName</p>
+                                    <div class="fee-dates">
+                                        <span>«·»œ«Ì…: @fee.StartDate.ToString("yyyy-MM-dd")</span>
+                                        <span>«·«” Õﬁ«ﬁ: @fee.DueDate.ToString("yyyy-MM-dd")</span>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="fee-total">
+                                <p class="fee-total-label">≈Ã„«·Ì «·√ ⁄«»</p>
+                                <p class="fee-total-value">@fee.TotalAmount.ToString("N0") Ã.„</p>
+                            </div>
                         </div>
-                        <div class="fee-total">
-                            <p class="fee-total-label">≈Ã„«·Ì «·√ ⁄«»</p>
-                            <p class="fee-total-value">@fee.TotalAmount.ToString("N0") Ã.„</p>
+
+                        <div class="progress-section">
+                            <div class="progress-header">
+                                <span> ﬁœ„ «·”œ«œ</span>
+                                <span>@fee.CollectedAmount.ToString("N0") / @fee.TotalAmount.ToString("N0") Ã.„</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill @(fee.Status == "„ √Œ—…" ? "progress-overdue" : "")"
+                                     style="width: @(fee.ProgressPercentage)%"></div>
+                            </div>
+                            <div class="progress-footer">
+                                <span>«·„œ›Ê⁄: @fee.ProgressPercentage.ToString("F0")%</span>
+                                <span class="@(fee.RemainingAmount > 0 ? "red" : "green")">
+                                    @(fee.RemainingAmount > 0 ? $"«·„ »ﬁÌ: {fee.RemainingAmount:N0} Ã.„" : "„ﬂ „·")
+                                </span>
+                            </div>
+                        </div>
+
+                        @if (fee.Payments.Any())
+                        {
+                            <div class="payments-section">
+                                <h4 class="payments-title">”Ã· «·œ›⁄«  (@fee.Payments.Count)</h4>
+                                <div class="payments-list">
+                                    @foreach (var payment in fee.Payments)
+                                    {
+                                        <div class="payment-item">
+                                            <p class="payment-amount">@payment.Amount.ToString("N0") Ã.„</p>
+                                            <p class="payment-meta">@payment.PaymentDate.ToShortDateString() - @payment.Method</p>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        <div class="fee-actions">
+                            <button class="btn-primary btn-sm" @onclick="() => OpenPaymentModal(fee.Id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19" />
+                                    <line x1="5" y1="12" x2="19" y2="12" />
+                                </svg>
+                                 ”ÃÌ· œ›⁄…
+                            </button>
+
+
+                            <a href="/financials/client-profile/@fee.ClientId" class="btn-primary btn-sm no-underline text-white">
+                                ⁄—÷ «· ›«’Ì· «·„«·Ì…
+                            </a>
+                        <button class="btn-outline btn-sm" @onclick="() => OpenScheduleModal(fee.Id, fee.CaseNumber, fee.RemainingAmount)">
+                            <i class="bi bi-calendar-plus"></i> ÃœÊ·… «·√ﬁ”«ÿ
+                        </button>
                         </div>
                     </div>
-
-                    <div class="progress-section">
-                        <div class="progress-header">
-                            <span> ﬁœ„ «·”œ«œ</span>
-                            <span>@fee.CollectedAmount.ToString("N0") / @fee.TotalAmount.ToString("N0") Ã.„</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill @(fee.Status == "„ √Œ—…" ? "progress-overdue" : "")"
-                                 style="width: @(fee.ProgressPercentage)%"></div>
-                        </div>
-                        <div class="progress-footer">
-                            <span>«·„œ›Ê⁄: @fee.ProgressPercentage.ToString("F0")%</span>
-                            <span class="@(fee.RemainingAmount > 0 ? "red" : "green")">
-                                @(fee.RemainingAmount > 0 ? $"«·„ »ﬁÌ: {fee.RemainingAmount:N0} Ã.„" : "„ﬂ „·")
+                }
+            }
+            else if (isLoading)
+            {
+                <p>Ã«—Ì «·»ÕÀ...</p>
+            }
+            else
+            {
+                <p>·«  ÊÃœ ‰ «∆Ã „ÿ«»ﬁ… ·»ÕÀﬂ.</p>
+            }
+        </div>
+        <!-- Fee Cards -->
+  
+        <!-- Monthly Revenue -->
+        <div class="revenue-card">
+            <h2 class="card-title">«·≈Ì—«œ«  «·‘Â—Ì…</h2>
+            <div class="revenue-grid">
+                @if (revenueList != null)
+                {
+                    @foreach (var month in revenueList)
+                    {
+                        <div class="revenue-month">
+                            <p class="month-name">@month.MonthName</p>
+                                    <p class="month-value">@month.TotalValue.ToString("N0") Ã.„</p>
+                            <span class="month-trend">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                                    <polyline points="17 6 23 6 23 12" />
+                                </svg>
+                                +10%
                             </span>
                         </div>
-                    </div>
-
-                    @if (fee.Payments.Any())
-                    {
-                        <div class="payments-section">
-                            <h4 class="payments-title">”Ã· «·œ›⁄«  (@fee.Payments.Count)</h4>
-                            <div class="payments-list">
-                                @foreach (var payment in fee.Payments)
-                                {
-                                    <div class="payment-item">
-                                        <p class="payment-amount">@payment.Amount.ToString("N0") Ã.„</p>
-                                        <p class="payment-meta">@payment.PaymentDate.ToShortDateString() - @payment.Method</p>
-                                    </div>
-                                }
-                            </div>
-                        </div>
                     }
-                    <div class="fee-actions">
-                        <button class="btn-primary btn-sm" @onclick="() => OpenPaymentModal(fee.Id)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="5" x2="12" y2="19" />
-                                <line x1="5" y1="12" x2="19" y2="12" />
-                            </svg>
-                             ”ÃÌ· œ›⁄…
-                        </button>
-
-
-                        <a href="/financials/client-profile/@fee.ClientId" class="btn-primary btn-sm no-underline text-white">
-                            ⁄—÷ «· ›«’Ì· «·„«·Ì…
-                        </a>
-                    </div>
-                </div>
-            }
-        }
-        else if (isLoading)
-        {
-            <p>Ã«—Ì «·»ÕÀ...</p>
-        }
-        else
-        {
-            <p>·«  ÊÃœ ‰ «∆Ã „ÿ«»ﬁ… ·»ÕÀﬂ.</p>
-        }
-    </div>
-    <!-- Fee Cards -->
-  
-    <!-- Monthly Revenue -->
-    <div class="revenue-card">
-        <h2 class="card-title">«·≈Ì—«œ«  «·‘Â—Ì…</h2>
-        <div class="revenue-grid">
-            <div class="revenue-month">
-                <p class="month-name">Ì‰«Ì—</p>
-                <p class="month-value">25,000 Ã.„</p>
-                <span class="month-trend">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                        <polyline points="17 6 23 6 23 12" />
-                    </svg>
-                    +10%
-                </span>
-            </div>
-            <div class="revenue-month">
-                <p class="month-name">›»—«Ì—</p>
-                <p class="month-value">30,000 Ã.„</p>
-                <span class="month-trend">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                        <polyline points="17 6 23 6 23 12" />
-                    </svg>
-                    +12%
-                </span>
-            </div>
-            <div class="revenue-month">
-                <p class="month-name">„«—”</p>
-                <p class="month-value">35,000 Ã.„</p>
-                <span class="month-trend">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                        <polyline points="17 6 23 6 23 12" />
-                    </svg>
-                    +14%
-                </span>
-            </div>
-            <div class="revenue-month">
-                <p class="month-name">√»—Ì·</p>
-                <p class="month-value">40,000 Ã.„</p>
-                <span class="month-trend">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                        <polyline points="17 6 23 6 23 12" />
-                    </svg>
-                    +16%
-                </span>
+                }
             </div>
         </div>
     </div>
-
-</div>
-@if (showModal)
+            
+    @if (showModal)
+    {
+        <div class="modal-backdrop fade show"></div>
+        <div class="modal d-block" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"> ”ÃÌ· œ›⁄… ÃœÌœ…</h5>
+                        <button type="button" class="btn-close btn-close-white" @onclick="CloseModal"></button>
+                    </div>
+                    <EditForm Model="paymentDto" OnValidSubmit="HandlePaymentSubmit">
+                        <div class="modal-body">
+                            <DataAnnotationsValidator />
+                            <div class="mb-3">
+                                <label class="form-label">«·„»·€ «·„” ·„</label>
+                                <InputNumber @bind-Value="paymentDto.Amount" class="form-control" placeholder="0.00" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"> «—ÌŒ «·œ›⁄</label>
+                                <InputDate @bind-Value="paymentDto.PaymentDate" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">ÿ—Ìﬁ… «·œ›⁄</label>
+                                <InputSelect @bind-Value="paymentDto.PaymentMethod" class="form-control">
+                                    <option value="1">‰ﬁœ«</option>
+                                    <option value="2"> ÕÊÌ· »‰ﬂÌ</option>
+                                    <option value="3">›Êœ«›Ê‰ ﬂ«‘ / „Õ›Ÿ…</option>
+                                </InputSelect>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" @onclick="CloseModal">≈·€«¡</button>
+                            <button type="submit" class="btn btn-primary"> √ﬂÌœ «·⁄„·Ì…</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    }
+@if (showScheduleModal)
 {
     <div class="modal-backdrop fade show"></div>
     <div class="modal d-block" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title"> ”ÃÌ· œ›⁄… ÃœÌœ…</h5>
-                    <button type="button" class="btn-close btn-close-white" @onclick="CloseModal"></button>
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title">ÃœÊ·… √ﬁ”«ÿ «·ﬁ÷Ì…: @selectedCaseNumber</h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="() => showScheduleModal = false"></button>
                 </div>
-                <EditForm Model="paymentDto" OnValidSubmit="HandlePaymentSubmit">
-                    <div class="modal-body">
-                        <DataAnnotationsValidator />
-                        <div class="mb-3">
-                            <label class="form-label">«·„»·€ «·„” ·„</label>
-                            <InputNumber @bind-Value="paymentDto.Amount" class="form-control" placeholder="0.00" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label"> «—ÌŒ «·œ›⁄</label>
-                            <InputDate @bind-Value="paymentDto.PaymentDate" class="form-control" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">ÿ—Ìﬁ… «·œ›⁄</label>
-                            <InputSelect @bind-Value="paymentDto.PaymentMethod" class="form-control">
-                                <option value="1">‰ﬁœ«</option>
-                                <option value="2"> ÕÊÌ· »‰ﬂÌ</option>
-                                <option value="3">›Êœ«›Ê‰ ﬂ«‘ / „Õ›Ÿ…</option>
-                            </InputSelect>
-                        </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning d-flex justify-content-between">
+                        <span>≈Ã„«·Ì «·„ »ﬁÌ €Ì— «·„ÃœÊ·: <b>@selectedRemainingAmount.ToString("N0") Ã.„</b></span>
+                        <span>„Ã„Ê⁄ «·√ﬁ”«ÿ «·ÃœÌœ…: <b class="@(currentTotalNewSchedules > selectedRemainingAmount ? "text-danger" : "")">@currentTotalNewSchedules.ToString("N0")</b></span>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" @onclick="CloseModal">≈·€«¡</button>
-                        <button type="submit" class="btn btn-primary"> √ﬂÌœ «·⁄„·Ì…</button>
-                    </div>
-                </EditForm>
+
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>«·„»·€</th>
+                                <th> «—ÌŒ «·«” Õﬁ«ﬁ</th>
+                                <th style="width: 50px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in newSchedulesList)
+                            {
+                                <tr>
+                                    <td><input type="number" class="form-control" @bind="item.Amount" /></td>
+                                    <td><input type="date" class="form-control" @bind="item.DueDate" /></td>
+                                    <td>
+                                        <button class="btn text-danger" @onclick="() => RemoveScheduleRow(item)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+                                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <button class="btn btn-outline-primary btn-sm w-100" @onclick="AddScheduleRow">+ ≈÷«›… —Ê ÃœÌœ</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" @onclick="() => showScheduleModal = false">≈·€«¡</button>
+                    <button type="button" class="btn btn-dark" @onclick="HandleScheduleSubmit"
+                            disabled="@(newSchedulesList.Count == 0 || currentTotalNewSchedules > selectedRemainingAmount)">
+                        Õ›Ÿ «·ÃœÊ·
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 }
-@code {
+   @code {
+    private bool isLoading = true;
+    private bool showModal = false;
+    private bool showScheduleModal = false;
+    private string searchTerm = "";
+    private System.Threading.Timer? _timer;
+
+    // --- «·»Ì«‰«  ---
     private FinancialStatDto stats = new();
     private List<FeeDetailsDto> fees = new();
-    private string searchTerm = "";
-    private bool isLoading = true;
+    private List<RevenueSummaryDto> revenueList = new();
+    private PaymentCreationDto paymentDto = new();
 
-    private bool showModal = false;
-    private smartLaywer.DTO.Finance.PaymentCreationDto paymentDto = new();
+    // --- „ €Ì—«  «·ÃœÊ·… ---
+    private int selectedFeeId;
+    private string selectedCaseNumber = "";
+    private decimal selectedRemainingAmount;
+    private List<InstallmentCreationDto> newSchedulesList = new();
 
-    private async Task OnSearchInput(ChangeEventArgs e)
+    // Õ”«»«  ·ÕŸÌ…
+    private decimal currentTotalNewSchedules => newSchedulesList.Sum(x => x.Amount);
+    private bool IsScheduleInvalid => currentTotalNewSchedules != selectedRemainingAmount;
+
+    protected override async Task OnInitializedAsync() => await LoadAllData();
+    private void CloseModal()
     {
-        searchTerm = e.Value?.ToString() ?? "";
-        await LoadFees();
+        showModal = false;
+        showScheduleModal = false; // ·Ê ⁄«Ì“ ‰›” «·„ÌÀÊœ  ﬁ›· „Êœ«· «·ÃœÊ·… ﬂ„«‰
     }
-
-    private async Task LoadFees()
+    private void RemoveScheduleRow(InstallmentCreationDto item)
     {
-        isLoading = true;
-        try
+        if (newSchedulesList.Contains(item))
         {
-            var paginatedResult = await FinancialsService.GetPagedFeesAsync(searchTerm, 1);
-            fees = paginatedResult.Items;
-        }
-        finally
-        {
-            isLoading = false;
+            newSchedulesList.Remove(item);
         }
     }
-
-    protected override async Task OnInitializedAsync()
+    private void AddScheduleRow()
+    {
+        newSchedulesList.Add(new InstallmentCreationDto
+        {
+            Amount = 0,
+            DueDate = DateTime.Now
+        });
+    }
+    private async Task LoadAllData()
     {
         isLoading = true;
         try
         {
             var statsTask = FinancialsService.GetDashboardStatsAsync();
-            var feesTask = LoadFees();
+            var revenueTask = FinancialsService.GetUpcomingRevenueAsync();
+            var feesTask = FinancialsService.GetPagedFeesAsync(searchTerm, 1);
 
-            await Task.WhenAll(statsTask, feesTask);
-            stats = await statsTask;
+            await Task.WhenAll(statsTask, revenueTask, feesTask);
+
+            stats = statsTask.Result;
+            revenueList = revenueTask.Result;
+            fees = feesTask.Result.Items;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading data: {ex.Message}");
+            // ≈ŸÂ«— —”«·… Œÿ√ ··„” Œœ„ Â‰«
+            Console.WriteLine($"Error: {ex.Message}");
         }
-        finally
-        {
-            isLoading = false;
-        }
+        finally { isLoading = false; }
     }
 
+    private async Task LoadFees()
+    {
+        var result = await FinancialsService.GetPagedFeesAsync(searchTerm, 1);
+        fees = result.Items;
+        StateHasChanged();
+    }
 
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? "";
+        _timer?.Dispose();
+        _timer = new System.Threading.Timer(async _ => await InvokeAsync(LoadFees), null, 400, -1);
+    }
+
+    // --- «· ⁄«„· „⁄ «·œ›⁄ ---
     private void OpenPaymentModal(int feeId)
     {
-        paymentDto = new smartLaywer.DTO.Finance.PaymentCreationDto
-        {
-            FeeId = feeId,
-            PaymentDate = DateTime.Now,
-            PaymentMethod = 1 
-        };
+        paymentDto = new PaymentCreationDto { FeeId = feeId, PaymentDate = DateTime.Now, PaymentMethod = 1 };
         showModal = true;
     }
 
-    private void CloseModal() => showModal = false;
-
     private async Task HandlePaymentSubmit()
     {
-        var success = await FinancialsService.RegisterPaymentAsync(paymentDto);
-        if (success)
+        if (await FinancialsService.RegisterPaymentAsync(paymentDto))
         {
             showModal = false;
-            await OnInitializedAsync();
+            await LoadAllData();
         }
     }
 
-    private void ExportStatement(int feeId)
+    // --- «· ⁄«„· „⁄ «·ÃœÊ·… ---
+    private void OpenScheduleModal(int feeId, string caseNo, decimal remaining)
     {
-        Console.WriteLine($"Exporting statement for FeeId: {feeId}");
+        selectedFeeId = feeId;
+        selectedCaseNumber = caseNo;
+        selectedRemainingAmount = remaining;
+        newSchedulesList = new() { new InstallmentCreationDto { DueDate = DateTime.Now, Amount = remaining } };
+        showScheduleModal = true;
     }
 
-    private string GetStatusClass(string status)
+    private async Task HandleScheduleSubmit()
     {
-        return status switch
+        if (IsScheduleInvalid) return;
+
+        if (await FinancialsService.CreatePaymentSchedulesAsync(selectedFeeId, newSchedulesList))
         {
-            "„œ›Ê⁄… »«·ﬂ«„·" => "badge-paid",
-            "œ›⁄ Ã“∆Ì" => "badge-partial",
-            "„ √Œ—…" => "badge-overdue",
-            _ => "badge-unpaid"
-        };
+            showScheduleModal = false;
+            await LoadAllData();
+        }
     }
+
+    private string GetStatusClass(string status) => status switch
+    {
+        "„œ›Ê⁄… »«·ﬂ«„·" => "badge-paid",
+        "œ›⁄ Ã“∆Ì" => "badge-partial",
+        "„ √Œ—…" => "badge-overdue",
+        _ => "badge-unpaid"
+    };
+
+    public void Dispose() => _timer?.Dispose();
 }
-<style>
-    .fee-actions {
-        display: flex;
-        gap: 8px;
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid #f0f0f0;
-    }
-
-    .no-underline {
-        text-decoration: none !important;
-    }
-
-    /* ·Ã⁄· «·„Êœ«· Ì»œÊ «Õ —«›Ì« */
-    .modal-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0,0,0,0.5);
-        z-index: 1040;
-    }
-
-    .modal {
-        z-index: 1050;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-    }
-    .fees-page {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        font-family: 'Cairo', 'Segoe UI', sans-serif;
-    }
-
-    /* Header */
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .page-title {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin: 0;
-    }
-
-    .page-sub {
-        color: #64748b;
-        margin: .25rem 0 0;
-        font-size: .9rem;
-    }
-
-    /* Stats */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-
-    .stat-card {
-        background: #fff;
-        border-radius: 12px;
-        padding: 1.25rem;
-        box-shadow: 0 1px 6px rgba(0,0,0,.08);
-    }
-
-    .stat-body {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .stat-label {
-        font-size: .85rem;
-        color: #64748b;
-        margin: 0;
-    }
-
-    .stat-value {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin: .25rem 0 0;
-    }
-
-        .stat-value.green {
-            color: #16a34a;
+    <style>
+        .fee-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #f0f0f0;
         }
 
-        .stat-value.amber {
-            color: #d97706;
+        .no-underline {
+            text-decoration: none !important;
         }
 
-        .stat-value.red {
-            color: #dc2626;
+        /* ·Ã⁄· «·„Êœ«· Ì»œÊ «Õ —«›Ì« */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 1040;
         }
 
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        flex-shrink: 0;
-    }
-
-    .bg-green {
-        background: #16a34a;
-    }
-
-    .bg-amber {
-        background: #d97706;
-    }
-
-    .bg-blue {
-        background: #2563eb;
-    }
-
-    .bg-red {
-        background: #dc2626;
-    }
-
-    /* Search */
-    .search-bar {
-        display: flex;
-        gap: 1rem;
-    }
-
-    .search-wrap {
-        position: relative;
-        flex: 1;
-    }
-
-    .search-icon {
-        position: absolute;
-        right: .875rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #94a3b8;
-    }
-
-    .search-input {
-        width: 100%;
-        padding: .65rem 2.5rem .65rem .875rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        font-family: inherit;
-        font-size: .9rem;
-        outline: none;
-    }
-
-        .search-input:focus {
-            border-color: #d97706;
-            box-shadow: 0 0 0 3px rgba(217,119,6,.1);
+        .modal {
+            z-index: 1050;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .fees-page {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            font-family: 'Cairo', 'Segoe UI', sans-serif;
         }
 
-    /* Buttons */
-    .btn-primary {
-        display: inline-flex;
-        align-items: center;
-        gap: .4rem;
-        background: #d97706;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        padding: .6rem 1.2rem;
-        font-family: inherit;
-        font-size: .9rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background .2s;
-    }
-
-        .btn-primary:hover {
-            background: #b45309;
+        /* Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-    .btn-outline {
-        display: inline-flex;
-        align-items: center;
-        gap: .4rem;
-        background: transparent;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: .6rem 1.2rem;
-        font-family: inherit;
-        font-size: .9rem;
-        color: #475569;
-        cursor: pointer;
-        transition: all .2s;
-    }
-
-        .btn-outline:hover {
-            border-color: #d97706;
-            color: #d97706;
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
         }
 
-    .btn-sm {
-        padding: .35rem .8rem;
-        font-size: .82rem;
-    }
+        .page-sub {
+            color: #64748b;
+            margin: .25rem 0 0;
+            font-size: .9rem;
+        }
 
-    /* Fee Cards */
-    .fees-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
 
-    .fee-card {
-        background: #fff;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 1px 6px rgba(0,0,0,.08);
-        border: 1px solid #e2e8f0;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
+        .stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        }
 
-    .fee-overdue {
-        border-color: #fca5a5;
-        background: #fff7f7;
-    }
+        .stat-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .fee-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-    }
+        .stat-label {
+            font-size: .85rem;
+            color: #64748b;
+            margin: 0;
+        }
 
-    .fee-left {
-        display: flex;
-        gap: 1rem;
-        align-items: flex-start;
-    }
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: .25rem 0 0;
+        }
 
-    .fee-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 10px;
-        background: #fef3c7;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #d97706;
-        flex-shrink: 0;
-    }
+            .stat-value.green {
+                color: #16a34a;
+            }
 
-    .fee-title-row {
-        display: flex;
-        align-items: center;
-        gap: .5rem;
-        margin-bottom: .3rem;
-        flex-wrap: wrap;
-    }
+            .stat-value.amber {
+                color: #d97706;
+            }
 
-    .fee-case {
-        font-weight: 600;
-        color: #1e293b;
-        margin: 0;
-        font-size: 1rem;
-    }
+            .stat-value.red {
+                color: #dc2626;
+            }
 
-    .fee-client {
-        font-size: .85rem;
-        color: #64748b;
-        margin: .2rem 0;
-    }
-
-    .fee-dates {
-        display: flex;
-        gap: 1rem;
-        font-size: .78rem;
-        color: #94a3b8;
-        flex-wrap: wrap;
-    }
-
-        .fee-dates span {
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
-            gap: .25rem;
+            justify-content: center;
+            color: #fff;
+            flex-shrink: 0;
         }
 
-    .fee-total {
-        text-align: left;
-        flex-shrink: 0;
-    }
-
-    .fee-total-label {
-        font-size: .8rem;
-        color: #64748b;
-        margin: 0;
-    }
-
-    .fee-total-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #d97706;
-        margin: .2rem 0 0;
-    }
-
-    /* Badges */
-    .badge {
-        font-size: .72rem;
-        padding: .2rem .6rem;
-        border-radius: 999px;
-        font-weight: 600;
-    }
-
-    .badge-paid {
-        background: #dcfce7;
-        color: #16a34a;
-    }
-
-    .badge-partial {
-        background: #dbeafe;
-        color: #2563eb;
-    }
-
-    .badge-unpaid {
-        background: #f1f5f9;
-        color: #475569;
-    }
-
-    .badge-overdue {
-        background: #fee2e2;
-        color: #dc2626;
-    }
-
-    /* Progress */
-    .progress-section {
-        display: flex;
-        flex-direction: column;
-        gap: .4rem;
-    }
-
-    .progress-header {
-        display: flex;
-        justify-content: space-between;
-        font-size: .85rem;
-        color: #64748b;
-    }
-
-    .progress-bar {
-        height: 8px;
-        background: #f1f5f9;
-        border-radius: 999px;
-        overflow: hidden;
-    }
-
-    .progress-fill {
-        height: 100%;
-        background: #d97706;
-        border-radius: 999px;
-        transition: width .4s;
-    }
-
-    .progress-overdue {
-        background: #dc2626;
-    }
-
-    .progress-footer {
-        display: flex;
-        justify-content: space-between;
-        font-size: .75rem;
-        color: #94a3b8;
-    }
-
-        .progress-footer .red {
-            color: #dc2626;
+        .bg-green {
+            background: #16a34a;
         }
 
-        .progress-footer .green {
+        .bg-amber {
+            background: #d97706;
+        }
+
+        .bg-blue {
+            background: #2563eb;
+        }
+
+        .bg-red {
+            background: #dc2626;
+        }
+
+        /* Search */
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: .875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: .65rem 2.5rem .65rem .875rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: .9rem;
+            outline: none;
+        }
+
+            .search-input:focus {
+                border-color: #d97706;
+                box-shadow: 0 0 0 3px rgba(217,119,6,.1);
+            }
+
+        /* Buttons */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            background: #d97706;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: .6rem 1.2rem;
+            font-family: inherit;
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+            .btn-primary:hover {
+                background: #b45309;
+            }
+
+        .btn-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            background: transparent;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: .6rem 1.2rem;
+            font-family: inherit;
+            font-size: .9rem;
+            color: #475569;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+            .btn-outline:hover {
+                border-color: #d97706;
+                color: #d97706;
+            }
+
+        .btn-sm {
+            padding: .35rem .8rem;
+            font-size: .82rem;
+        }
+
+        /* Fee Cards */
+        .fees-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .fee-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 6px rgba(0,0,0,.08);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .fee-overdue {
+            border-color: #fca5a5;
+            background: #fff7f7;
+        }
+
+        .fee-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .fee-left {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .fee-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: #fef3c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d97706;
+            flex-shrink: 0;
+        }
+
+        .fee-title-row {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            margin-bottom: .3rem;
+            flex-wrap: wrap;
+        }
+
+        .fee-case {
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .fee-client {
+            font-size: .85rem;
+            color: #64748b;
+            margin: .2rem 0;
+        }
+
+        .fee-dates {
+            display: flex;
+            gap: 1rem;
+            font-size: .78rem;
+            color: #94a3b8;
+            flex-wrap: wrap;
+        }
+
+            .fee-dates span {
+                display: flex;
+                align-items: center;
+                gap: .25rem;
+            }
+
+        .fee-total {
+            text-align: left;
+            flex-shrink: 0;
+        }
+
+        .fee-total-label {
+            font-size: .8rem;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .fee-total-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #d97706;
+            margin: .2rem 0 0;
+        }
+
+        /* Badges */
+        .badge {
+            font-size: .72rem;
+            padding: .2rem .6rem;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        .badge-paid {
+            background: #dcfce7;
             color: #16a34a;
         }
 
-    /* Payments */
-    .payments-section {
-        border-top: 1px solid #f1f5f9;
-        padding-top: 1rem;
-    }
+        .badge-partial {
+            background: #dbeafe;
+            color: #2563eb;
+        }
 
-    .payments-title {
-        font-size: .9rem;
-        font-weight: 600;
-        color: #1e293b;
-        display: flex;
-        align-items: center;
-        gap: .4rem;
-        margin: 0 0 .75rem;
-    }
+        .badge-unpaid {
+            background: #f1f5f9;
+            color: #475569;
+        }
 
-    .payments-list {
-        display: flex;
-        flex-direction: column;
-        gap: .5rem;
-    }
+        .badge-overdue {
+            background: #fee2e2;
+            color: #dc2626;
+        }
 
-    .payment-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: #f8fafc;
-        border-radius: 8px;
-        padding: .65rem .875rem;
-    }
+        /* Progress */
+        .progress-section {
+            display: flex;
+            flex-direction: column;
+            gap: .4rem;
+        }
 
-    .payment-left {
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-    }
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: .85rem;
+            color: #64748b;
+        }
 
-    .payment-check {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: #dcfce7;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #16a34a;
-        flex-shrink: 0;
-    }
+        .progress-bar {
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 999px;
+            overflow: hidden;
+        }
 
-    .payment-amount {
-        font-size: .875rem;
-        font-weight: 600;
-        color: #1e293b;
-        margin: 0;
-    }
+        .progress-fill {
+            height: 100%;
+            background: #d97706;
+            border-radius: 999px;
+            transition: width .4s;
+        }
 
-    .payment-meta {
-        font-size: .75rem;
-        color: #94a3b8;
-        margin: .1rem 0 0;
-    }
+        .progress-overdue {
+            background: #dc2626;
+        }
 
-    .receipt-badge {
-        font-size: .72rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 6px;
-        padding: .2rem .5rem;
-        color: #64748b;
-    }
+        .progress-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: .75rem;
+            color: #94a3b8;
+        }
 
-    /* Actions */
-    .fee-actions {
-        display: flex;
-        gap: .5rem;
-        flex-wrap: wrap;
-        padding-top: .25rem;
-    }
+            .progress-footer .red {
+                color: #dc2626;
+            }
 
-    /* Revenue */
-    .revenue-card {
-        background: #fff;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 1px 6px rgba(0,0,0,.08);
-    }
+            .progress-footer .green {
+                color: #16a34a;
+            }
 
-    .card-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #1e293b;
-        margin: 0 0 1rem;
-    }
+        /* Payments */
+        .payments-section {
+            border-top: 1px solid #f1f5f9;
+            padding-top: 1rem;
+        }
 
-    .revenue-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 1rem;
-    }
+        .payments-title {
+            font-size: .9rem;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            margin: 0 0 .75rem;
+        }
 
-    .revenue-month {
-        text-align: center;
-        background: #f8fafc;
-        border-radius: 10px;
-        padding: 1rem;
-    }
+        .payments-list {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+        }
 
-    .month-name {
-        font-size: .85rem;
-        color: #64748b;
-        margin: 0 0 .4rem;
-    }
+        .payment-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: .65rem .875rem;
+        }
 
-    .month-value {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: #16a34a;
-        margin: 0 0 .3rem;
-    }
+        .payment-left {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+        }
 
-    .month-trend {
-        font-size: .75rem;
-        color: #16a34a;
-        display: inline-flex;
-        align-items: center;
-        gap: .2rem;
-    }
+        .payment-check {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #dcfce7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #16a34a;
+            flex-shrink: 0;
+        }
 
-    .red {
-        color: #dc2626;
-    }
+        .payment-amount {
+            font-size: .875rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
 
-    .green {
-        color: #16a34a;
-    }
-</style>
+        .payment-meta {
+            font-size: .75rem;
+            color: #94a3b8;
+            margin: .1rem 0 0;
+        }
+
+        .receipt-badge {
+            font-size: .72rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: .2rem .5rem;
+            color: #64748b;
+        }
+
+        /* Actions */
+        .fee-actions {
+            display: flex;
+            gap: .5rem;
+            flex-wrap: wrap;
+            padding-top: .25rem;
+        }
+
+        /* Revenue */
+        .revenue-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0 0 1rem;
+        }
+
+        .revenue-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .revenue-month {
+            text-align: center;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .month-name {
+            font-size: .85rem;
+            color: #64748b;
+            margin: 0 0 .4rem;
+        }
+
+        .month-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #16a34a;
+            margin: 0 0 .3rem;
+        }
+
+        .month-trend {
+            font-size: .75rem;
+            color: #16a34a;
+            display: inline-flex;
+            align-items: center;
+            gap: .2rem;
+        }
+
+        .red {
+            color: #dc2626;
+        }
+
+        .green {
+            color: #16a34a;
+        }
+    </style>
 

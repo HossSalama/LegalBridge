@@ -1,5 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
 @inject IAuthService AuthService
+@inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 
@@ -110,16 +112,45 @@
 </div>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authStateTask { get; set; } = null!;
+
     private bool sidebarOpen = false;
     private bool userMenuOpen = false;
-    private string userName = "المحامي";
+    private string userName = "جاري التحميل...";
     private int notificationCount = 5;
-
     private record NavItem(string Path, string Label, string Icon, NavLinkMatch Match = NavLinkMatch.Prefix);
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authStateTask;
+        var user = authState.User;
 
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            userName = user.Identity.Name ?? "المحامي";
+        }
+        else
+        {
+            Navigation.NavigateTo("/login");
+        }
+    }
+    private void ToggleSidebar() => sidebarOpen = !sidebarOpen;
+    private void CloseSidebar() => sidebarOpen = false;
+    private void ToggleUserMenu() => userMenuOpen = !userMenuOpen;
+
+    private async Task HandleLogout()
+    {
+        await AuthService.LogoutAsync();
+
+        var customAuthProvider = (HostAuthenticationStateProvider)AuthStateProvider;
+        customAuthProvider.Logout();
+
+        Navigation.NavigateTo("/login");
+    }
     private List<NavItem> navItems = new()
     {
         new("/",             "لوحة التحكم",      IconDashboard,   NavLinkMatch.All),
+        new("/lawyers",       "الموظفين",           IconUsers),
         new("/clients",      "العملاء",           IconUsers),
         new("/cases",        "القضايا",           IconBriefcase),
         new("/hearings",     "الجلسات",           IconCalendar),
@@ -136,25 +167,7 @@
         new("/reports",      "التقارير",          IconChart),
     };
 
-    protected override async Task OnInitializedAsync()
-    {
-        if (!await AuthService.IsAuthenticatedAsync())
-        {
-            Navigation.NavigateTo("/login");
-            return;
-        }
-        userName = await AuthService.GetUserNameAsync() ?? "المحامي";
-    }
 
-    private void ToggleSidebar() => sidebarOpen = !sidebarOpen;
-    private void CloseSidebar() => sidebarOpen = false;
-    private void ToggleUserMenu() => userMenuOpen = !userMenuOpen;
-
-    private async Task HandleLogout()
-    {
-        await AuthService.LogoutAsync();
-        Navigation.NavigateTo("/login");
-    }
 
     // ── SVG Icons ──────────────────────────────────────────────────
     private const string IconDashboard   = """<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>""";
