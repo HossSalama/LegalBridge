@@ -13,5 +13,6 @@ namespace smartLaywer.Services.InterfaceService
         //Task<List<CaseHearingsDto>> GetCasesWithHearingsAsync();
         //Task<List<HearingListDto>> GetCaseHearingsAsync(int caseId);
         //Task<bool> CreateHearingAsync(HearingCreateDto dto);
+        
     }
 }

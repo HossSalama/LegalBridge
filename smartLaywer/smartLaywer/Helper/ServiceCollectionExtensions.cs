@@ -2,6 +2,7 @@
 using smartLaywer.Mapping.FinancialMapping;
 using smartLaywer.Repository.UnitWork;
 using smartLaywer.Services.ClassService;
+using smartLaywer.Services.ReportService;
 
 namespace smartLaywer.Helper
 {
@@ -27,6 +28,8 @@ namespace smartLaywer.Helper
             services.AddScoped<IClientService, ClientService>();
             services.AddScoped<IHearingService, HearingService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IDashboardService, DashboardService>();
+            services.AddScoped<IReportService, ReportService>();
 
             return services;
         }

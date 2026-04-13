@@ -160,5 +160,13 @@ namespace smartLaywer.Repository.ClassRepository
             AttendanceStatusEnum.Postponed => "مؤجل",
             _ => a.ToString()
         };
+
+        public async Task<IEnumerable<Hearing>> GetAllWithDetailsAsync()
+        {
+            return await _context.Hearings
+                .Include(h => h.Case).ThenInclude(c => c.Client)
+                .Include(h => h.Court)
+                .ToListAsync();
+        }
     }
 }

@@ -1,4 +1,4 @@
-
+Ôªø
 using smartLaywer.NewFolder;
 using Windows.UI.Notifications;
 
@@ -64,10 +64,15 @@ public partial class LegalManagementContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder
-                .UseSqlServer("Data Source=.;Initial Catalog=LegalManagementDB;Integrated Security=True;Encrypt=False;Trust Server Certificate=True")
+            optionsBuilder.UseSqlServer(@"Data Source=.\SQLEXPRESS;Initial Catalog=LegalCaseManagementDB;Integrated Security=True;TrustServerCertificate=True;")
                 .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
         }
+        //if (!optionsBuilder.IsConfigured)
+        //{
+        //    optionsBuilder
+        //        .UseSqlServer("Data Source=.\\SQLEXPRESS;Initial Catalog=LegalManagementDB;Integrated Security=True;Encrypt=False;Trust Server Certificate=True")
+        //        .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+        //}
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -365,7 +370,7 @@ public partial class LegalManagementContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Document__3214EC07983567AD");
             entity.ToTable("Documents", "Docs");
 
-            //  ÕÊÌ· «·‰Ê⁄ ·‹ Enum (”Ì Œ“‰ ﬂ‹ int)
+            // √ä√ç√¶√≠√° √á√°√§√¶√ö √°√ú Enum (√ì√≠√ä√é√í√§ √ü√ú int)
             entity.Property(e => e.DocType)
                 .IsRequired();
 
@@ -475,7 +480,7 @@ public partial class LegalManagementContext : DbContext
 
             entity.ToTable("LegalLibrary", "Docs");
 
-            //  ÕÊÌ· «·‰Ê⁄ ·‹ Enum
+            // √ä√ç√¶√≠√° √á√°√§√¶√ö √°√ú Enum
             entity.Property(e => e.Category)
                 .IsRequired();
 
@@ -504,7 +509,7 @@ public partial class LegalManagementContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
 
-            // «· ⁄œÌ· Â‰«: «” Œœ«„ «·‹ Enum ﬂ‹ Default
+            // √á√°√ä√ö√è√≠√° √•√§√á: √á√ì√ä√é√è√á√£ √á√°√ú Enum √ü√ú Default
             entity.Property(e => e.NoteType)
                 .HasDefaultValue(NoteTypeEnum.General);
 
@@ -554,7 +559,7 @@ public partial class LegalManagementContext : DbContext
             entity.Property(e => e.Notes).HasMaxLength(500);
             entity.Property(e => e.PlannedAmount).HasColumnType("decimal(18, 2)");
 
-            // «· ⁄œÌ· Â‰«: «” Œœ«„ «·‹ Enum ﬂ‹ Default
+            // √á√°√ä√ö√è√≠√° √•√§√á: √á√ì√ä√é√è√á√£ √á√°√ú Enum √ü√ú Default
             entity.Property(e => e.Status)
                 .HasDefaultValue(PaymentStatusEnum.Pending);
 
@@ -575,7 +580,7 @@ public partial class LegalManagementContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
 
-            //  ÕÊÌ· «·‰Ê⁄ ·‹ Enum (”Ì Œ“‰ ﬂ‹ int)
+            // √ä√ç√¶√≠√° √á√°√§√¶√ö √°√ú Enum (√ì√≠√ä√é√í√§ √ü√ú int)
             entity.Property(e => e.ReportType)
                 .IsRequired();
 
@@ -631,13 +636,17 @@ public partial class LegalManagementContext : DbContext
             entity.HasData(new User
             {
                 Id = 2,
-                FullName = "√œ„‰ «·‰Ÿ«„",
+                FullName = "ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ",
+                //Id = 1,
+                //FullName = "√É√è√£√§ √á√°√§√ô√á√£",
                 Email = "admin@lawyer.com",
                 PhoneNumber = "01012345678",
                 NationalId = "29001011234567", 
                 RoleId = 1,
                 IsActive = true,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
+                // √è√• √•√á√î √°√à√á√ì√¶√ë√è √á√ù√ä√ë√á√ñ√≠ (√£√ã√°√á√∞: Admin@123) √à√á√ì√ä√é√è√á√£ BCrypt
+                //PasswordHash = "$2a$11$mC8769zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.",
                 LastLoginAt = DateTime.Now
             });
         });

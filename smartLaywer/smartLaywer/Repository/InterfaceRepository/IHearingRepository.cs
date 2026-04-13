@@ -21,5 +21,6 @@ namespace smartLaywer.Repository.InterfaceRepository
 
         //// Ã·» «·ﬁ÷«Ì« «··Ì ⁄‰œÂ« Ã·”«  (··’›Õ… «· ›’Ì·Ì…)
         //Task<List<CaseHearingsDto>> GetCasesWithHearingsAsync();
+        Task<IEnumerable<Hearing>> GetAllWithDetailsAsync();
     }
 }
