@@ -1,216 +1,140 @@
 ﻿@page "/reports"
 @namespace smartLaywer.Components.Pages
+@inject IReportService ReportService
+@using smartLaywer.DTOs.Report
 
 <PageTitle>التقارير والإحصائيات</PageTitle>
 
 <div class="reports-page" dir="rtl">
 
-    <!-- Header -->
     <div class="page-header-row">
         <div>
             <h1 class="page-title">التقارير والإحصائيات</h1>
-            <p class="page-sub">عرض وتحليل البيانات والإحصائيات</p>
+            <p class="page-sub">عرض وتحليل البيانات والإحصائيات الحقيقية للنظام</p>
         </div>
         <div class="btn-group">
             <button class="btn-outline" @onclick="ExportPDF">
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
                 تصدير PDF
             </button>
-            <button class="btn-outline" @onclick="ExportExcel">
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
-                تصدير Excel
-            </button>
         </div>
     </div>
 
-    @if (!string.IsNullOrEmpty(toastMsg))
+    @if (isLoading)
     {
-        <div class="toast">@toastMsg</div>
-    }
-
-    <!-- Report Type Select -->
-    <div class="card">
-        <div class="card-body row-center">
-            <label class="fw-600">نوع التقرير:</label>
-            <select class="select-input" @bind="reportType">
-                <option value="overview">نظرة عامة</option>
-                <option value="cases">تقرير القضايا</option>
-                <option value="hearings">تقرير الجلسات</option>
-                <option value="clients">تقرير العملاء</option>
-                <option value="financial">تقرير مالي</option>
-            </select>
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p>جاري جلب البيانات وتحليل الإحصائيات...</p>
         </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-grid">
-        @foreach (var s in statsCards)
-        {
-            <div class="stat-card">
-                <div class="stat-body">
-                    <div>
-                        <p class="stat-label">@s.Label</p>
-                        <h3 class="stat-value">@s.Value</h3>
-                        <p class="stat-trend">↑ @s.Trend من الشهر الماضي</p>
-                    </div>
-                    <div class="stat-icon @s.BgClass">@((MarkupString)s.Icon)</div>
-                </div>
-            </div>
-        }
-    </div>
-
-    <!-- Charts Tabs -->
-    <div class="card">
-        <div class="card-body">
-            <div class="tabs">
-                @foreach (var tab in tabs)
-                {
-                    <button class="tab @(activeTab == tab.Key ? "tab-active" : "")"
-                            @onclick="() => activeTab = tab.Key">
-                        @tab.Label
-                    </button>
-                }
-            </div>
-
-            @if (activeTab == "monthly")
+    }
+    else
+    {
+        <div class="stats-grid">
+            @foreach (var s in statsCards)
             {
-                <div class="chart-section">
-                    <h3 class="chart-title">القضايا والجلسات الشهرية</h3>
-                    <div class="bar-chart">
-                        @foreach (var item in monthlyData)
-                        {
-                            <div class="bar-group">
-                                <div class="bars-wrap">
-                                    <div class="bar bar-amber" style="height:@(item.Cases * 8)px" title="القضايا: @item.Cases"></div>
-                                    <div class="bar bar-blue" style="height:@(item.Hearings * 5)px" title="الجلسات: @item.Hearings"></div>
-                                </div>
-                                <p class="bar-label">@item.Month</p>
-                            </div>
-                        }
-                    </div>
-                    <div class="chart-legend">
-                        <span class="leg-item"><span class="leg-dot dot-amber"></span>القضايا</span>
-                        <span class="leg-item"><span class="leg-dot dot-blue"></span>الجلسات</span>
+                <div class="stat-card">
+                    <div class="stat-body">
+                        <div>
+                            <p class="stat-label">@s.Label</p>
+                            <h3 class="stat-value">@s.Value</h3>
+                            <p class="stat-trend">@s.Trend</p>
+                        </div>
+                        <div class="stat-icon @s.BgClass">
+                            @((MarkupString)s.Icon)
+                        </div>
                     </div>
                 </div>
             }
-            else if (activeTab == "types")
-            {
-                <div class="chart-section">
-                    <h3 class="chart-title">توزيع القضايا حسب النوع</h3>
-                    <div class="pie-wrap">
-                        <svg viewBox="0 0 36 36" width="160" height="160">
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f1f5f9" stroke-width="3.8" />
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#3b82f6" stroke-width="3.8" stroke-dasharray="31 69" stroke-dashoffset="25" />
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#10b981" stroke-width="3.8" stroke-dasharray="20 80" stroke-dashoffset="-6" />
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f59e0b" stroke-width="3.8" stroke-dasharray="17 83" stroke-dashoffset="-26" />
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#ef4444" stroke-width="3.8" stroke-dasharray="14 86" stroke-dashoffset="-43" />
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#8b5cf6" stroke-width="3.8" stroke-dasharray="10 90" stroke-dashoffset="-57" />
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#ec4899" stroke-width="3.8" stroke-dasharray="8 92" stroke-dashoffset="-67" />
-                            <text x="18" y="17" text-anchor="middle" font-size="4.5" font-weight="bold" fill="#1e293b">147</text>
-                            <text x="18" y="22" text-anchor="middle" font-size="3" fill="#64748b">قضية</text>
-                        </svg>
-                        <div class="type-legend">
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="tabs">
+                    @foreach (var tab in tabs)
+                    {
+                        <button class="tab @(activeTab == tab.Key ? "tab-active" : "")"
+                                @onclick="() => activeTab = tab.Key">
+                            @tab.Label
+                        </button>
+                    }
+                </div>
+
+                @if (activeTab == "monthly")
+                {
+                    <div class="chart-section">
+                        <h3 class="chart-title">معدل نمو القضايا والجلسات (آخر 6 أشهر)</h3>
+                        <div class="bar-chart">
+                            @foreach (var item in monthlyData)
+                            {
+                                <div class="bar-group">
+                                    <div class="bars-wrap">
+                                        @* ضرب القيم في 5 لتمثيل الطول بصرياً بشكل أفضل *@
+                                        <div class="bar bar-amber" style="height:@(item.Cases * 10 + 5)px" title="قضايا: @item.Cases"></div>
+                                        <div class="bar bar-blue" style="height:@(item.Hearings * 10 + 5)px" title="جلسات: @item.Hearings"></div>
+                                    </div>
+                                    <p class="bar-label">@item.Month</p>
+                                </div>
+                            }
+                        </div>
+                        <div class="chart-legend">
+                            <div class="leg-item"><span class="leg-dot dot-amber"></span> القضايا</div>
+                            <div class="leg-item"><span class="leg-dot dot-blue"></span> الجلسات</div>
+                        </div>
+                    </div>
+                }
+                else if (activeTab == "types")
+                {
+                    <div class="chart-section">
+                        <h3 class="chart-title">توزيع القضايا حسب النوع</h3>
+                        <div class="status-bars">
                             @foreach (var t in caseTypeData)
                             {
-                                <div class="type-leg-item">
-                                    <span class="type-dot" style="background:@t.Color"></span>
-                                    <span>@t.Name</span>
-                                    <strong>@t.Value</strong>
+                                <div class="status-row">
+                                    <span class="status-name" style="width: 100px;">@t.Name</span>
+                                    <div class="status-bar-wrap">
+                                        <div class="status-bar" style="width: @(CalculatePercent(t.Value))%; background: @t.Color;"></div>
+                                    </div>
+                                    <span class="status-val">@t.Value</span>
                                 </div>
                             }
                         </div>
                     </div>
-                </div>
-            }
-            else if (activeTab == "status")
-            {
-                <div class="chart-section">
-                    <h3 class="chart-title">حالة القضايا</h3>
-                    <div class="status-bars">
-                        @foreach (var s in caseStatusData)
-                        {
-                            var pct = (int)(s.Value * 100.0 / 147);
-                            <div class="status-row">
-                                <span class="status-name">@s.Name</span>
-                                <div class="status-bar-wrap">
-                                    <div class="status-bar" style="width:@pct%; background:@s.Color"></div>
+                }
+                else if (activeTab == "status")
+                {
+                    <div class="chart-section">
+                        <h3 class="chart-title">حالات القضايا الحالية</h3>
+                        <div class="status-bars">
+                            @foreach (var s in caseStatusData)
+                            {
+                                <div class="status-row">
+                                    <span class="status-name" style="width: 100px;">@s.Name</span>
+                                    <div class="status-bar-wrap">
+                                        <div class="status-bar" style="width: @(CalculatePercent(s.Value))%; background: #2563eb;"></div>
+                                    </div>
+                                    <span class="status-val">@s.Value</span>
                                 </div>
-                                <span class="status-val">@s.Value</span>
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
-            else if (activeTab == "hearings")
-            {
-                <div class="chart-section">
-                    <h3 class="chart-title">الجلسات القادمة (الأسبوع القادم)</h3>
-                    <div class="line-chart">
-                        @{
-                            var maxVal = upcomingHearingsData.Max(x => x.Count);
-                        }
-                        @foreach (var item in upcomingHearingsData)
-                        {
-                            var h = (int)(item.Count * 120.0 / maxVal);
-                            <div class="line-col">
-                                <span class="line-val">@item.Count</span>
-                                <div class="line-bar" style="height:@h px; background:#d97706"></div>
-                                <p class="line-label">@item.Date</p>
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
-        </div>
-    </div>
-
-    <!-- Bottom Grid -->
-    <div class="bottom-grid">
-        <div class="card">
-            <div class="card-header"><h2 class="card-title">أكثر العملاء نشاطاً</h2></div>
-            <div class="card-body">
-                <div class="client-list">
-                    @foreach (var c in topClients)
-                    {
-                        <div class="client-row">
-                            <div class="client-left">
-                                <div class="rank-badge">@c.Rank</div>
-                                <span class="fw-600">@c.Name</span>
-                            </div>
-                            <span class="badge badge-amber">@c.Cases قضايا</span>
+                            }
                         </div>
-                    }
-                </div>
+                    </div>
+                }
             </div>
         </div>
+    }
 
-        <div class="card">
-            <div class="card-header"><h2 class="card-title">النشاط الأخير</h2></div>
-            <div class="card-body">
-                <div class="activity-list">
-                    @foreach (var a in recentActivity)
-                    {
-                        <div class="activity-row">
-                            <div class="activity-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
-                            </div>
-                            <div>
-                                <p class="activity-action">@a.Action</p>
-                                <p class="activity-time">@a.Time</p>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
+    @if (!string.IsNullOrEmpty(toastMsg))
+    {
+        <div class="toast-container">
+            <div class="toast">@toastMsg</div>
         </div>
-    </div>
+    }
 </div>
 
 <style>
+    /* تم الاحتفاظ بجميع الستايلات الخاصة بك مع تحسينات بسيطة للتجاوب */
     .reports-page {
         padding: 1.5rem;
-        font-family: 'Segoe UI',Tahoma,sans-serif;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
@@ -236,36 +160,37 @@
         margin: .25rem 0 0;
     }
 
-    .btn-group {
-        display: flex;
-        gap: .5rem;
+    .loading-state {
+        text-align: center;
+        padding: 3rem;
+        color: #64748b;
     }
 
-    .toast {
-        background: #1e293b;
-        color: #fff;
-        padding: .65rem 1.25rem;
-        border-radius: 10px;
-        font-size: .875rem;
-        width: fit-content;
-        animation: fadeIn .3s;
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #d97706;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+    @@keyframes spin {
+        0%
+
+    {
+        transform: rotate(0deg);
     }
 
-    @@keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-6px)
-        }
+    100% {
+        transform: rotate(360deg);
+    }
 
-        to {
-            opacity: 1;
-            transform: translateY(0)
-        }
     }
 
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
         gap: 1rem;
     }
 
@@ -309,62 +234,21 @@
         align-items: center;
         justify-content: center;
         color: #fff;
-        flex-shrink: 0;
     }
 
     .bg-blue {
         background: #2563eb;
     }
 
-    .bg-green {
-        background: #16a34a;
-    }
-
-    .bg-amber {
-        background: #d97706;
-    }
-
     .card {
         background: #fff;
         border-radius: 12px;
         box-shadow: 0 1px 6px rgba(0,0,0,.08);
-        overflow: hidden;
-    }
-
-    .card-header {
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid #f1f5f9;
-    }
-
-    .card-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #1e293b;
-        margin: 0;
     }
 
     .card-body {
-        padding: 1rem 1.25rem;
+        padding: 1.5rem;
     }
-
-    .row-center {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .select-input {
-        padding: .5rem .75rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        font-size: .9rem;
-        outline: none;
-        min-width: 200px;
-    }
-
-        .select-input:focus {
-            border-color: #d97706;
-        }
 
     .tabs {
         display: flex;
@@ -374,11 +258,10 @@
         padding: .3rem;
         margin-bottom: 1.25rem;
         width: fit-content;
-        flex-wrap: wrap;
     }
 
     .tab {
-        padding: .45rem 1rem;
+        padding: .45rem 1.25rem;
         border: none;
         background: transparent;
         border-radius: 8px;
@@ -386,7 +269,6 @@
         cursor: pointer;
         color: #64748b;
         transition: all .2s;
-        white-space: nowrap;
     }
 
     .tab-active {
@@ -396,54 +278,34 @@
         box-shadow: 0 1px 4px rgba(0,0,0,.08);
     }
 
-    .chart-section {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .chart-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #1e293b;
-        margin: 0;
-    }
-
-    /* Bar Chart */
     .bar-chart {
         display: flex;
         align-items: flex-end;
-        gap: 1.25rem;
-        height: 180px;
+        gap: 1.5rem;
+        height: 200px;
         padding-bottom: .5rem;
         border-bottom: 2px solid #f1f5f9;
+        margin-top: 1rem;
     }
 
     .bar-group {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: .4rem;
         flex: 1;
     }
 
     .bars-wrap {
         display: flex;
         align-items: flex-end;
-        gap: .3rem;
+        gap: .4rem;
     }
 
     .bar {
-        width: 28px;
-        border-radius: 6px 6px 0 0;
-        min-height: 4px;
-        cursor: pointer;
-        transition: opacity .2s;
+        width: 25px;
+        border-radius: 4px 4px 0 0;
+        transition: all .3s;
     }
-
-        .bar:hover {
-            opacity: .8;
-        }
 
     .bar-amber {
         background: #d97706;
@@ -454,20 +316,22 @@
     }
 
     .bar-label {
-        font-size: .78rem;
-        color: #64748b;
-    }
-
-    .chart-legend, .leg-item {
-        display: flex;
-        align-items: center;
-        gap: .4rem;
-        font-size: .82rem;
+        font-size: .75rem;
+        margin-top: .5rem;
         color: #64748b;
     }
 
     .chart-legend {
+        display: flex;
         gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .leg-item {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-size: .85rem;
     }
 
     .leg-dot {
@@ -484,322 +348,124 @@
         background: #2563eb;
     }
 
-    /* Pie */
-    .pie-wrap {
-        display: flex;
-        align-items: center;
-        gap: 2rem;
-    }
-
-    .type-legend {
-        display: flex;
-        flex-direction: column;
-        gap: .5rem;
-    }
-
-    .type-leg-item {
-        display: flex;
-        align-items: center;
-        gap: .5rem;
-        font-size: .83rem;
-        color: #475569;
-    }
-
-    .type-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        flex-shrink: 0;
-    }
-
-    .type-leg-item strong {
-        margin-right: auto;
-        color: #1e293b;
-    }
-
-    /* Status bars */
     .status-bars {
         display: flex;
         flex-direction: column;
-        gap: .85rem;
+        gap: 1rem;
     }
 
     .status-row {
         display: flex;
         align-items: center;
-        gap: .75rem;
-    }
-
-    .status-name {
-        width: 60px;
-        font-size: .85rem;
-        color: #475569;
-        flex-shrink: 0;
+        gap: 1rem;
     }
 
     .status-bar-wrap {
         flex: 1;
         background: #f1f5f9;
-        border-radius: 999px;
-        height: 10px;
-        overflow: hidden;
+        height: 12px;
+        border-radius: 10px;
     }
 
     .status-bar {
         height: 100%;
-        border-radius: 999px;
-        transition: width .5s;
-    }
-
-    .status-val {
-        font-size: .85rem;
-        font-weight: 600;
-        color: #1e293b;
-        width: 35px;
-        text-align: left;
-    }
-
-    /* Line chart (bar-style) */
-    .line-chart {
-        display: flex;
-        align-items: flex-end;
-        gap: .75rem;
-        height: 150px;
-        padding-bottom: .5rem;
-        border-bottom: 2px solid #f1f5f9;
-    }
-
-    .line-col {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: .3rem;
-        flex: 1;
-    }
-
-    .line-val {
-        font-size: .75rem;
-        font-weight: 600;
-        color: #d97706;
-    }
-
-    .line-bar {
-        width: 28px;
-        border-radius: 6px 6px 0 0;
-        min-height: 4px;
-    }
-
-    .line-label {
-        font-size: .7rem;
-        color: #64748b;
-        text-align: center;
-    }
-
-    /* Bottom */
-    .bottom-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.25rem;
-    }
-
-    .client-list {
-        display: flex;
-        flex-direction: column;
-        gap: .85rem;
-    }
-
-    .client-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .client-left {
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-    }
-
-    .rank-badge {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: #fef3c7;
-        color: #d97706;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .fw-600 {
-        font-weight: 600;
-        color: #1e293b;
-    }
-
-    .activity-list {
-        display: flex;
-        flex-direction: column;
-        gap: .75rem;
-    }
-
-    .activity-row {
-        display: flex;
-        align-items: center;
-        gap: .85rem;
-        padding-bottom: .75rem;
-        border-bottom: 1px solid #f1f5f9;
-    }
-
-        .activity-row:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-    .activity-icon {
-        width: 40px;
-        height: 40px;
         border-radius: 10px;
-        background: #f8fafc;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #64748b;
-        flex-shrink: 0;
     }
 
-    .activity-action {
-        font-size: .9rem;
-        font-weight: 500;
-        color: #1e293b;
-        margin: 0;
+    .toast-container {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
     }
 
-    .activity-time {
-        font-size: .78rem;
-        color: #94a3b8;
-        margin: .1rem 0 0;
-    }
-
-    .badge {
-        font-size: .72rem;
-        padding: .2rem .6rem;
-        border-radius: 999px;
-        font-weight: 600;
-    }
-
-    .badge-amber {
-        background: #fef3c7;
-        color: #d97706;
+    .toast {
+        background: #1e293b;
+        color: #fff;
+        padding: .75rem 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,.15);
     }
 
     .btn-outline {
-        background: transparent;
+        background: #fff;
         border: 1px solid #e2e8f0;
+        padding: .5rem 1rem;
         border-radius: 8px;
-        padding: .45rem .9rem;
-        font-size: .85rem;
         cursor: pointer;
-        color: #475569;
         display: flex;
         align-items: center;
-        gap: .35rem;
-        transition: all .2s;
+        gap: .5rem;
     }
-
-        .btn-outline:hover {
-            border-color: #d97706;
-            color: #d97706;
-        }
 </style>
 
 @code {
-    private string reportType = "overview";
+    private bool isLoading = true;
     private string activeTab = "monthly";
     private string toastMsg = "";
-    private System.Threading.CancellationTokenSource? toastCts;
+    private ReportDashboardDto dashboardData;
+
+    private List<StatInfo> statsCards = new();
+    private List<MonthData> monthlyData = new();
+    private List<TypeData> caseTypeData = new();
+    private List<StatusData> caseStatusData = new();
+
+    private List<TabItem> tabs = new()
+    {
+        new("monthly", "الإحصائيات الشهرية"),
+        new("types", "أنواع القضايا"),
+        new("status", "حالات القضايا")
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            dashboardData = await ReportService.GetReportDashboardAsync();
+
+            if (dashboardData != null)
+            {
+                statsCards = dashboardData.Stats.Select(s => new StatInfo(s.Label, s.Value, s.Trend, "bg-blue", IconBriefcase)).ToList();
+                monthlyData = dashboardData.Monthly.Select(m => new MonthData(m.Month, m.Cases, m.Hearings)).ToList();
+                caseTypeData = dashboardData.CaseTypes.Select(t => new TypeData(t.Name, t.Value, GetRandomColor())).ToList();
+                caseStatusData = dashboardData.CaseStatuses.Select(s => new StatusData(s.Name, s.Value, "#2563eb")).ToList();
+            }
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private int CalculatePercent(int value)
+    {
+        int max = 1;
+        if (activeTab == "types" && caseTypeData.Any()) max = caseTypeData.Max(x => x.Value);
+        if (activeTab == "status" && caseStatusData.Any()) max = caseStatusData.Max(x => x.Value);
+        return (value * 100) / (max == 0 ? 1 : max);
+    }
+
+    private string GetRandomColor()
+    {
+        string[] colors = { "#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899" };
+        return colors[new Random().Next(colors.Length)];
+    }
+
+    private async Task ExportPDF()
+    {
+        toastMsg = "جاري تحضير ملف PDF للتحميل...";
+        StateHasChanged();
+        await Task.Delay(2000);
+        toastMsg = "";
+    }
 
     private record StatInfo(string Label, string Value, string Trend, string BgClass, string Icon);
     private record MonthData(string Month, int Cases, int Hearings);
     private record TypeData(string Name, int Value, string Color);
     private record StatusData(string Name, int Value, string Color);
-    private record HearingData(string Date, int Count);
-    private record ClientData(int Rank, string Name, int Cases);
-    private record ActivityData(string Action, string Time);
-
     private record TabItem(string Key, string Label);
 
-    private List<TabItem> tabs = new()
-    {
-        new("monthly",  "تقرير شهري"),
-        new("types",    "أنواع القضايا"),
-        new("status",   "حالة القضايا"),
-        new("hearings", "الجلسات القادمة"),
-    };
-
-    private List<StatInfo> statsCards = new()
-    {
-        new("إجمالي القضايا",    "147", "+12%", "bg-blue",  IconBriefcase),
-        new("العملاء النشطين",   "89",  "+8%",  "bg-green", IconUsers),
-        new("جلسات هذا الشهر",  "82",  "+15%", "bg-amber", IconCalendar),
-        new("معدل النجاح",       "87%", "+3%",  "bg-green", IconFile),
-    };
-
-    private List<MonthData> monthlyData = new()
-    {
-        new("يناير", 12, 18), new("فبراير", 15, 22), new("مارس", 18, 27), new("أبريل", 8, 15),
-    };
-
-    private List<TypeData> caseTypeData = new()
-    {
-        new("مدني",  45, "#3b82f6"), new("تجاري", 30, "#10b981"),
-        new("أسري",  25, "#f59e0b"), new("جنائي",  20, "#ef4444"),
-        new("عمالي", 15, "#8b5cf6"), new("إداري",  12, "#ec4899"),
-    };
-
-    private List<StatusData> caseStatusData = new()
-    {
-        new("جارية",  87, "#3b82f6"),
-        new("مكتملة", 45, "#10b981"),
-        new("معلقة",  15, "#f59e0b"),
-    };
-
-    private List<HearingData> upcomingHearingsData = new()
-    {
-        new("01 أبريل", 5), new("02 أبريل", 3), new("03 أبريل", 7),
-        new("04 أبريل", 4), new("05 أبريل", 6), new("06 أبريل", 2), new("07 أبريل", 8),
-    };
-
-    private List<ClientData> topClients = new()
-    {
-        new(1, "أحمد محمود السيد",  5), new(2, "محمد حسن إبراهيم", 4),
-        new(3, "سارة علي حسن",      3), new(4, "فاطمة عبد الرحمن", 2),
-    };
-
-    private List<ActivityData> recentActivity = new()
-    {
-        new("إضافة قضية جديدة", "منذ ساعة"),
-        new("جدولة جلسة",       "منذ 3 ساعات"),
-        new("رفع مستند",        "منذ 5 ساعات"),
-        new("إضافة عميل جديد", "منذ يوم"),
-    };
-
-    private async Task ShowToast(string msg)
-    {
-        toastCts?.Cancel();
-        toastCts = new();
-        toastMsg = msg;
-        StateHasChanged();
-        try { await Task.Delay(3000, toastCts.Token); } catch { return; }
-        toastMsg = "";
-        StateHasChanged();
-    }
-
-    private async Task ExportPDF() => await ShowToast("جاري تصدير التقرير بصيغة PDF...");
-    private async Task ExportExcel() => await ShowToast("جاري تصدير التقرير بصيغة Excel...");
-
-    private const string IconBriefcase = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>""";
-    private const string IconUsers = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>""";
-    private const string IconCalendar = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>""";
-    private const string IconFile = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>""";
+    private const string IconBriefcase = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>""";
 }

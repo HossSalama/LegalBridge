@@ -21,6 +21,7 @@ namespace smartLaywer.Repository.UnitWork
         public IGenericRepository<User> Users { get; private set; }
         public IGenericRepository<Department> Departments { get; private set; }
 
+        public IGenericRepository<Report> Reports { get; private set; }
         public UnitOfWork(LegalManagementContext context, IMapper mapper)
         {
             _context = context;
@@ -39,6 +40,7 @@ namespace smartLaywer.Repository.UnitWork
             Courts = new GenericRepository<Court>(_context);
             Users = new GenericRepository<User>(_context);
             Departments = new GenericRepository<Department>(_context);
+            Reports = new GenericRepository<Report>(_context);
         }
 
         public async Task<int> CompleteAsync() => await _context.SaveChangesAsync();

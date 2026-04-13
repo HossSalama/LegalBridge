@@ -13,6 +13,7 @@ global using smartLaywer.Service.ClassService;
 
 global using smartLaywer.DTO.Hearing;
 global using smartLaywer.Services.InterfaceService;
+global using smartLaywer.DTO.Dashboard;
 
 
 global using smartLaywer.Repository.InterfaceRepository;

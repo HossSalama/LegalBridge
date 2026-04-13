@@ -11,5 +11,6 @@ namespace smartLaywer.Services.InterfaceService
         Task<bool> UpdateHearingAndScheduleNextAsync(UpdateHearingResultDto dto);
         Task<HearingDetailsDto?> GetHearingDetailsAsync(int id);
 
+
     }
 }

@@ -1,10 +1,13 @@
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using smartLaywer.Helper;
 using smartLaywer.Mapping.CaseMapping;
 using smartLaywer.Mapping.FinancialMapping;
 using smartLaywer.Mapping.HearingMapping;
 using smartLaywer.Repository.UnitWork;
+
+using smartLaywer.Services;
 using smartLaywer.Services.ClassService;
 
 namespace smartLaywer
@@ -33,13 +36,16 @@ namespace smartLaywer
 
             builder.Services.AddMauiBlazorWebView();
 
+
             builder.Services.AddDbContext<LegalManagementContext>(options =>
                 options
                     .UseSqlServer("Data Source=.;Initial Catalog=LegalManagementDB;Integrated Security=True;Encrypt=False;Trust Server Certificate=True")
                     .ConfigureWarnings(w => w.Ignore(
                         Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
-           
+
+
+
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
             builder.Logging.AddDebug();
