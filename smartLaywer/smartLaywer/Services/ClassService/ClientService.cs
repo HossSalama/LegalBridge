@@ -74,6 +74,7 @@ namespace smartLaywer.Services.ClassService
             existing.JobTitle = updated.JobTitle;
             existing.Gender = updated.Gender;
             existing.ClientType = updated.ClientType;
+            existing.IsActive = updated.IsActive;
 
             _unitOfWork.Client.Update(existing);
             await _unitOfWork.CompleteAsync();
