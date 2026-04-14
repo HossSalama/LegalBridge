@@ -174,8 +174,71 @@ namespace smartLaywer.Service.ClassService
         }
 
 
+        public async Task<ClientFinancialProfileDto> GetClientFullFinancialHistoryAsync(int clientId)
+        {
+            var fees = await _unitOfWork.Financials.GetAllQueryableNoTracking()
+                .Where(f => f.ClientId == clientId)
+                .Include(f => f.Client)
+                .Include(f => f.Case)
+                .Include(f => f.ActualPayments)
+                .Include(f => f.PaymentSchedules)
+                .ToListAsync();
 
+            var profile = new ClientFinancialProfileDto
+            {
+                ClientId = clientId,
+                ClientName = fees.FirstOrDefault()?.Client?.FullName ?? "⁄„Ì· „Õœœ",
+                TotalAgreedAmount = fees.Sum(f => f.TotalAmount),
+                TotalPaid = fees.SelectMany(f => f.ActualPayments).Sum(p => p.Amount),
+                TotalOverdue = await GetTotalOverdueForClientAsync(clientId)
+            };
 
+            foreach (var fee in fees)
+            {
+                var caseDto = new CaseFinanceDto
+                {
+                    CaseId = fee.CaseId,
+                    CaseNumber = fee.Case.CaseNumber,
+                    CaseTotalFee = fee.TotalAmount
+                };
+
+                caseDto.Transactions.AddRange(fee.ActualPayments.Select(p => new FinancialTransactionDto
+                {
+                    Date = p.CreatedAt,
+                    Description = $"œ›⁄… „«·Ì… - ≈Ì’«· —ﬁ„ {p.ReceiptNumber}",
+                    Amount = p.Amount,
+                    Type = "Credit"
+                }));
+
+                var expenses = await _unitOfWork.Expenses.GetAllQueryableNoTracking()
+                    .Where(e => e.CaseId == fee.CaseId)
+                    .ToListAsync();
+
+                caseDto.Transactions.AddRange(expenses.Select(e => new FinancialTransactionDto
+                {
+                    Date = e.ExpenseDate,
+                    Description = $"„’«—Ì› ≈œ«—Ì…: {e.Description}",
+                    Amount = e.Amount,
+                    Type = "Debit"
+                }));
+
+                caseDto.Installments = _mapper.Map<List<InstallmentDetailDto>>(fee.PaymentSchedules)
+                    .OrderBy(i => i.DueDate)
+                    .ToList();
+
+                profile.Cases.Add(caseDto);
+            }
+
+            return profile;
+        }
+        private async Task<decimal> GetTotalOverdueForClientAsync(int clientId)
+        {
+            return await _unitOfWork.Schedules.GetAllQueryableNoTracking()
+                .Where(ps => ps.Fee.ClientId == clientId &&
+                             ps.DueDate < DateTime.Now &&
+                             ps.Status != PaymentStatusEnum.Paid)
+                .SumAsync(ps => ps.PlannedAmount);
+        }
 
 
 

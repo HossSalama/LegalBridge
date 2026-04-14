@@ -8,7 +8,7 @@ namespace smartLaywer.Service.InterfaceService
         Task<PaginatedList<FeeDetailsDto>> GetPagedFeesAsync(string? searchTerm, int pageNumber);
 
         Task<bool> CollectPaymentAsync(int feeId, decimal amount, PaymentMethodEnum method, int currentUserId);
-
+        Task<ClientFinancialProfileDto> GetClientFullFinancialHistoryAsync(int clientId);
 
 
     }

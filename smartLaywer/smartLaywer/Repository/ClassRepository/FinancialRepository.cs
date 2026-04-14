@@ -61,7 +61,5 @@ namespace smartLaywer.Repository.ClassRepository
 
 
 
-
-       
     }
 }

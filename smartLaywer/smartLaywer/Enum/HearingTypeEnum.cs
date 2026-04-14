@@ -6,6 +6,6 @@ namespace smartLaywer.Enum
         Hearing = 1,
         [Display(Name = " ÕﬁÌﬁ")] 
         Investigation = 2,
-
+        Expert = 3,
     }
 }

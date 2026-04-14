@@ -32,6 +32,7 @@ namespace smartLaywer.Helper
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IAgendaService, AgendaService>();
 
             return services;
         }
