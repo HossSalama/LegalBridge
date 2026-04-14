@@ -635,16 +635,13 @@ public partial class LegalManagementContext : DbContext
             {
                 Id = 2,
                 FullName = "���� ������",
-                //Id = 1,
-                //FullName = "ÃÏãä ÇáäÙÇã",
                 Email = "admin@lawyer.com",
                 PhoneNumber = "01012345678",
                 NationalId = "29001011234567", 
                 RoleId = 1,
                 IsActive = true,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
-                // Ïå åÇÔ áÈÇÓæÑÏ ÇÝÊÑÇÖí (ãËáÇð: Admin@123) ÈÇÓÊÎÏÇã BCrypt
-                //PasswordHash = "$2a$11$mC8769zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.",
+        
                 LastLoginAt = DateTime.Now
             });
         });

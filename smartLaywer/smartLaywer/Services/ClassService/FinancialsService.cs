@@ -1,5 +1,8 @@
-using smartLaywer.Repository.UnitWork;
+
+
+using Microsoft.AspNetCore.Components.Authorization;
 using System.Globalization;
+using System.Security.Claims;
 
 namespace smartLaywer.Service.ClassService
 {
@@ -8,25 +11,177 @@ namespace smartLaywer.Service.ClassService
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private const int PageSize = 10;
-        public FinancialsService(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly AuthenticationStateProvider _authStateProvider;
+
+        public FinancialsService(IUnitOfWork unitOfWork, IMapper mapper , AuthenticationStateProvider authenticationStateProvider )
         {
             _unitOfWork = unitOfWork;
             _mapper=mapper;
+            _authStateProvider = authenticationStateProvider;
         }
 
-        /// <summary>
-        /// Ã·» ≈Õ’«∆Ì«  ⁄«„… ··„ﬂ » (≈Ã„«·Ì «·„Õ’·° «·„œÌÊ‰Ì« ° ⁄œœ «·ﬁ÷«Ì« «·„œ›Ê⁄… »«·ﬂ«„·) ·⁄—÷Â« ›Ì «··ÊÕ… «·—∆Ì”Ì….
-        /// </summary>
-        public async Task<FinancialStatDto> GetDashboardStatsAsync() =>
-            await _unitOfWork.Financials.GetFinancialSummaryAsync();
+        public async Task<ScheduleValidationResult> AddInstallmentToScheduleAsync(PaymentSchedule newInstallment)
+        {
+            var feeData = await _unitOfWork.Financials.GetAllQueryableNoTracking()
+                .Where(f => f.Id == newInstallment.FeeId)
+                .Select(f => new
+                {
+                    Total = f.TotalAmount,
+                    ScheduledSum = f.PaymentSchedules.Sum(ps => ps.PlannedAmount)
+                })
+                .FirstOrDefaultAsync();
 
-        /// <summary>
-        /// Ã·» ﬁ«∆„… »Ã„Ì⁄ √ ⁄«» «·ﬁ÷«Ì« »‘ﬂ· „ﬁ”„ ·’›Õ«  „⁄ ≈„ﬂ«‰Ì… «·»ÕÀ »—ﬁ„ «·ﬁ÷Ì… √Ê «”„ «·⁄„Ì·.
-        /// </summary>
-        /// <param name="searchTerm">ﬂ·„… «·»ÕÀ («”„ «·⁄„Ì· √Ê —ﬁ„ «·ﬁ÷Ì…)</param>
-        /// <param name="pageNumber">—ﬁ„ «·’›Õ… «·Õ«·Ì…</param>
-        public async Task<PaginatedList<FeeDetailsDto>> GetPagedFeesAsync(string? searchTerm, int pageNumber)=>
+            if (feeData == null) throw new KeyNotFoundException("”Ã· «·√ ⁄«» €Ì— „ÊÃÊœ.");
+
+            var totalAfterAddition = feeData.ScheduledSum + newInstallment.PlannedAmount;
+
+            var result = new ScheduleValidationResult
+            {
+                CaseTotalFee = feeData.Total,
+                AlreadyScheduled = feeData.ScheduledSum,
+                RemainingToSchedule = feeData.Total - feeData.ScheduledSum
+            };
+
+            if (totalAfterAddition > feeData.Total)
+            {
+                result.CanAdd = false;
+                result.Status = "Excess";
+                return result;
+            }
+
+            try
+            {
+                newInstallment.Status = PaymentStatusEnum.Pending;
+
+                var lastNumber = await _unitOfWork.Schedules.GetAllQueryableNoTracking()
+                    .Where(ps => ps.FeeId == newInstallment.FeeId)
+                    .MaxAsync(ps => (int?)ps.InstallmentNumber) ?? 0;
+
+                newInstallment.InstallmentNumber = lastNumber + 1;
+
+                await _unitOfWork.Schedules.AddAsync(newInstallment);
+                await _unitOfWork.CompleteAsync();
+
+                result.CanAdd = true;
+                result.Status = (totalAfterAddition == feeData.Total) ? "Equal" : "Remaining";
+            }
+            catch (Exception)
+            {
+                result.CanAdd = false;
+                result.Status = "Error";
+            }
+
+            return result;
+        }
+
+
+        public async Task<bool> SaveSchedulesAsync(CreateSchedulesDto dto)
+        {
+            if (dto == null || !dto.Schedules.Any()) return false;
+
+            try
+            {
+                var feeData = await _unitOfWork.Financials.GetAllQueryableNoTracking()
+                    .Where(f => f.Id == dto.FeeId)
+                    .Select(f => new {
+                        Total = f.TotalAmount,
+                        CurrentSum = f.PaymentSchedules.Sum(ps => ps.PlannedAmount)
+                    }).FirstOrDefaultAsync();
+
+                if (feeData == null) return false;
+
+                var newTotal = dto.Schedules.Sum(s => s.Amount);
+                if ((feeData.CurrentSum + newTotal) > feeData.Total) return false;
+
+                var lastNumber = await _unitOfWork.Schedules.GetAllQueryableNoTracking()
+                    .Where(ps => ps.FeeId == dto.FeeId)
+                    .MaxAsync(ps => (int?)ps.InstallmentNumber) ?? 0;
+                var entities = dto.Schedules.Select((s, index) => new PaymentSchedule
+                {
+                    FeeId = dto.FeeId,
+                    PlannedAmount = s.Amount,
+                    DueDate = s.DueDate,
+                    InstallmentNumber = lastNumber + (index + 1),
+                    Status = PaymentStatusEnum.Pending
+                }).ToList();
+
+                await _unitOfWork.Schedules.AddRangeAsync(entities);
+                return await _unitOfWork.CompleteAsync() > 0;
+            }
+            catch { return false; }
+        }
+
+        public async Task<FinancialStatDto> GetDashboardStatsAsync() =>
+    await _unitOfWork.Financials.GetFinancialSummaryAsync();
+
+
+        public async Task<PaginatedList<FeeDetailsDto>> GetPagedFeesAsync(string? searchTerm, int pageNumber) =>
             await _unitOfWork.Financials.GetPagedFeesAsync(searchTerm, pageNumber, PageSize);
+
+
+        public async Task<bool> CollectPaymentAsync(int feeId, decimal amount, PaymentMethodEnum method, int currentUserId)
+        {
+            if (amount <= 0) return false;
+
+            try
+            {
+                var payment = new ActualPayment
+                {
+                    FeeId = feeId,
+                    Amount = amount,
+                    PaymentDate = DateOnly.FromDateTime(DateTime.Now),
+                    Method = method,
+                    ReceivedBy = currentUserId, 
+                    CreatedAt = DateTime.Now
+                };
+
+                await _unitOfWork.ActualPayments.AddAsync(payment);
+
+                var pendingSchedules = await _unitOfWork.Schedules.GetAllQueryableTracking()
+                    .Where(ps => ps.FeeId == feeId && ps.Status != PaymentStatusEnum.Paid)
+                    .OrderBy(ps => ps.DueDate)
+                    .ToListAsync();
+
+                decimal remainingToDistribute = amount;
+
+                foreach (var schedule in pendingSchedules)
+                {
+                    if (remainingToDistribute <= 0) break;
+                    decimal amountNeededForThisSchedule = schedule.PlannedAmount;
+
+                    if (remainingToDistribute >= amountNeededForThisSchedule)
+                    {
+                        schedule.Status = PaymentStatusEnum.Paid;
+                        remainingToDistribute -= amountNeededForThisSchedule;
+                    }
+                    else
+                    {
+
+                         schedule.PlannedAmount -= remainingToDistribute;
+
+                        remainingToDistribute = 0; 
+                        break;
+                    }
+                }
+
+                return await _unitOfWork.CompleteAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in CollectPayment: {ex.Message}");
+                return false;
+            }
+        }
+
+
+
+
+
+
+
+
+
+
 
         /// <summary>
         ///  ”ÃÌ· ⁄„·Ì… œ›⁄ ›⁄·Ì… ÃœÌœ…° Ê Ê·Ìœ —ﬁ„ ≈Ì’«· ·Â«° À„ ≈⁄«œ…  ”ÊÌ… ÃœÊ· «·√ﬁ”«ÿ »‰«¡ ⁄·Ï «·„»·€ «·ÃœÌœ.

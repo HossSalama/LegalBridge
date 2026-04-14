@@ -9,5 +9,6 @@ namespace smartLaywer.Repository.InterfaceRepository
         Task<T?> GetByIdAsync(int id);
         IQueryable<T> GetAllQueryableNoTracking();
         IQueryable<T> GetAllQueryableTracking();
+        Task AddRangeAsync(IEnumerable<T> entities);
     }
 }
