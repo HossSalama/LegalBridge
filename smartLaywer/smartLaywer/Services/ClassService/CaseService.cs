@@ -101,7 +101,7 @@ namespace smartLaywer.Services.ClassService
                 fee.CaseId = newCase.Id;
                 fee.ClientId = newCase.ClientId;
                 fee.CreatedAt = DateTime.Now;
-                await _unitOfWork.Financials.AddFeeAsync(fee);
+                await _unitOfWork.Financials.AddAsync(fee);// addfeeasync(fee)
                 await _unitOfWork.CompleteAsync();
             }
         }
