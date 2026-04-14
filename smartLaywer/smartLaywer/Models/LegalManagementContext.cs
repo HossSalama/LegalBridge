@@ -1,5 +1,4 @@
-﻿
-using BCrypt.Net;
+﻿using BCrypt.Net;
 using smartLaywer.NewFolder;
 using Windows.Security.Cryptography.Certificates;
 using Windows.UI.Notifications;
@@ -62,6 +61,7 @@ public partial class LegalManagementContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<Appointment> Appointments { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -70,7 +70,7 @@ public partial class LegalManagementContext : DbContext
             optionsBuilder.UseSqlServer("Data Source =.; Initial Catalog = LegalManagementDB; Integrated Security = True; Encrypt=False; Trust Server Certificate=True")
                 .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
         }
- 
+
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -274,7 +274,7 @@ public partial class LegalManagementContext : DbContext
                 .HasDefaultValue("#1D9E75");
 
             entity.Property(e => e.StatusName)
-                .HasDefaultValue(CaseStatusEnum.Open); 
+                .HasDefaultValue(CaseStatusEnum.Open);
 
             entity.HasData(
                 new CaseStatus { Id = 1, StatusName = CaseStatusEnum.Open, Color = "#1D9E75" },
@@ -368,7 +368,7 @@ public partial class LegalManagementContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Document__3214EC07983567AD");
             entity.ToTable("Documents", "Docs");
 
-            // ÊÍæíá ÇáäæÚ áÜ Enum (ÓíÊÎÒä ßÜ int)
+            // تحويل Enum إلى int
             entity.Property(e => e.DocType)
                 .IsRequired();
 
@@ -450,7 +450,7 @@ public partial class LegalManagementContext : DbContext
             entity.Property(e => e.Period)
                 .HasComputedColumnSql("(case when datepart(hour,[HearingDateTime])<(12) then 1 else 2 end)", false);
 
-            entity.Property(e => e.NextHearingPeriod); 
+            entity.Property(e => e.NextHearingPeriod);
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -639,7 +639,7 @@ public partial class LegalManagementContext : DbContext
                 //FullName = "ÃÏãä ÇáäÙÇã",
                 Email = "admin@lawyer.com",
                 PhoneNumber = "01012345678",
-                NationalId = "29001011234567", 
+                NationalId = "29001011234567",
                 RoleId = 1,
                 IsActive = true,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
@@ -647,6 +647,23 @@ public partial class LegalManagementContext : DbContext
                 //PasswordHash = "$2a$11$mC8769zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.",
                 LastLoginAt = DateTime.Now
             });
+        });
+
+        modelBuilder.Entity<Appointment>(entity =>
+        {
+            entity.ToTable("Appointments", "Legal");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(300);
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.Location).HasMaxLength(300);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
+
+            entity.HasOne(a => a.Case).WithMany()
+                .HasForeignKey(a => a.CaseId).OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne(a => a.Client).WithMany()
+                .HasForeignKey(a => a.ClientId).OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne(a => a.CreatedByNavigation).WithMany()
+                .HasForeignKey(a => a.CreatedBy).OnDelete(DeleteBehavior.Restrict);
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -22,3 +22,5 @@ global using AutoMapper.QueryableExtensions;
 global using smartLaywer.Helper;
 
 global using smartLaywer.Enum;
+
+global using smartLaywer.DTO.Agenda;
