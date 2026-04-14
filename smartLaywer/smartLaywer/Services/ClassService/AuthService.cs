@@ -113,7 +113,7 @@ namespace smartLaywer.Services.ClassService
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
 
             if (!isPasswordValid)
-                throw new Exception("»Ì«‰«  «·œŒÊ· €Ì— ’ÕÌÕ….");
+                throw new Exception("»Ì«‰«   ………«·œŒÊ· €Ì— ’ÕÌÕ….");
            
             user.LastLoginAt = DateTime.Now;
             _unitOfWork.Users.Update(user);

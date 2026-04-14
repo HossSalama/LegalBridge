@@ -461,7 +461,19 @@ public partial class LegalManagementContext : DbContext
                 .HasForeignKey(d => d.RoleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Users_Roles");
-           
+            string adminPasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123");
+            entity.HasData(new User
+            {
+                Id = 1,
+                FullName = "„œÌ— «·‰Ÿ«„",
+                Email = "admin@lawyer.com",
+                PasswordHash = adminPasswordHash,
+                PhoneNumber = "01000000000",
+                NationalId = "12345678901234", 
+                IsActive = true,
+                RoleId = 1 
+            });
+
         });
 
         modelBuilder.Entity<Appointment>(entity =>

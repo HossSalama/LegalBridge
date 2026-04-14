@@ -240,7 +240,8 @@ namespace smartLaywer.Service.ClassService
                 .SumAsync(ps => ps.PlannedAmount);
         }
 
-
+       
+           
 
 
 

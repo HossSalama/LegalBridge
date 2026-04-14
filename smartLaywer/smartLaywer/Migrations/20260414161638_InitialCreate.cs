@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace smartLaywer.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -433,6 +433,52 @@ namespace smartLaywer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Appointments",
+                schema: "Legal",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    AppointmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AppointmentType = table.Column<int>(type: "int", nullable: false),
+                    Priority = table.Column<int>(type: "int", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    CaseId = table.Column<int>(type: "int", nullable: true),
+                    ClientId = table.Column<int>(type: "int", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    CreatedBy = table.Column<int>(type: "int", nullable: false),
+                    IsCompleted = table.Column<bool>(type: "bit", nullable: false),
+                    CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Appointments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Appointments_Cases_CaseId",
+                        column: x => x.CaseId,
+                        principalSchema: "Legal",
+                        principalTable: "Cases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Appointments_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalSchema: "Legal",
+                        principalTable: "Clients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Appointments_Users_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalSchema: "Core",
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CaseLawyers",
                 schema: "Legal",
                 columns: table => new
@@ -584,13 +630,13 @@ namespace smartLaywer.Migrations
                     CaseId = table.Column<int>(type: "int", nullable: false),
                     CourtId = table.Column<int>(type: "int", nullable: false),
                     DeptId = table.Column<int>(type: "int", nullable: false),
-                    HearingType = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "Hearing"),
+                    HearingType = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
                     HearingDateTime = table.Column<DateTime>(type: "datetime", nullable: false),
                     JudgeName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Period = table.Column<int>(type: "int", nullable: false, computedColumnSql: "(case when datepart(hour,[HearingDateTime])<(12) then 1 else 2 end)", stored: false),
                     AttendanceStatus = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
                     Result = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NextHearingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    NextHearingDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     NextHearingPeriod = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())"),
                     CreatedBy = table.Column<int>(type: "int", nullable: false)
@@ -732,7 +778,7 @@ namespace smartLaywer.Migrations
                 schema: "Core",
                 table: "Users",
                 columns: new[] { "Id", "Email", "FullName", "IsActive", "LastLoginAt", "NationalId", "PasswordHash", "PhoneNumber", "RoleId", "SecondNumber" },
-                values: new object[] { 1, "admin@lawyer.com", "أدمن النظام", true, new DateTime(2026, 4, 9, 2, 43, 47, 504, DateTimeKind.Local).AddTicks(5003), "29001011234567", "$2a$11$mC8769zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.Y4zS57X6A.", "01012345678", 1, null });
+                values: new object[] { 1, "admin@lawyer.com", "مدير النظام", true, null, "12345678901234", "$2a$11$PszPRubAQE4fDmVijVaDQODTvCpyH3QSpkOApCplLeJuhBHb8Tf5a", "01000000000", 1, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ActualPayments_FeeId",
@@ -803,6 +849,24 @@ namespace smartLaywer.Migrations
                 column: "AppealNumber",
                 unique: true,
                 filter: "[AppealNumber] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_CaseId",
+                schema: "Legal",
+                table: "Appointments",
+                column: "CaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_ClientId",
+                schema: "Legal",
+                table: "Appointments",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_CreatedBy",
+                schema: "Legal",
+                table: "Appointments",
+                column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CaseLawyers_UserId",
@@ -1070,6 +1134,10 @@ namespace smartLaywer.Migrations
 
             migrationBuilder.DropTable(
                 name: "Appeals",
+                schema: "Legal");
+
+            migrationBuilder.DropTable(
+                name: "Appointments",
                 schema: "Legal");
 
             migrationBuilder.DropTable(

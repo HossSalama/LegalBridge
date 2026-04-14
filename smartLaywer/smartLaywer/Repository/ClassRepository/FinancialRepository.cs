@@ -52,9 +52,12 @@ namespace smartLaywer.Repository.ClassRepository
                 .ToPaginatedListAsync(pageNumber, pageSize);
         }
 
-      
 
 
+        public async Task AddFeeAsync(Fee fee)
+        {
+            await _context.Fees.AddAsync(fee);
+        }
 
 
 

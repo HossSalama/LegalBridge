@@ -1214,6 +1214,19 @@ namespace smartLaywer.Migrations
                         .HasFilter("[NationalId] IS NOT NULL");
 
                     b.ToTable("Users", "Core");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Email = "admin@lawyer.com",
+                            FullName = "مدير النظام",
+                            IsActive = true,
+                            NationalId = "12345678901234",
+                            PasswordHash = "$2a$11$PszPRubAQE4fDmVijVaDQODTvCpyH3QSpkOApCplLeJuhBHb8Tf5a",
+                            PhoneNumber = "01000000000",
+                            RoleId = 1
+                        });
                 });
 
             modelBuilder.Entity("smartLaywer.Models.ActualPayment", b =>
