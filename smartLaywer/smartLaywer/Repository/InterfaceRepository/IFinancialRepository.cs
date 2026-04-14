@@ -5,11 +5,5 @@ namespace smartLaywer.Repository.InterfaceRepository
         Task<FinancialStatDto> GetFinancialSummaryAsync();
         Task<PaginatedList<FeeDetailsDto>> GetPagedFeesAsync(string searchTerm, int pageNumber, int pageSize);
 
-
-
-
-
-        Task<List<PaymentSchedule>> GetUnpaidSchedulesAsync(int feeId);
-        Task AddFeeAsync(Fee fee);
     }
 }

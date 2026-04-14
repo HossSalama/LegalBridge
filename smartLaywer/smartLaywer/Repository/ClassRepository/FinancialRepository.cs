@@ -62,17 +62,6 @@ namespace smartLaywer.Repository.ClassRepository
 
 
 
-        public async Task<List<PaymentSchedule>> GetUnpaidSchedulesAsync(int feeId)
-        {
-            return await _context.PaymentSchedules
-                .Where(ps => ps.FeeId == feeId && ps.Status != PaymentStatusEnum.Paid)
-                .OrderBy(ps => ps.DueDate)
-                .ToListAsync();
-        }
-
-        public async Task AddFeeAsync(Fee fee)
-        {
-            await _context.Fees.AddAsync(fee);
-        }
+       
     }
 }
