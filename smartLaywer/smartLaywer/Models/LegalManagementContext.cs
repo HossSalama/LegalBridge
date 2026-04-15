@@ -33,7 +33,7 @@ public partial class LegalManagementContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer("Data Source =.; Initial Catalog = LegalManagementDB; Integrated Security = True; Encrypt=False; Trust Server Certificate=True")
+            optionsBuilder.UseSqlServer("Data Source =.;Initial Catalog=LegalcasManagementDB; Integrated Security = True; Encrypt=False; Trust Server Certificate=True")
                 .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
         }
     }
@@ -267,7 +267,7 @@ public partial class LegalManagementContext : DbContext
             entity.Property(e => e.DocType)
                 .IsRequired();
             entity.Property(e => e.FilePath).HasMaxLength(500).IsUnicode(false);
-            entity.Property(e => e.MimeType).HasMaxLength(10).IsUnicode(false);
+            entity.Property(e => e.MimeType).HasMaxLength(1000).IsUnicode(false);
             entity.Property(e => e.Title).HasMaxLength(500);
             entity.Property(e => e.UploadedAt)
                 .HasDefaultValueSql("(getdate())")

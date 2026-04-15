@@ -81,6 +81,7 @@
     <ItemGroup>
       <Folder Include="DTO\Notification\" />
       <Folder Include="Mapping\HearingMapping\" />
+      <Folder Include="wwwroot\uploads\documents\" />
     </ItemGroup>
 
 </Project>

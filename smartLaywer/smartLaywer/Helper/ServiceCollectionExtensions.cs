@@ -34,6 +34,8 @@ namespace smartLaywer.Helper
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IAgendaService, AgendaService>();
 
+            services.AddScoped<IDocumentService, DocumentService>();
+
             return services;
         }
         public static IServiceCollection AddMapping(this IServiceCollection services)
