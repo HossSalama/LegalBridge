@@ -29,7 +29,7 @@ namespace smartLaywer.Services.ClassService
             await stream.CopyToAsync(fs);
 
             document.FilePath = Path.Combine("Uploads", "LegalLibrary", document.Category.ToString(), fileName);
-            document.MimeType = file.ContentType;
+            document.MimeType = "pen";
 
             if (string.IsNullOrEmpty(document.Title)) document.Title = file.Name;
 

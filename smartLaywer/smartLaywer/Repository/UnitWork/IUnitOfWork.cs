@@ -18,11 +18,10 @@ namespace smartLaywer.Repository.UnitWork
         IGenericRepository<Department> Departments { get; }
         IGenericRepository<Report> Reports { get; }
         IClientRepository Client { get; }
-<<<<<<< HEAD
+
         IHearingDetailsRepository HearingDetails { get; }
-=======
-        IGenericRepository<LegalLibrary> LegalLibraries { get; }
->>>>>>> 2db0ea3599fed4764943d4eb5f9b239a765368dd
+
+        IGenericRepository<smartLaywer.Models.LegalLibrary> LegalLibraries { get; }
         Task<int> CompleteAsync();
         IDocumentRepository Document { get; }
         Task<int> SaveChangesAsync();

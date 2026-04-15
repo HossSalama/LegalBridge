@@ -147,7 +147,7 @@
                 </div>
 
                 <div class="modal-actions">
-                    <button type="submit" class="btn-primary">Õ›Ÿ «·„” ‰œ</button>
+                    <button type="submit" class="btn-primary" >Õ›Ÿ «·„” ‰œ</button>
                     <button type="button" class="btn-outline" @onclick="CloseModal">≈·€«¡</button>
                 </div>
             </EditForm>
@@ -185,7 +185,7 @@
         newDoc.AddedBy = 1;
         newDoc.AddedByNavigation = null!;
 
-        newDoc.MimeType = "pending";
+        newDoc.MimeType = "pen";
         newDoc.FilePath = "pending";
 
         var success = await LegalService.AddDocumentAsync(selectedFile, newDoc);
@@ -196,6 +196,8 @@
             selectedFile = null;
         }
     }
+
+
     private async Task HandleOpenFile(string path)
     {
         var fullPath = LegalService.GetFullPath(path);
@@ -212,7 +214,6 @@
         }
     }
 
-    // „ÌÀÊœ „”«⁄œ… ·Ã·» «·√ÌﬁÊ‰… »‰«¡ ⁄·Ï «·‰Ê⁄
     private const string IconScale = """<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="3" x2="12" y2="21"/><path d="M3 9l9-7 9 7"/><path d="M3 9l4.5 9 4.5-9"/><path d="M12 9l4.5 9 4.5-9"/></svg>""";
     private const string IconFile = """<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>""";
     private const string IconBook = """<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>""";

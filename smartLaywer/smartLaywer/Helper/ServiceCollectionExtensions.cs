@@ -34,16 +34,13 @@ namespace smartLaywer.Helper
             services.AddScoped<ICourtService, CourtService>();
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IDashboardService, DashboardService>();
-<<<<<<< HEAD
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IHearingDetailsService, HearingDetailsService>();
             services.AddScoped<IInvestigationService, InvestigationService>();
             services.AddScoped<IDocumentService, DocumentService>();
-=======
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IAgendaService, AgendaService>();
             services.AddScoped<ILegalLibraryService, LegalLibraryService>();
->>>>>>> 2db0ea3599fed4764943d4eb5f9b239a765368dd
 
             return services;
         }
