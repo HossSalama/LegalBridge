@@ -359,12 +359,12 @@
     {
         public decimal Amount { get; set; }
         public DateTime PaymentDate { get; set; } = DateTime.Now;
-        public PaymentMethodEnum PaymentMethod { get; set; } = PaymentMethodEnum.Cash; // «› —«÷Ì ‰ﬁœ«
+        public PaymentMethodEnum PaymentMethod { get; set; } = PaymentMethodEnum.Cash; 
     }
     private void OpenPaymentModal(int feeId)
     {
         selectedFeeId = feeId;
-        paymentDto = new PaymentDto(); // ≈⁄«œ…  ’›Ì— «·»Ì«‰« 
+        paymentDto = new PaymentDto(); 
         showModal = true;
     }
     private void CloseModal() => showModal = false;
@@ -395,7 +395,7 @@
             }
             else
             {
-                // „„ﬂ‰  ÷Ì› Â‰« Alert ··„” Œœ„ ·Ê «·›‘· »”»» «·œ« «»Ì“
+          
                 Console.WriteLine("›‘· ›Ì  ”ÃÌ· ⁄„·Ì… «·œ›⁄.");
             }
         }
