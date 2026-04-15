@@ -17,6 +17,7 @@ namespace smartLaywer.Repository.UnitWork
         IGenericRepository<Department> Departments { get; }
         IGenericRepository<Report> Reports { get; }
         IClientRepository Client { get; }
+        IGenericRepository<LegalLibrary> LegalLibraries { get; }
         Task<int> CompleteAsync();
     }
 }
