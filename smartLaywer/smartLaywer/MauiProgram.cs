@@ -9,6 +9,7 @@ using smartLaywer.Repository.UnitWork;
 
 using smartLaywer.Services;
 using smartLaywer.Services.ClassService;
+using smartLaywer.WinUI;
 
 namespace smartLaywer
 {
@@ -39,12 +40,12 @@ namespace smartLaywer
 
             builder.Services.AddDbContext<LegalManagementContext>(options =>
                 options
-                    .UseSqlServer("Data Source=.;Initial Catalog=LegalManagementDB;Integrated Security=True;Encrypt=False;Trust Server Certificate=True")
+                    .UseSqlServer("Data Source=.\\SQLEXPRESS;Initial Catalog=LegalManagementDB;Integrated Security=True;Encrypt=False;Trust Server Certificate=True")
                     .ConfigureWarnings(w => w.Ignore(
                         Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
 
-
+            
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

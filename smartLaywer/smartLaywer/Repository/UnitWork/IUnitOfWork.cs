@@ -7,6 +7,7 @@ namespace smartLaywer.Repository.UnitWork
         IGenericRepository<PaymentSchedule> Schedules { get; }
         IGenericRepository<AdminExpense> Expenses { get; }
         IHearingRepository Hearing { get; }
+        IInvestigationRepository Investigations { get; }
 
         ICaseRepository Cases { get; }
         IGenericRepository<Client> Clients { get; }
@@ -17,6 +18,9 @@ namespace smartLaywer.Repository.UnitWork
         IGenericRepository<Department> Departments { get; }
         IGenericRepository<Report> Reports { get; }
         IClientRepository Client { get; }
+        IHearingDetailsRepository HearingDetails { get; }
         Task<int> CompleteAsync();
+        IDocumentRepository Document { get; }
+        Task<int> SaveChangesAsync();
     }
 }

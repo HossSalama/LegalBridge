@@ -67,7 +67,7 @@ public partial class LegalManagementContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer("Data Source =.; Initial Catalog = LegalManagementDB; Integrated Security = True; Encrypt=False; Trust Server Certificate=True")
+            optionsBuilder.UseSqlServer("Data Source =.\\SQLEXPRESS;Initial Catalog=LegalManagementDB; Integrated Security = True; Encrypt=False; Trust Server Certificate=True")
                 .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
         }
  

@@ -1,3 +1,4 @@
+using smartLaywer.Components.Pages;
 using smartLaywer.Repository.UnitWork;
 
 namespace smartLaywer.Repository.UnitWork
@@ -20,6 +21,9 @@ namespace smartLaywer.Repository.UnitWork
         public IGenericRepository<Court> Courts { get; private set; }
         public IGenericRepository<User> Users { get; private set; }
         public IGenericRepository<Department> Departments { get; private set; }
+        public IHearingDetailsRepository HearingDetails { get; private set; }
+        public IInvestigationRepository Investigations { get; }
+        public IDocumentRepository Document { get; }
 
         public IGenericRepository<Report> Reports { get; private set; }
         public UnitOfWork(LegalManagementContext context, IMapper mapper)
@@ -41,8 +45,17 @@ namespace smartLaywer.Repository.UnitWork
             Users = new GenericRepository<User>(_context);
             Departments = new GenericRepository<Department>(_context);
             Reports = new GenericRepository<Report>(_context);
+            HearingDetails = new HearingDetailsRepository(_context);
+            Investigations = new InvestigationRepository(_context);
+            Document = new DocumentRepository(context);
+
         }
 
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync();
+        }
+        
         public async Task<int> CompleteAsync() => await _context.SaveChangesAsync();
         public void Dispose() { }
     }

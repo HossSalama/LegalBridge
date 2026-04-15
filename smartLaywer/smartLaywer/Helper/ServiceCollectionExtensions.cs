@@ -17,7 +17,10 @@ namespace smartLaywer.Helper
             services.AddScoped<ICaseRepository, CaseRepository>();
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<IHearingRepository, HearingRepository>();
-            
+            services.AddScoped<IHearingDetailsRepository, HearingDetailsRepository>();
+            services.AddScoped<IInvestigationRepository, InvestigationRepository>();
+            services.AddScoped<IDocumentRepository, DocumentRepository>();
+
             return services;
         }
         public static IServiceCollection AddServices(this IServiceCollection services)
@@ -32,6 +35,9 @@ namespace smartLaywer.Helper
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IHearingDetailsService, HearingDetailsService>();
+            services.AddScoped<IInvestigationService, InvestigationService>();
+            services.AddScoped<IDocumentService, DocumentService>();
 
             return services;
         }
