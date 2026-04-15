@@ -12,17 +12,21 @@ namespace smartLaywer.Repository.ClassRepository
 
         public async Task<FinancialStatDto> GetFinancialSummaryAsync()
         {
-            var totalCollected = await _context.ActualPayments.SumAsync(ap => ap.Amount);
+            var feeAnalytics = await _context.Fees
+                .Select(f => new
+                {
+                    TotalAmount = f.TotalAmount,
+                    Collected = f.ActualPayments.Sum(ap => (decimal?)ap.Amount) ?? 0
+                })
+                .ToListAsync();
 
-            var totalFeesAmount = await _context.Fees.SumAsync(f => f.TotalAmount);
+            var totalFeesAmount = feeAnalytics.Sum(x => x.TotalAmount);
+            var totalCollected = feeAnalytics.Sum(x => x.Collected);
+            var fullyPaidCount = feeAnalytics.Count(x => x.Collected >= x.TotalAmount && x.TotalAmount > 0);
 
             var totalOverdue = await _context.PaymentSchedules
                 .Where(ps => ps.DueDate < DateTime.Now && ps.Status != PaymentStatusEnum.Paid)
-                .SumAsync(ps => ps.PlannedAmount);
-
-            var fullyPaidCount = await _context.Fees
-                .Where(f => f.ActualPayments.Sum(ap => ap.Amount) >= f.TotalAmount)
-                .CountAsync();
+                .SumAsync(ps => (decimal?)ps.PlannedAmount) ?? 0;
 
             return new FinancialStatDto
             {
@@ -35,7 +39,7 @@ namespace smartLaywer.Repository.ClassRepository
 
         public async Task<PaginatedList<FeeDetailsDto>> GetPagedFeesAsync(string searchTerm, int pageNumber, int pageSize)
         {
-            var query = _context.Fees.AsQueryable();
+            var query = _context.Fees.AsNoTracking().AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -48,17 +52,17 @@ namespace smartLaywer.Repository.ClassRepository
                 .ToPaginatedListAsync(pageNumber, pageSize);
         }
 
-        public async Task<List<PaymentSchedule>> GetUnpaidSchedulesAsync(int feeId)
-        {
-            return await _context.PaymentSchedules
-                .Where(ps => ps.FeeId == feeId && ps.Status != PaymentStatusEnum.Paid)
-                .OrderBy(ps => ps.DueDate)
-                .ToListAsync();
-        }
+
 
         public async Task AddFeeAsync(Fee fee)
         {
             await _context.Fees.AddAsync(fee);
         }
+
+
+
+
+
+
     }
 }

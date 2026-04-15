@@ -26,6 +26,7 @@ namespace smartLaywer.Repository.UnitWork
         public IDocumentRepository Document { get; }
 
         public IGenericRepository<Report> Reports { get; private set; }
+        public IGenericRepository<LegalLibrary> LegalLibraries { get; private set; }
         public UnitOfWork(LegalManagementContext context, IMapper mapper)
         {
             _context = context;
@@ -45,10 +46,15 @@ namespace smartLaywer.Repository.UnitWork
             Users = new GenericRepository<User>(_context);
             Departments = new GenericRepository<Department>(_context);
             Reports = new GenericRepository<Report>(_context);
+<<<<<<< HEAD
             HearingDetails = new HearingDetailsRepository(_context);
             Investigations = new InvestigationRepository(_context);
             Document = new DocumentRepository(context);
 
+=======
+
+            LegalLibraries = new GenericRepository<LegalLibrary>(_context);
+>>>>>>> 2db0ea3599fed4764943d4eb5f9b239a765368dd
         }
 
         public async Task<int> SaveChangesAsync()

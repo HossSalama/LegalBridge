@@ -1,32 +1,29 @@
-ï»¿@page "/fees"
+@page "/fees"
 @namespace smartLaywer.Components.Pages
+@using smartLaywer.Service.ClassService
+@using smartLaywer.Service.InterfaceService
 @inject IFinancialsService FinancialsService
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
 
-<PageTitle>Ø§Ù„Ø£ØªØ¹Ø§Ø¨ ÙˆØ§Ù„Ø¯ÙØ¹Ø§Øª</PageTitle>
+<PageTitle>ÇáÃÊÚÇÈ æÇáÏİÚÇÊ</PageTitle>
 
 <div class="fees-page" dir="rtl">
 
     <div class="page-header">
         <div>
-            <h1 class="page-title">Ø§Ù„Ø£ØªØ¹Ø§Ø¨ ÙˆØ§Ù„Ø¯ÙØ¹Ø§Øª</h1>
-            <p class="page-sub">Ø¥Ø¯Ø§Ø±Ø© Ø£ØªØ¹Ø§Ø¨ Ø§Ù„Ù‚Ø¶Ø§ÙŠØ§ ÙˆÙ…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø¯ÙØ¹Ø§Øª</p>
+            <h1 class="page-title">ÇáÃÊÚÇÈ æÇáÏİÚÇÊ</h1>
+            <p class="page-sub">ÅÏÇÑÉ ÃÊÚÇÈ ÇáŞÖÇíÇ æãÊÇÈÚÉ ÇáÏİÚÇÊ</p>
         </div>
-        @* <button class="btn-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                     fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                ØªØ³Ø¬ÙŠÙ„ Ø¯ÙØ¹Ø© Ø¬Ø¯ÙŠØ¯Ø©
-            </button> *@
     </div>
 
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-body">
                 <div>
-                    <p class="stat-label">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø­ØµÙ„</p>
-                    <h3 class="stat-value green">@stats.TotalCollected.ToString("N0") Ø¬.Ù…</h3>
+                    <p class="stat-label">ÅÌãÇáí ÇáãÍÕá</p>
+                    <h3 class="stat-value green">@stats.TotalCollected.ToString("N0") Ì.ã</h3>
                 </div>
                 <div class="stat-icon bg-green">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
@@ -40,8 +37,8 @@
         <div class="stat-card">
             <div class="stat-body">
                 <div>
-                    <p class="stat-label">Ø§Ù„Ù…Ø¨Ø§Ù„Øº Ø§Ù„Ù…Ø³ØªØ­Ù‚Ø©</p>
-                    <h3 class="stat-value amber">@stats.TotalOutstanding.ToString("N0") Ø¬.Ù…</h3>
+                    <p class="stat-label">ÇáãÈÇáÛ ÇáãÓÊÍŞÉ</p>
+                    <h3 class="stat-value amber">@stats.TotalOutstanding.ToString("N0") Ì.ã</h3>
                 </div>
                 <div class="stat-icon bg-amber">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
@@ -55,7 +52,7 @@
         <div class="stat-card">
             <div class="stat-body">
                 <div>
-                    <p class="stat-label">Ù…Ø¯ÙÙˆØ¹Ø© Ø¨Ø§Ù„ÙƒØ§Ù…Ù„</p>
+                    <p class="stat-label">ãÏİæÚÉ ÈÇáßÇãá</p>
                     <h3 class="stat-value">@stats.FullyPaidCount</h3>
                 </div>
                 <div class="stat-icon bg-blue">
@@ -70,8 +67,8 @@
         <div class="stat-card">
             <div class="stat-body">
                 <div>
-                    <p class="stat-label">Ù…ØªØ£Ø®Ø±Ø©</p>
-                    <h3 class="stat-value red">@stats.TotalOverdue.ToString("N0") Ø¬.Ù…</h3>
+                    <p class="stat-label">ãÊÃÎÑÉ</p>
+                    <h3 class="stat-value red">@stats.TotalOverdue.ToString("N0") Ì.ã</h3>
                 </div>
                 <div class="stat-icon bg-red">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
@@ -92,57 +89,49 @@
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <input type="text" placeholder="Ø§Ù„Ø¨Ø­Ø« Ø¨Ø±Ù‚Ù… Ø§Ù„Ù‚Ø¶ÙŠØ© Ø£Ùˆ Ø§Ø³Ù… Ø§Ù„Ø¹Ù…ÙŠÙ„..." class="search-input" @oninput="OnSearchInput" />
+            <input type="text" placeholder="ÇáÈÍË ÈÑŞã ÇáŞÖíÉ Ãæ ÇÓã ÇáÚãíá..." class="search-input" @oninput="OnSearchInput" />
         </div>
-        @* <button class="btn-outline">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                     fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                ØªØµØ¯ÙŠØ± Ø§Ù„ØªÙ‚Ø±ÙŠØ±
-            </button> *@
+ 
     </div>
     <div class="fees-list">
         @if (fees != null && fees.Any())
         {
             @foreach (var fee in fees)
             {
-                <div class="fee-card @(fee.Status == "Ù…ØªØ£Ø®Ø±Ø©" ? "fee-overdue" : "")">
+                <div class="fee-card @(fee.Status == "ãÊÃÎÑÉ" ? "fee-overdue" : "")">
                     <div class="fee-top">
                         <div class="fee-left">
                             <div class="fee-info">
                                 <div class="fee-title-row">
-                                    <h3 class="fee-case">Ø§Ù„Ù‚Ø¶ÙŠØ©: @fee.CaseNumber</h3>
+                                    <h3 class="fee-case">ÇáŞÖíÉ: @fee.CaseNumber</h3>
                                     <span class="badge @GetStatusClass(fee.Status)">@fee.Status</span>
                                 </div>
                                 <p class="fee-client">@fee.ClientName</p>
                                 <div class="fee-dates">
-                                    <span>Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©: @fee.StartDate.ToString("yyyy-MM-dd")</span>
-                                    <span>Ø§Ù„Ø§Ø³ØªØ­Ù‚Ø§Ù‚: @fee.DueDate.ToString("yyyy-MM-dd")</span>
+                                    <span>ÇáÈÏÇíÉ: @fee.StartDate.ToString("yyyy-MM-dd")</span>
+                                    <span>ÇáÇÓÊÍŞÇŞ: @fee.DueDate.ToString("yyyy-MM-dd")</span>
                                 </div>
                             </div>
                         </div>
                         <div class="fee-total">
-                            <p class="fee-total-label">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø£ØªØ¹Ø§Ø¨</p>
-                            <p class="fee-total-value">@fee.TotalAmount.ToString("N0") Ø¬.Ù…</p>
+                            <p class="fee-total-label">ÅÌãÇáí ÇáÃÊÚÇÈ</p>
+                            <p class="fee-total-value">@fee.TotalAmount.ToString("N0") Ì.ã</p>
                         </div>
                     </div>
 
                     <div class="progress-section">
                         <div class="progress-header">
-                            <span>ØªÙ‚Ø¯Ù… Ø§Ù„Ø³Ø¯Ø§Ø¯</span>
-                            <span>@fee.CollectedAmount.ToString("N0") / @fee.TotalAmount.ToString("N0") Ø¬.Ù…</span>
+                            <span>ÊŞÏã ÇáÓÏÇÏ</span>
+                            <span>@fee.CollectedAmount.ToString("N0") / @fee.TotalAmount.ToString("N0") Ì.ã</span>
                         </div>
                         <div class="progress-bar">
-                            <div class="progress-fill @(fee.Status == "Ù…ØªØ£Ø®Ø±Ø©" ? "progress-overdue" : "")"
+                            <div class="progress-fill @(fee.Status == "ãÊÃÎÑÉ" ? "progress-overdue" : "")"
                                  style="width: @(fee.ProgressPercentage)%"></div>
                         </div>
                         <div class="progress-footer">
-                            <span>Ø§Ù„Ù…Ø¯ÙÙˆØ¹: @fee.ProgressPercentage.ToString("F0")%</span>
+                            <span>ÇáãÏİæÚ: @fee.ProgressPercentage.ToString("F0")%</span>
                             <span class="@(fee.RemainingAmount > 0 ? "red" : "green")">
-                                @(fee.RemainingAmount > 0 ? $"Ø§Ù„Ù…ØªØ¨Ù‚ÙŠ: {fee.RemainingAmount:N0} Ø¬.Ù…" : "Ù…ÙƒØªÙ…Ù„")
+                                @(fee.RemainingAmount > 0 ? $"ÇáãÊÈŞí: {fee.RemainingAmount:N0} Ì.ã" : "ãßÊãá")
                             </span>
                         </div>
                     </div>
@@ -150,12 +139,12 @@
                     @if (fee.Payments.Any())
                     {
                         <div class="payments-section">
-                            <h4 class="payments-title">Ø³Ø¬Ù„ Ø§Ù„Ø¯ÙØ¹Ø§Øª (@fee.Payments.Count)</h4>
+                            <h4 class="payments-title">ÓÌá ÇáÏİÚÇÊ (@fee.Payments.Count)</h4>
                             <div class="payments-list">
                                 @foreach (var payment in fee.Payments)
                                 {
                                     <div class="payment-item">
-                                        <p class="payment-amount">@payment.Amount.ToString("N0") Ø¬.Ù…</p>
+                                        <p class="payment-amount">@payment.Amount.ToString("N0") Ì.ã</p>
                                         <p class="payment-meta">@payment.PaymentDate.ToShortDateString() - @payment.Method</p>
                                     </div>
                                 }
@@ -163,39 +152,57 @@
                         </div>
                     }
                     <div class="fee-actions">
-                        <button class="btn-primary btn-sm" @onclick="() => OpenPaymentModal(fee.Id)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="5" x2="12" y2="19" />
-                                <line x1="5" y1="12" x2="19" y2="12" />
-                            </svg>
-                            ØªØ³Ø¬ÙŠÙ„ Ø¯ÙØ¹Ø©
+                        <button class="btn-collect btn-sm" @onclick="() => OpenPaymentModal(fee.Id)">
+                            <i class="bi bi-cash-coin"></i> ÊÍÕíá ãÈáÛ
                         </button>
 
+                        <button class="btn-schedule btn-sm" @onclick="() => OpenScheduleModal(fee.Id, fee.CaseNumber, fee.RemainingAmount)">
+                            <i class="bi bi-calendar-plus"></i> ÌÏæáÉ ÇáÃŞÓÇØ
+                        </button>
 
-                        <a href="/financials/client-profile/@fee.ClientId" class="btn-primary btn-sm no-underline text-white">
-                            Ø¹Ø±Ø¶ Ø§Ù„ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ù…Ø§Ù„ÙŠØ©
+                        <a href="/financials/client-profile/@fee.ClientId" class="btn-details btn-sm">
+                            <i class="bi bi-eye"></i> ÊİÇÕíá
                         </a>
-                        <button class="btn-outline btn-sm" @onclick="() => OpenScheduleModal(fee.Id, fee.CaseNumber, fee.RemainingAmount)">
-                            <i class="bi bi-calendar-plus"></i> Ø¬Ø¯ÙˆÙ„Ø© Ø§Ù„Ø£Ù‚Ø³Ø§Ø·
-                        </button>
                     </div>
                 </div>
             }
         }
         else if (isLoading)
         {
-            <p>Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¨Ø­Ø«...</p>
+            <p>ÌÇÑí ÇáÈÍË...</p>
         }
         else
         {
-            <p>Ù„Ø§ ØªÙˆØ¬Ø¯ Ù†ØªØ§Ø¦Ø¬ Ù…Ø·Ø§Ø¨Ù‚Ø© Ù„Ø¨Ø­Ø«Ùƒ.</p>
+            <p>áÇ ÊæÌÏ äÊÇÆÌ ãØÇÈŞÉ áÈÍËß.</p>
         }
     </div>
-    <!-- Fee Cards -->
+    @if (fees != null && fees.Any())
+    {
+        <div class="pagination-container d-flex justify-content-center mt-4">
+            <button class="btn btn-outline-primary btn-sm mx-1"
+                    disabled="@(!hasPreviousPage)"
+                    @onclick="() => ChangePage(currentPage - 1)">
+                ÇáÓÇÈŞ
+            </button>
+
+            <span class="align-self-center mx-3">ÕİÍÉ @currentPage ãä @totalPages</span>
+
+            <button class="btn btn-outline-primary btn-sm mx-1"
+                    disabled="@(!hasNextPage)"
+                    @onclick="() => ChangePage(currentPage + 1)">
+                ÇáÊÇáí
+            </button>
+        </div>
+    }
+   
+
+</div>
+
+
+@*  <!-- Fee Cards -->
     <!-- Monthly Revenue -->
     <div class="revenue-card">
-        <h2 class="card-title">Ø§Ù„Ø¥ÙŠØ±Ø§Ø¯Ø§Øª Ø§Ù„Ø´Ù‡Ø±ÙŠØ©</h2>
+        <h2 class="card-title">ÇáÅíÑÇÏÇÊ ÇáÔåÑíÉ</h2>
         <div class="revenue-grid">
             @if (revenueList != null)
             {
@@ -203,7 +210,7 @@
                 {
                     <div class="revenue-month">
                         <p class="month-name">@month.MonthName</p>
-                        <p class="month-value">@month.TotalValue.ToString("N0") Ø¬.Ù…</p>
+                        <p class="month-value">@month.TotalValue.ToString("N0") Ì.ã</p>
                         <span class="month-trend">
                             <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2">
@@ -217,47 +224,10 @@
             }
         </div>
     </div>
-</div>
+</div> *@
 
-@if (showModal)
-{
-    <div class="modal-backdrop fade show"></div>
-    <div class="modal d-block" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">ØªØ³Ø¬ÙŠÙ„ Ø¯ÙØ¹Ø© Ø¬Ø¯ÙŠØ¯Ø©</h5>
-                    <button type="button" class="btn-close btn-close-white" @onclick="CloseModal"></button>
-                </div>
-                <EditForm Model="paymentDto" OnValidSubmit="HandlePaymentSubmit">
-                    <div class="modal-body">
-                        <DataAnnotationsValidator />
-                        <div class="mb-3">
-                            <label class="form-label">Ø§Ù„Ù…Ø¨Ù„Øº Ø§Ù„Ù…Ø³ØªÙ„Ù…</label>
-                            <InputNumber @bind-Value="paymentDto.Amount" class="form-control" placeholder="0.00" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¯ÙØ¹</label>
-                            <InputDate @bind-Value="paymentDto.PaymentDate" class="form-control" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Ø·Ø±ÙŠÙ‚Ø© Ø§Ù„Ø¯ÙØ¹</label>
-                            <InputSelect @bind-Value="paymentDto.PaymentMethod" class="form-control">
-                                <option value="1">Ù†Ù‚Ø¯Ø§Ù‹</option>
-                                <option value="2">ØªØ­ÙˆÙŠÙ„ Ø¨Ù†ÙƒÙŠ</option>
-                                <option value="3">ÙÙˆØ¯Ø§ÙÙˆÙ† ÙƒØ§Ø´ / Ù…Ø­ÙØ¸Ø©</option>
-                            </InputSelect>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" @onclick="CloseModal">Ø¥Ù„ØºØ§Ø¡</button>
-                        <button type="submit" class="btn btn-primary">ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø¹Ù…Ù„ÙŠØ©</button>
-                    </div>
-                </EditForm>
-            </div>
-        </div>
-    </div>
-}
+
+
 @if (showScheduleModal)
 {
     <div class="modal-backdrop fade show"></div>
@@ -265,20 +235,20 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
                 <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title">Ø¬Ø¯ÙˆÙ„Ø© Ø£Ù‚Ø³Ø§Ø· Ø§Ù„Ù‚Ø¶ÙŠØ©: @selectedCaseNumber</h5>
+                    <h5 class="modal-title">ÌÏæáÉ ÃŞÓÇØ ÇáŞÖíÉ: @selectedCaseNumber</h5>
                     <button type="button" class="btn-close btn-close-white" @onclick="() => showScheduleModal = false"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-warning d-flex justify-content-between">
-                        <span>Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…ØªØ¨Ù‚ÙŠ ØºÙŠØ± Ø§Ù„Ù…Ø¬Ø¯ÙˆÙ„: <b>@selectedRemainingAmount.ToString("N0") Ø¬.Ù…</b></span>
-                        <span>Ù…Ø¬Ù…ÙˆØ¹ Ø§Ù„Ø£Ù‚Ø³Ø§Ø· Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©: <b class="@(currentTotalNewSchedules > selectedRemainingAmount ? "text-danger" : "")">@currentTotalNewSchedules.ToString("N0")</b></span>
+                        <span>ÅÌãÇáí ÇáãÊÈŞí ÛíÑ ÇáãÌÏæá: <b>@selectedRemainingAmount.ToString("N0") Ì.ã</b></span>
+                        <span>ãÌãæÚ ÇáÃŞÓÇØ ÇáÌÏíÏÉ: <b class="@(currentTotalNewSchedules > selectedRemainingAmount ? "text-danger" : "")">@currentTotalNewSchedules.ToString("N0")</b></span>
                     </div>
 
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Ø§Ù„Ù…Ø¨Ù„Øº</th>
-                                <th>ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ø³ØªØ­Ù‚Ø§Ù‚</th>
+                                <th>ÇáãÈáÛ</th>
+                                <th>ÊÇÑíÎ ÇáÇÓÊÍŞÇŞ</th>
                                 <th style="width: 50px"></th>
                             </tr>
                         </thead>
@@ -300,147 +270,250 @@
                             }
                         </tbody>
                     </table>
-                    <button class="btn btn-outline-primary btn-sm w-100" @onclick="AddScheduleRow">+ Ø¥Ø¶Ø§ÙØ© Ø±Ùˆ Ø¬Ø¯ÙŠØ¯</button>
+                    <button class="btn btn-outline-primary btn-sm w-100" @onclick="AddScheduleRow">+ ÅÖÇİÉ Ñæ ÌÏíÏ</button>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light" @onclick="() => showScheduleModal = false">Ø¥Ù„ØºØ§Ø¡</button>
+                    <button type="button" class="btn btn-light" @onclick="() => showScheduleModal = false">ÅáÛÇÁ</button>
                     <button type="button" class="btn btn-dark" @onclick="HandleScheduleSubmit"
                             disabled="@(newSchedulesList.Count == 0 || currentTotalNewSchedules > selectedRemainingAmount)">
-                        Ø­ÙØ¸ Ø§Ù„Ø¬Ø¯ÙˆÙ„
+                        ÍİÙ ÇáÌÏæá
                     </button>
                 </div>
             </div>
         </div>
     </div>
 }
+@if (showModal)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal d-block" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">ÊÓÌíá ÏİÚÉ ÌÏíÏÉ - ŞÖíÉ @selectedCaseNumber</h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseModal"></button>
+                </div>
+                <EditForm Model="paymentDto" OnValidSubmit="HandlePaymentSubmit">
+                    <div class="modal-body">
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-3">
+                            <label class="form-label">ÇáãÈáÛ ÇáãÓÊáã</label>
+                            <InputNumber @bind-Value="paymentDto.Amount" class="form-control" placeholder="0.00" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">ÊÇÑíÎ ÇáÏİÚ</label>
+                            <InputDate @bind-Value="paymentDto.PaymentDate" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">ØÑíŞÉ ÇáÏİÚ</label>
+                            <InputSelect @bind-Value="paymentDto.PaymentMethod" class="form-control">
+                                @foreach (var method in Enum.GetValues<PaymentMethodEnum>())
+                                {
+                                    <option value="@method">@method.ToString()</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" @onclick="CloseModal">ÅáÛÇÁ</button>
+                        <button type="submit" class="btn btn-primary" disabled="@isLoading">
+                            @if (isLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm"></span>
+                            }
+                            ÊÃßíÏ ÇáÚãáíÉ
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
+    private FinancialStatDto stats = new(); 
     private bool isLoading = true;
-    private bool showModal = false;
-    private bool showScheduleModal = false;
+    private List<FeeDetailsDto> fees;
     private string searchTerm = "";
-    private System.Threading.Timer? _timer;
-
-    // --- Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª ---
-    private FinancialStatDto stats = new();
-    private List<FeeDetailsDto> fees = new();
-    private List<RevenueSummaryDto> revenueList = new();
-    private PaymentCreationDto paymentDto = new();
-
-    // --- Ù…ØªØºÙŠØ±Ø§Øª Ø§Ù„Ø¬Ø¯ÙˆÙ„Ø© ---
-    private int selectedFeeId;
+    private int currentPage = 1;
+    private bool hasNextPage; 
+    private bool hasPreviousPage;
+    private int totalPages;
+    private bool showScheduleModal = false;
     private string selectedCaseNumber = "";
+    private int selectedFeeId;
     private decimal selectedRemainingAmount;
-    private List<InstallmentCreationDto> newSchedulesList = new();
-
-    // Ø­Ø³Ø§Ø¨Ø§Øª Ù„Ø­Ø¸ÙŠØ©
-    private decimal currentTotalNewSchedules => newSchedulesList.Sum(x => x.Amount);
-    private bool IsScheduleInvalid => currentTotalNewSchedules != selectedRemainingAmount;
-
-    protected override async Task OnInitializedAsync() => await LoadAllData();
-    private void CloseModal()
+    private List<NewScheduleItem> newSchedulesList = new();
+    private decimal currentTotalNewSchedules => newSchedulesList.Sum(s => s.Amount);
+    private bool showModal = false; 
+    private PaymentDto paymentDto = new();
+    public class NewScheduleItem
     {
-        showModal = false;
-        showScheduleModal = false; // Ù„Ùˆ Ø¹Ø§ÙŠØ² Ù†ÙØ³ Ø§Ù„Ù…ÙŠØ«ÙˆØ¯ ØªÙ‚ÙÙ„ Ù…ÙˆØ¯Ø§Ù„ Ø§Ù„Ø¬Ø¯ÙˆÙ„Ø© ÙƒÙ…Ø§Ù†
+        public decimal Amount { get; set; }
+        public DateTime DueDate { get; set; } = DateTime.Now.AddMonths(1);
     }
-    private void RemoveScheduleRow(InstallmentCreationDto item)
+    public class PaymentDto
     {
-        if (newSchedulesList.Contains(item))
+        public decimal Amount { get; set; }
+        public DateTime PaymentDate { get; set; } = DateTime.Now;
+        public PaymentMethodEnum PaymentMethod { get; set; } = PaymentMethodEnum.Cash; 
+    }
+    private void OpenPaymentModal(int feeId)
+    {
+        selectedFeeId = feeId;
+        paymentDto = new PaymentDto(); 
+        showModal = true;
+    }
+    private void CloseModal() => showModal = false;
+    private async Task HandlePaymentSubmit()
+    {
+        if (paymentDto.Amount <= 0) return;
+
+        isLoading = true;
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (int.TryParse(userIdClaim, out int currentUserId))
         {
-            newSchedulesList.Remove(item);
+            var success = await FinancialsService.CollectPaymentAsync(
+                selectedFeeId,
+                paymentDto.Amount,
+                paymentDto.PaymentMethod,
+                currentUserId
+            );
+
+            if (success)
+            {
+                showModal = false;
+                await LoadDashboardStats();
+                await LoadFees();
+            }
+            else
+            {
+          
+                Console.WriteLine("İÔá İí ÊÓÌíá ÚãáíÉ ÇáÏİÚ.");
+            }
         }
+
+        isLoading = false;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboardStats();
+        await LoadFees();
+    }
+    private void OpenScheduleModal(int feeId, string caseNumber, decimal remainingAmount)
+    {
+        selectedFeeId = feeId;
+        selectedCaseNumber = caseNumber;
+        selectedRemainingAmount = remainingAmount;
+
+        newSchedulesList.Clear(); 
+        AddScheduleRow(); 
+
+        showScheduleModal = true;
     }
     private void AddScheduleRow()
     {
-        newSchedulesList.Add(new InstallmentCreationDto
-        {
-            Amount = 0,
-            DueDate = DateTime.Now
-        });
-    }
-    private async Task LoadAllData()
-    {
-        isLoading = true;
-        try
-        {
-            var statsTask = FinancialsService.GetDashboardStatsAsync();
-            var revenueTask = FinancialsService.GetUpcomingRevenueAsync();
-            var feesTask = FinancialsService.GetPagedFeesAsync(searchTerm, 1);
+        decimal suggestedAmount = selectedRemainingAmount - currentTotalNewSchedules;
+        if (suggestedAmount < 0) suggestedAmount = 0;
 
-            await Task.WhenAll(statsTask, revenueTask, feesTask);
-
-            stats = statsTask.Result;
-            revenueList = revenueTask.Result;
-            fees = feesTask.Result.Items;
-        }
-        catch (Exception ex)
-        {
-            // Ø¥Ø¸Ù‡Ø§Ø± Ø±Ø³Ø§Ù„Ø© Ø®Ø·Ø£ Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù… Ù‡Ù†Ø§
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-        finally { isLoading = false; }
+        newSchedulesList.Add(new NewScheduleItem { Amount = suggestedAmount });
     }
 
-    private async Task LoadFees()
+    private void RemoveScheduleRow(NewScheduleItem item)
     {
-        var result = await FinancialsService.GetPagedFeesAsync(searchTerm, 1);
-        fees = result.Items;
-        StateHasChanged();
-    }
-
-    private void OnSearchInput(ChangeEventArgs e)
-    {
-        searchTerm = e.Value?.ToString() ?? "";
-        _timer?.Dispose();
-        _timer = new System.Threading.Timer(async _ => await InvokeAsync(LoadFees), null, 400, -1);
-    }
-
-    // --- Ø§Ù„ØªØ¹Ø§Ù…Ù„ Ù…Ø¹ Ø§Ù„Ø¯ÙØ¹ ---
-    private void OpenPaymentModal(int feeId)
-    {
-        paymentDto = new PaymentCreationDto { FeeId = feeId, PaymentDate = DateTime.Now, PaymentMethod = 1 };
-        showModal = true;
-    }
-
-    private async Task HandlePaymentSubmit()
-    {
-        if (await FinancialsService.RegisterPaymentAsync(paymentDto))
-        {
-            showModal = false;
-            await LoadAllData();
-        }
-    }
-
-    // --- Ø§Ù„ØªØ¹Ø§Ù…Ù„ Ù…Ø¹ Ø§Ù„Ø¬Ø¯ÙˆÙ„Ø© ---
-    private void OpenScheduleModal(int feeId, string caseNo, decimal remaining)
-    {
-        selectedFeeId = feeId;
-        selectedCaseNumber = caseNo;
-        selectedRemainingAmount = remaining;
-        newSchedulesList = new() { new InstallmentCreationDto { DueDate = DateTime.Now, Amount = remaining } };
-        showScheduleModal = true;
+        newSchedulesList.Remove(item);
     }
 
     private async Task HandleScheduleSubmit()
     {
-        if (IsScheduleInvalid) return;
+        if (currentTotalNewSchedules > selectedRemainingAmount || !newSchedulesList.Any())
+            return;
 
-        if (await FinancialsService.CreatePaymentSchedulesAsync(selectedFeeId, newSchedulesList))
+        isLoading = true;
+
+        var dto = new CreateSchedulesDto
+        {
+            FeeId = selectedFeeId,
+            Schedules = newSchedulesList.Select(x => new ScheduleItemDto
+            {
+                Amount = x.Amount,
+                DueDate = x.DueDate
+            }).ToList()
+        };
+
+        var success = await FinancialsService.SaveSchedulesAsync(dto);
+
+        if (success)
         {
             showScheduleModal = false;
-            await LoadAllData();
-        }
-    }
+            newSchedulesList.Clear();
 
+            await LoadDashboardStats(); 
+            await LoadFees();           
+
+        }
+        else
+        {
+            Console.WriteLine("İÔá ÇáÍİÙ: ÊÃßÏ ãä Ãä ÇáãÈÇáÛ áÇ ÊÊÌÇæÒ ÇáÅÌãÇáí.");
+        }
+
+        isLoading = false; 
+    }
+    private async Task LoadFees()
+    {
+        isLoading = true;
+        var result = await FinancialsService.GetPagedFeesAsync(searchTerm, currentPage);
+        fees = result.Items;
+        hasNextPage = result.HasNextPage;
+        hasPreviousPage = result.HasPreviousPage;
+        totalPages = result.TotalPages;
+        isLoading = false;
+    }
+    private async Task OnSearchInput(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? "";
+        currentPage = 1; 
+        await LoadFees();
+    }
+    private async Task ChangePage(int newPage)
+    {
+        currentPage = newPage;
+        await LoadFees(); 
+    }
     private string GetStatusClass(string status) => status switch
     {
-        "Ù…Ø¯ÙÙˆØ¹Ø© Ø¨Ø§Ù„ÙƒØ§Ù…Ù„" => "badge-paid",
-        "Ø¯ÙØ¹ Ø¬Ø²Ø¦ÙŠ" => "badge-partial",
-        "Ù…ØªØ£Ø®Ø±Ø©" => "badge-overdue",
-        _ => "badge-unpaid"
+        "ãßÊãáÉ" => "bg-success",
+        "ãÊÃÎÑÉ" => "bg-danger",
+        "ÊÍÊ ÇáÊÍÕíá" => "bg-warning text-dark",
+        _ => "bg-secondary"
     };
-
-    public void Dispose() => _timer?.Dispose();
+    private async Task LoadDashboardStats()
+    {
+        try
+        {
+            isLoading = true;
+            stats = await FinancialsService.GetDashboardStatsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading stats: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+   
 }
+
+
 <style>
     .fee-actions {
         display: flex;
@@ -454,7 +527,7 @@
         text-decoration: none !important;
     }
 
-    /* Ù„Ø¬Ø¹Ù„ Ø§Ù„Ù…ÙˆØ¯Ø§Ù„ ÙŠØ¨Ø¯Ùˆ Ø§Ø­ØªØ±Ø§ÙÙŠØ§Ù‹ */
+    /* áÌÚá ÇáãæÏÇá íÈÏæ ÇÍÊÑÇİíÇğ */
     .modal-backdrop {
         position: fixed;
         top: 0;
@@ -532,6 +605,49 @@
         font-weight: 700;
         color: #1e293b;
         margin: .25rem 0 0;
+    }
+
+    .fee-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .btn-collect {
+        background-color: #16a34a; 
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+        .btn-collect:hover {
+            background-color: #15803d;
+        }
+
+    /* ÒÑÇÑ ÇáÌÏæáÉ */
+    .btn-schedule {
+        background-color: #1e293b; /* ÃÓæÏ/ßÍáí ãÑíÍ */
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-weight: 600;
+    }
+
+    /* ÒÑÇÑ ÇáÊİÇÕíá */
+    .btn-details {
+        background-color: #f1f5f9;
+        color: #475569;
+        text-decoration: none;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.85rem;
     }
 
         .stat-value.green {

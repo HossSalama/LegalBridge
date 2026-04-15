@@ -12,8 +12,8 @@ using smartLaywer.Models;
 namespace smartLaywer.Migrations
 {
     [DbContext(typeof(LegalManagementContext))]
-    [Migration("20260413015459_FixUserSeedData")]
-    partial class FixUserSeedData
+    [Migration("20260414161638_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -197,6 +197,67 @@ namespace smartLaywer.Migrations
                         .HasFilter("[AppealNumber] IS NOT NULL");
 
                     b.ToTable("Appeals", "Legal");
+                });
+
+            modelBuilder.Entity("smartLaywer.Models.Appointment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AppointmentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("AppointmentType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CaseId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ClientId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CaseId");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.ToTable("Appointments", "Legal");
                 });
 
             modelBuilder.Entity("smartLaywer.Models.Case", b =>
@@ -1162,12 +1223,11 @@ namespace smartLaywer.Migrations
                         {
                             Id = 1,
                             Email = "admin@lawyer.com",
-                            FullName = "أدمن النظام",
+                            FullName = "مدير النظام",
                             IsActive = true,
-                            LastLoginAt = new DateTime(2026, 4, 13, 3, 54, 55, 848, DateTimeKind.Local).AddTicks(7750),
-                            NationalId = "29001011234567",
-                            PasswordHash = "$2a$11$Fdny20UP3dmshlwtiIJwduLTW7N16vrqf/J42ElcFZbsRLamKAp4K",
-                            PhoneNumber = "01012345678",
+                            NationalId = "12345678901234",
+                            PasswordHash = "$2a$11$PszPRubAQE4fDmVijVaDQODTvCpyH3QSpkOApCplLeJuhBHb8Tf5a",
+                            PhoneNumber = "01000000000",
                             RoleId = 1
                         });
                 });
@@ -1251,6 +1311,31 @@ namespace smartLaywer.Migrations
                     b.Navigation("Court");
 
                     b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("smartLaywer.Models.Appointment", b =>
+                {
+                    b.HasOne("smartLaywer.Models.Case", "Case")
+                        .WithMany()
+                        .HasForeignKey("CaseId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("smartLaywer.Models.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("smartLaywer.Models.User", "CreatedByNavigation")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Case");
+
+                    b.Navigation("Client");
+
+                    b.Navigation("CreatedByNavigation");
                 });
 
             modelBuilder.Entity("smartLaywer.Models.Case", b =>

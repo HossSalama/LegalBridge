@@ -1,69 +1,118 @@
 ﻿@page "/agenda"
 @namespace smartLaywer.Components.Pages
+@using smartLaywer.DTO.Agenda
+@using smartLaywer.Enum
+@using smartLaywer.Models
+@inject IAgendaService AgendaService
+@inject ILookupService LookupService
 
 <PageTitle>الأجندة القضائية</PageTitle>
 
 <div class="agenda-page" dir="rtl">
 
-    <!-- Header -->
+    <!-- ══════════════════ HEADER ══════════════════ -->
     <div class="page-header-row">
         <div>
             <h1 class="page-title">الأجندة القضائية</h1>
             <p class="page-sub">جدولة ومتابعة جميع المواعيد والجلسات</p>
         </div>
-        <div class="btn-group">
-            <button class="btn-outline">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
-                تصدير
-            </button>
-            <button class="btn-outline">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
-                تصفية
-            </button>
-            <button class="btn-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                إضافة موعد
-            </button>
+        <button class="btn-primary" @onclick="OpenAddModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            إضافة موعد
+        </button>
+    </div>
+
+    <!-- ══════════════════ STATS ══════════════════ -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-body">
+                <div>
+                    <p class="stat-label">مواعيد اليوم</p>
+                    <h3 class="stat-value">@(stats?.TodayCount ?? 0)</h3>
+                </div>
+                <div class="stat-icon bg-blue">@((MarkupString)Ico22Cal)</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div>
+                    <p class="stat-label">هذا الأسبوع</p>
+                    <h3 class="stat-value">@(stats?.WeekCount ?? 0)</h3>
+                </div>
+                <div class="stat-icon bg-green">@((MarkupString)Ico22Clock)</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div>
+                    <p class="stat-label">جلسات قادمة</p>
+                    <h3 class="stat-value blue">@(stats?.UpcomingHearingsCount ?? 0)</h3>
+                </div>
+                <div class="stat-icon bg-blue">@((MarkupString)Ico22Brief)</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-body">
+                <div>
+                    <p class="stat-label">مواعيد نهائية</p>
+                    <h3 class="stat-value red">@(stats?.DeadlinesCount ?? 0)</h3>
+                </div>
+                <div class="stat-icon bg-red">@((MarkupString)Ico22File)</div>
+            </div>
         </div>
     </div>
 
-    <!-- Main Grid -->
+    <!-- ══════════════════ MAIN GRID ══════════════════ -->
     <div class="main-grid">
 
-        <!-- Calendar Panel -->
+        <!-- Calendar -->
         <div class="card">
-            <div class="card-header"><h2 class="card-title">التقويم</h2></div>
+            <div class="card-header-plain">
+                <h2 class="card-title">التقويم</h2>
+            </div>
             <div class="card-body">
-                <!-- Simple Calendar Grid -->
                 <div class="cal-nav">
-                    <button class="cal-nav-btn">‹</button>
-                    <span class="cal-month">أبريل 2026</span>
-                    <button class="cal-nav-btn">›</button>
+                    <button class="cal-nav-btn" @onclick="PrevMonth">‹</button>
+                    <span class="cal-month">@GetMonthLabel(calYear, calMonth)</span>
+                    <button class="cal-nav-btn" @onclick="NextMonth">›</button>
                 </div>
                 <div class="cal-grid">
-                    <div class="cal-dow">أح</div><div class="cal-dow">إث</div><div class="cal-dow">ث</div>
-                    <div class="cal-dow">أر</div><div class="cal-dow">خ</div><div class="cal-dow">ج</div><div class="cal-dow">س</div>
+                    <div class="cal-dow">أح</div><div class="cal-dow">إث</div>
+                    <div class="cal-dow">ث</div><div class="cal-dow">أر</div>
+                    <div class="cal-dow">خ</div><div class="cal-dow">ج</div>
+                    <div class="cal-dow">س</div>
 
-                    @for (int i = 1; i <= 2; i++)
+                    @{
+                        var firstDay = (int)new DateTime(calYear, calMonth, 1).DayOfWeek;
+                    }
+                    @for (int i = 0; i < firstDay; i++)
                     {
                         <div class="cal-day cal-empty"></div>
                     }
-                    @for (int d = 1; d <= 30; d++)
+                    @{
+                        var daysInMonth = DateTime.DaysInMonth(calYear, calMonth);
+                    }
+                    @for (int d = 1; d <= daysInMonth; d++)
                     {
                         var day = d;
-                        var hasEvent = day == 1 || day == 2 || day == 3 || day == 4 || day == 5;
-                        var isToday = day == 10;
-                        <div class="cal-day @(isToday ? "cal-today" : "") @(hasEvent ? "cal-has-event" : "")">
+                        var thisDate = new DateTime(calYear, calMonth, day);
+                        var isToday = thisDate.Date == DateTime.Today;
+                        var isSelected = thisDate.Date == selectedDate?.Date;
+                        var hasEvent = eventDates.Contains(thisDate.Date);
+                        <div class="cal-day @(isToday ? "cal-today" : "") @(isSelected && !isToday ? "cal-selected" : "") @(hasEvent ? "cal-has-event" : "")"
+                             @onclick="() => SelectDate(thisDate)">
                             @day
                             @if (hasEvent)
                             {
-                                <span class="cal-dot"></span>
+                                <span class="cal-dot @(isToday ? "dot-white" : "")"></span>
                             }
                         </div>
                     }
                 </div>
-
-                <!-- Legend -->
                 <div class="legend">
                     <div class="legend-item"><span class="legend-dot dot-blue"></span>جلسات محكمة</div>
                     <div class="legend-item"><span class="legend-dot dot-green"></span>اجتماعات</div>
@@ -75,152 +124,708 @@
 
         <!-- Events List -->
         <div class="card">
-            <div class="card-header"><h2 class="card-title">المواعيد القادمة</h2></div>
-            <div class="card-body">
-                <div class="events-list">
-
-                    @foreach (var ev in events)
+            <div class="card-header-row">
+                <h2 class="card-title">
+                    @if (selectedDate.HasValue)
                     {
-                        <div class="event-item event-@ev.TypeColor">
-                            <div class="event-main">
-                                <div class="event-icon">
-                                    @((MarkupString)ev.Icon)
-                                </div>
-                                <div class="event-content">
-                                    <div class="event-title-row">
-                                        <h4 class="event-title">@ev.Title</h4>
-                                        <span class="badge badge-outline">@ev.TypeLabel</span>
-                                        @if (ev.IsHighPriority)
+                        <span>مواعيد @selectedDate.Value.ToString("yyyy-MM-dd")</span>
+                    }
+                    else
+                    {
+
+                        <span>المواعيد القادمة</span>
+                    }
+                </h2>
+                @if (selectedDate.HasValue)
+                {
+                    <button class="btn-link" @onclick="ClearDateFilter">← عرض الكل</button>
+                }
+            </div>
+            <div class="card-body">
+                @if (isLoading)
+                {
+                    <div class="loading-msg">جاري التحميل...</div>
+                }
+                else if (!string.IsNullOrEmpty(loadError))
+                {
+                    <div class="error-msg" @onclick="() => loadError = string.Empty" style="cursor:pointer">
+                        ⚠️ @loadError <small>(اضغط للإغلاق)</small>
+                    </div>
+                }
+                else if (displayedItems.Count == 0)
+                {
+                    <div class="empty-msg">
+                        @((MarkupString)Ico22Cal)
+                        <p>لا توجد مواعيد في هذه الفترة</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="events-list">
+                        @foreach (var item in displayedItems)
+                        {
+                            <div class="event-item event-@item.TypeColor">
+                                <div class="event-main">
+                                    <div class="event-icon">
+                                        @if (item.ItemType == AgendaItemType.Hearing)
                                         {
-                                            <span class="badge badge-red">أولوية عالية</span>
+                                            @((MarkupString)Ico20Cal)
+                                        }
+                                        else if (item.AppointmentType == AppointmentTypeEnum.MemoDeadline
+                                        || item.AppointmentType == AppointmentTypeEnum.Deadline)
+                                        {
+                                            @((MarkupString)Ico20File)
+                                        }
+                                        else
+                                        {
+                                            @((MarkupString)Ico20Clock)
                                         }
                                     </div>
-                                    <div class="event-meta">
-                                        <span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
-                                            @ev.Date
-                                        </span>
-                                        <span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                                            @ev.Time
-                                        </span>
-                                        <span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
-                                            @ev.Location
-                                        </span>
-                                        <span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /></svg>
-                                            القضية: @ev.CaseNumber
-                                        </span>
+                                    <div class="event-content">
+                                        <div class="event-title-row">
+                                            <h4 class="event-title">@item.Title</h4>
+                                            <span class="badge badge-outline">@item.TypeLabel</span>
+                                            @if (item.IsHighPriority)
+                                            {
+                                                <span class="badge badge-red">أولوية عالية</span>
+                                            }
+                                            @if (item.IsCompleted)
+                                            {
+                                                <span class="badge badge-green">✓ مكتمل</span>
+                                            }
+                                        </div>
+                                        <div class="event-meta">
+                                            <span>@((MarkupString)IcoSmCal) @item.DateTime.ToString("yyyy-MM-dd")</span>
+                                            <span>@((MarkupString)IcoSmClock) @item.DateTime.ToString("hh:mm tt")</span>
+                                            @if (!string.IsNullOrEmpty(item.Location))
+                                            {
+                                                <span>@((MarkupString)IcoSmPin) @item.Location</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.CaseNumber))
+                                            {
+                                                <span>@((MarkupString)IcoSmFile) القضية: @item.CaseNumber</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.ClientName))
+                                            {
+                                                <span>@((MarkupString)IcoSmUser) @item.ClientName</span>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="event-actions">
+                                    <button class="btn-outline btn-sm" @onclick="() => OpenDetails(item)">
+                                        التفاصيل
+                                    </button>
+                                    @if (item.ItemType == AgendaItemType.Appointment)
+                                    {
+                                        <button class="btn-primary btn-sm" @onclick="() => OpenEditModal(item)">
+                                            تعديل
+                                        </button>
+                                    }
+                                </div>
                             </div>
-                            <div class="event-actions">
-                                <button class="btn-outline btn-sm">التفاصيل</button>
-                                <button class="btn-primary btn-sm">تعديل</button>
-                            </div>
-                        </div>
-                    }
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bottom Stats -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-body">
-                <div><p class="stat-label">جلسات اليوم</p><h3 class="stat-value">3</h3></div>
-                <div class="stat-icon bg-blue">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
-                </div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-body">
-                <div><p class="stat-label">جلسات هذا الأسبوع</p><h3 class="stat-value">12</h3></div>
-                <div class="stat-icon bg-green">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                </div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-body">
-                <div><p class="stat-label">مواعيد نهائية</p><h3 class="stat-value red">5</h3></div>
-                <div class="stat-icon bg-red">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
-                </div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-body">
-                <div><p class="stat-label">جلسات تحقيق</p><h3 class="stat-value amber">2</h3></div>
-                <div class="stat-icon bg-amber">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
-                </div>
+                        }
+                    </div>
+                }
             </div>
         </div>
     </div>
 </div>
 
+<!-- ══════════════════ ADD MODAL ══════════════════ -->
+@if (showAddModal)
+{
+    <div class="modal-overlay" @onclick="CloseAddModal">
+        <div class="modal-box modal-md" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h3 class="modal-title">إضافة موعد جديد</h3>
+                <button class="modal-close" @onclick="CloseAddModal">✕</button>
+            </div>
+            <p class="modal-sub">أدخل تفاصيل الموعد الجديد</p>
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label>عنوان الموعد *</label>
+                    <input type="text" class="form-input"
+                           placeholder="مثال: اجتماع مع العميل / موعد تسليم المذكرة"
+                           @bind="newAppt.Title" />
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>نوع الموعد *</label>
+                        <select class="form-input" @bind="newAppt.AppointmentType">
+                            <option value="@AppointmentTypeEnum.ClientMeeting">اجتماع مع العميل</option>
+                            <option value="@AppointmentTypeEnum.MemoDeadline">موعد تسليم المذكرة</option>
+                            <option value="@AppointmentTypeEnum.Internal">موعد داخلي</option>
+                            <option value="@AppointmentTypeEnum.Deadline">موعد نهائي</option>
+                            <option value="@AppointmentTypeEnum.FollowUp">متابعة</option>
+                            <option value="@AppointmentTypeEnum.Other">أخرى</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الأولوية</label>
+                        <select class="form-input" @bind="newAppt.Priority">
+                            <option value="@AppointmentPriorityEnum.Normal">عادي</option>
+                            <option value="@AppointmentPriorityEnum.High">مرتفع</option>
+                            <option value="@AppointmentPriorityEnum.Urgent">عاجل</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>التاريخ والوقت *</label>
+                        <input type="datetime-local" class="form-input"
+                               value="@newAppt.AppointmentDate.ToString("yyyy-MM-ddTHH:mm")"
+                               @onchange="e => { if (DateTime.TryParse(e.Value?.ToString(), out var d)) newAppt.AppointmentDate = d; }" />
+                    </div>
+                    <div class="form-group">
+                        <label>المكان</label>
+                        <input type="text" class="form-input"
+                               placeholder="مثال: المكتب - غرفة الاجتماعات"
+                               @bind="newAppt.Location" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>القضية المرتبطة</label>
+                        <select class="form-input" @bind="selectedCaseId">
+                            <option value="0">-- اختر قضية (اختياري) --</option>
+                            @foreach (var c in availableCases)
+                            {
+                                <option value="@c.Id">@c.CaseNumber — @c.Title</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>العميل المرتبط</label>
+                        <select class="form-input" @bind="selectedClientId">
+                            <option value="0">-- اختر عميل (اختياري) --</option>
+                            @foreach (var cl in availableClients)
+                            {
+                                <option value="@cl.Id">@cl.FullName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>وصف / ملاحظات</label>
+                    <textarea class="form-input" rows="3"
+                              placeholder="تفاصيل إضافية..."
+                              @bind="newAppt.Description"></textarea>
+                </div>
+
+                @if (!string.IsNullOrEmpty(addError))
+                {
+                    <div class="error-msg">@addError</div>
+                }
+
+                <div class="modal-actions">
+                    <button class="btn-primary" style="flex:1"
+                            @onclick="SaveAppointment" disabled="@isSaving">
+                        @(isSaving ? "جاري الحفظ..." : "حفظ الموعد")
+                    </button>
+                    <button class="btn-outline" style="flex:1" @onclick="CloseAddModal">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- ══════════════════ DETAILS MODAL ══════════════════ -->
+@if (showDetailsModal && detailsItem != null)
+{
+    <div class="modal-overlay" @onclick="() => showDetailsModal = false">
+        <div class="modal-box modal-md" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    @(detailsItem.ItemType == AgendaItemType.Hearing ? "تفاصيل الجلسة" : "تفاصيل الموعد")
+                </h3>
+                <button class="modal-close" @onclick="() => showDetailsModal = false">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-grid">
+
+                    <div class="detail-item">
+                        <span class="detail-label">العنوان</span>
+                        <span class="detail-value">@detailsItem.Title</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">النوع</span>
+                        <span class="detail-value">@detailsItem.TypeLabel</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">التاريخ والوقت</span>
+                        <span class="detail-value">@detailsItem.DateTime.ToString("yyyy-MM-dd   hh:mm tt")</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">المكان</span>
+                        <span class="detail-value">@(string.IsNullOrEmpty(detailsItem.Location) ? "—" : detailsItem.Location)</span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(detailsItem.CaseNumber))
+                    {
+                        <div class="detail-item">
+                            <span class="detail-label">رقم القضية</span>
+                            <span class="detail-value">@detailsItem.CaseNumber</span>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(detailsItem.ClientName))
+                    {
+                        <div class="detail-item">
+                            <span class="detail-label">العميل</span>
+                            <span class="detail-value">@detailsItem.ClientName</span>
+                        </div>
+                    }
+
+                    @if (detailsItem.ItemType == AgendaItemType.Hearing)
+                    {
+                        <div class="detail-item">
+                            <span class="detail-label">المحكمة</span>
+                            <span class="detail-value">@(detailsItem.CourtName ?? "—")</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">الدائرة</span>
+                            <span class="detail-value">@(detailsItem.DepartmentName ?? "—")</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">القاضي</span>
+                            <span class="detail-value">@(string.IsNullOrEmpty(detailsItem.JudgeName) ? "—" : detailsItem.JudgeName)</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">حالة الحضور</span>
+                            <span class="detail-value">@(detailsItem.AttendanceStatus?.GetDisplayName() ?? "—")</span>
+                        </div>
+                        <div class="detail-item" style="grid-column:span 2">
+                            <span class="detail-label">النتيجة</span>
+                            <span class="detail-value">@(string.IsNullOrEmpty(detailsItem.Result) ? "لم تُحدَّد بعد" : detailsItem.Result)</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="detail-item">
+                            <span class="detail-label">الأولوية</span>
+                            <span class="detail-value">@(detailsItem.PriorityLabel ?? "—")</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">الحالة</span>
+                            <span class="detail-value">@(detailsItem.IsCompleted ? "✓ مكتمل" : "قادم")</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(detailsItem.Description))
+                        {
+                            <div class="detail-item" style="grid-column:span 2">
+                                <span class="detail-label">الوصف / الملاحظات</span>
+                                <span class="detail-value">@detailsItem.Description</span>
+                            </div>
+                        }
+                    }
+
+                    <div class="detail-item">
+                        <span class="detail-label">أُضيف بواسطة</span>
+                        <span class="detail-value">@(detailsItem.CreatedByName ?? "—")</span>
+                    </div>
+
+                </div>
+                <div class="modal-actions" style="margin-top:1rem">
+                    <button class="btn-outline" style="flex:1"
+                            @onclick="() => showDetailsModal = false">
+                        إغلاق
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- ══════════════════ EDIT MODAL ══════════════════ -->
+@if (showEditModal && editAppt != null)
+{
+    <div class="modal-overlay" @onclick="CloseEditModal">
+        <div class="modal-box modal-md" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h3 class="modal-title">تعديل الموعد</h3>
+                <button class="modal-close" @onclick="CloseEditModal">✕</button>
+            </div>
+            <p class="modal-sub">عدّل تفاصيل الموعد</p>
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <label>عنوان الموعد *</label>
+                    <input type="text" class="form-input"
+                           placeholder="مثال: اجتماع مع العميل / موعد تسليم المذكرة"
+                           @bind="editAppt.Title" />
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>نوع الموعد *</label>
+                        <select class="form-input" @bind="editAppt.AppointmentType">
+                            <option value="@AppointmentTypeEnum.ClientMeeting">اجتماع مع العميل</option>
+                            <option value="@AppointmentTypeEnum.MemoDeadline">موعد تسليم المذكرة</option>
+                            <option value="@AppointmentTypeEnum.Internal">موعد داخلي</option>
+                            <option value="@AppointmentTypeEnum.Deadline">موعد نهائي</option>
+                            <option value="@AppointmentTypeEnum.FollowUp">متابعة</option>
+                            <option value="@AppointmentTypeEnum.Other">أخرى</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الأولوية</label>
+                        <select class="form-input" @bind="editAppt.Priority">
+                            <option value="@AppointmentPriorityEnum.Normal">عادي</option>
+                            <option value="@AppointmentPriorityEnum.High">مرتفع</option>
+                            <option value="@AppointmentPriorityEnum.Urgent">عاجل</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>التاريخ والوقت *</label>
+                        <input type="datetime-local" class="form-input"
+                               value="@editAppt!.AppointmentDate.ToString("yyyy-MM-ddTHH:mm")"
+                               @onchange="e => { if (DateTime.TryParse(e.Value?.ToString(), out var d)) editAppt!.AppointmentDate = d; }" />
+                    </div>
+                    <div class="form-group">
+                        <label>المكان</label>
+                        <input type="text" class="form-input"
+                               placeholder="مثال: المكتب - غرفة الاجتماعات"
+                               @bind="editAppt.Location" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>القضية المرتبطة</label>
+                        <select class="form-input" @bind="editCaseId">
+                            <option value="0">-- اختر قضية (اختياري) --</option>
+                            @foreach (var c in availableCases)
+                            {
+                                <option value="@c.Id">@c.CaseNumber — @c.Title</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>العميل المرتبط</label>
+                        <select class="form-input" @bind="editClientId">
+                            <option value="0">-- اختر عميل (اختياري) --</option>
+                            @foreach (var cl in availableClients)
+                            {
+                                <option value="@cl.Id">@cl.FullName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>وصف / ملاحظات</label>
+                    <textarea class="form-input" rows="3"
+                              placeholder="تفاصيل إضافية..."
+                              @bind="editAppt.Description"></textarea>
+                </div>
+
+                @if (!string.IsNullOrEmpty(editError))
+                {
+                    <div class="error-msg">@editError</div>
+                }
+
+                <div class="modal-actions">
+                    <button class="btn-primary" style="flex:1"
+                            @onclick="SaveEdit" disabled="@isSaving">
+                        @(isSaving ? "جاري الحفظ..." : "حفظ التعديل")
+                    </button>
+                    <button class="btn-outline" style="flex:1" @onclick="CloseEditModal">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
-    private record AgendaEvent(string Title, string TypeLabel, string TypeColor, string Date,
-        string Time, string Location, string CaseNumber, bool IsHighPriority, string Icon);
 
-    private List<AgendaEvent> events = new()
+
+    private List<AgendaItemDto> allItems = new();
+    private List<AgendaItemDto> displayedItems = new();
+    private AgendaStatsDto? stats;
+    private HashSet<DateTime> eventDates = new();
+
+    private List<Case> availableCases = new();
+    private List<Client> availableClients = new();
+
+    private int selectedCaseId = 0;
+    private int selectedClientId = 0;
+
+    private int calYear = DateTime.Today.Year;
+    private int calMonth = DateTime.Today.Month;
+    private DateTime? selectedDate;
+
+    private int currentUserId = 0;
+
+    private bool isLoading = true;
+    private bool isSaving = false;
+    private string loadError = string.Empty;
+    private string addError = string.Empty;
+
+    private bool showAddModal = false;
+    private AppointmentCreationDto newAppt = new();
+
+    private bool showDetailsModal = false;
+    private AgendaItemDto? detailsItem;
+
+    private bool showEditModal = false;
+    private AppointmentCreationDto? editAppt;
+    private int editAppointmentId = 0;
+    private int editCaseId = 0;
+    private int editClientId = 0;
+    private string editError = string.Empty;
+
+    private bool showDeleteConfirm = false;
+    private int deleteTargetId = 0;
+
+    protected override async Task OnInitializedAsync()
     {
-        new("جلسة محكمة ابتدائية", "جلسة", "blue", "2026-04-01", "10:00 ص",
-            "محكمة القاهرة الابتدائية - قاعة 3", "2024/156", true, IconCalendar),
-        new("اجتماع مع العميل", "اجتماع", "green", "2026-04-01", "02:00 م",
-            "المكتب - غرفة الاجتماعات", "2024/142", false, IconClock),
-        new("جلسة استئناف", "جلسة", "blue", "2026-04-02", "11:30 ص",
-            "محكمة الاستئناف - قاعة 1", "2024/189", true, IconCalendar),
-        new("جلسة تحقيق", "تحقيق", "amber", "2026-04-03", "09:00 ص",
-            "النيابة العامة", "2024/201", true, IconPin),
-        new("موعد تسليم المذكرة", "موعد نهائي", "red", "2026-04-04", "03:00 م",
-            "المحكمة الدستورية", "2024/178", true, IconFile),
-    };
+        var stored = await SecureStorage.Default.GetAsync("UserId");
+        if (int.TryParse(stored, out var uid))
+            currentUserId = uid;
 
-    private const string IconCalendar = """<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>""";
-    private const string IconClock = """<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>""";
-    private const string IconPin = """<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>""";
-    private const string IconFile = """<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>""";
+        await LoadAllAsync();
+    }
+
+    private async Task LoadAllAsync()
+    {
+        isLoading = true;
+        loadError = string.Empty;
+        StateHasChanged();
+        try
+        {
+            stats = await AgendaService.GetAgendaStatsAsync();
+            allItems = await AgendaService.GetUpcomingItemsAsync(60);
+            availableClients = await LookupService.GetActiveClientsAsync();
+            availableCases = await LookupService.GetActiveCasesAsync();
+            await RefreshCalendarDots();
+
+            ApplyFilter();
+        }
+        catch (Exception ex)
+        {
+            loadError = $"حدث خطأ أثناء تحميل البيانات: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task RefreshCalendarDots()
+    {
+        var dates = await AgendaService.GetDatesWithEventsAsync(calYear, calMonth);
+        eventDates = dates.ToHashSet();
+    }
+
+    private void ApplyFilter()
+    {
+        displayedItems = selectedDate.HasValue
+            ? allItems.Where(i => i.DateTime.Date == selectedDate.Value.Date).ToList()
+            : allItems;
+    }
+
+    
+    private void SelectDate(DateTime date)
+    {
+        selectedDate = date;
+        ApplyFilter();
+    }
+
+    private void ClearDateFilter()
+    {
+        selectedDate = null;
+        ApplyFilter();
+    }
+
+    private async Task PrevMonth()
+    {
+        var dt = new DateTime(calYear, calMonth, 1).AddMonths(-1);
+        calYear = dt.Year;
+        calMonth = dt.Month;
+        await RefreshCalendarDots();
+    }
+
+    private async Task NextMonth()
+    {
+        var dt = new DateTime(calYear, calMonth, 1).AddMonths(1);
+        calYear = dt.Year;
+        calMonth = dt.Month;
+        await RefreshCalendarDots();
+    }
+
+    private static string GetMonthLabel(int year, int month)
+    {
+        string[] ar = { "يناير","فبراير","مارس","أبريل","مايو","يونيو",
+                         "يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر" };
+        return $"{ar[month - 1]} {year}";
+    }
+
+    
+    private void OpenAddModal()
+    {
+        newAppt = new AppointmentCreationDto
+        {
+            AppointmentDate = DateTime.Now.AddHours(1),
+            AppointmentType = AppointmentTypeEnum.ClientMeeting,
+            Priority = AppointmentPriorityEnum.Normal,
+            CreatedBy = currentUserId
+        };
+        selectedCaseId = 0;
+        selectedClientId = 0;
+        addError = string.Empty;
+        showAddModal = true;
+    }
+
+    private void CloseAddModal()
+    {
+        showAddModal = false;
+        addError = string.Empty;
+    }
+
+    private async Task SaveAppointment()
+    {
+        addError = string.Empty;
+
+        if (newAppt.AppointmentDate == default || newAppt.AppointmentDate < DateTime.Now.AddMinutes(-5))
+        { addError = "يجب اختيار تاريخ ووقت صحيح ."; return; }
+        if (string.IsNullOrWhiteSpace(newAppt.Title))
+        { addError = "عنوان الموعد مطلوب."; return; }
+
+        if (newAppt.AppointmentDate < DateTime.Now.AddMinutes(-5))
+        { addError = "تاريخ الموعد يجب أن يكون في المستقبل."; return; }
+
+        if (currentUserId == 0)
+        { addError = "يجب تسجيل الدخول أولاً."; return; }
+
+        newAppt.CaseId = selectedCaseId == 0 ? null : selectedCaseId;
+        newAppt.ClientId = selectedClientId == 0 ? null : selectedClientId;
+        newAppt.CreatedBy = currentUserId;
+
+        isSaving = true;
+        try
+        {
+            var ok = await AgendaService.AddAppointmentAsync(newAppt);
+            if (ok)
+            {
+                CloseAddModal();
+                await LoadAllAsync();
+            }
+            else
+            {
+                addError = "فشل حفظ الموعد. حاول مرة أخرى.";
+            }
+        }
+        catch (Exception ex)
+        {
+            addError = $"خطأ: {ex.Message}";
+        }
+        finally { isSaving = false; }
+    }
+
+    
+    private void OpenDetails(AgendaItemDto item)
+    {
+        detailsItem = item;
+        showDetailsModal = true;
+    }
+
+
+    private void OpenEditModal(AgendaItemDto item)
+    {
+        editAppointmentId = item.Id;
+        editAppt = new AppointmentCreationDto
+        {
+            Title = item.Title,
+            Description = item.Description,
+            AppointmentDate = item.DateTime == default ? DateTime.Now.AddHours(1) : item.DateTime,
+            AppointmentType = item.AppointmentType ?? AppointmentTypeEnum.ClientMeeting,
+            Priority = item.Priority ?? AppointmentPriorityEnum.Normal,
+            Location = item.Location,
+            CreatedBy = currentUserId
+        };
+        editCaseId = availableCases.FirstOrDefault(c => c.CaseNumber == item.CaseNumber)?.Id ?? 0;
+        editClientId = availableClients.FirstOrDefault(c => c.FullName == item.ClientName)?.Id ?? 0;
+        editError = string.Empty;
+        showEditModal = true;
+    }
+
+    private void CloseEditModal()
+    {
+        showEditModal = false;
+        editAppt = null;
+        editError = string.Empty;
+    }
+
+    private async Task SaveEdit()
+    {
+        if (editAppt == null) return;
+        editError = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(editAppt.Title))
+        { editError = "عنوان الموعد مطلوب."; return; }
+
+        if (editAppt.AppointmentDate == default)
+        { editError = "يجب اختيار تاريخ ووقت صحيح."; return; }
+
+        editAppt.CaseId = editCaseId == 0 ? null : editCaseId;
+        editAppt.ClientId = editClientId == 0 ? null : editClientId;
+        editAppt.CreatedBy = currentUserId;
+
+        isSaving = true;
+        try
+        {
+            var ok = await AgendaService.UpdateAppointmentAsync(editAppointmentId, editAppt);
+            if (ok)
+            {
+                CloseEditModal();
+                await LoadAllAsync();
+            }
+            else
+            {
+                editError = "فشل حفظ التعديل. حاول مرة أخرى.";
+            }
+        }
+        catch (Exception ex)
+        {
+            editError = $"خطأ: {ex.Message}";
+        }
+        finally { isSaving = false; }
+    }
+
+
+
+    private const string Ico22Cal = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>""";
+    private const string Ico22Clock = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>""";
+    private const string Ico22Brief = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>""";
+    private const string Ico22File = """<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>""";
+    private const string Ico20Cal = """<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>""";
+    private const string Ico20Clock = """<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>""";
+    private const string Ico20File = """<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>""";
+    private const string IcoSmCal = """<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>""";
+    private const string IcoSmClock = """<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>""";
+    private const string IcoSmPin = """<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>""";
+    private const string IcoSmFile = """<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>""";
+    private const string IcoSmUser = """<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>""";
 }
 
 <style>
-    .app-shell {
-        display: flex !important;
-        width: 100% !important;
-        height: 100vh !important;
-        overflow: hidden !important;
-    }
-
-    .main-wrap {
-        flex: 1 !important;
-        min-width: 0 !important;
-        overflow-x: hidden !important;
-    }
-
-    .sidebar {
-        flex-shrink: 0 !important;
-        width: 240px !important;
-    }
-
-    .page-content {
-        flex: 1 !important;
-        width: 100% !important;
-        overflow-y: auto !important;
-        box-sizing: border-box !important;
-    }
     .agenda-page {
         padding: 1.5rem;
-        font-family: 'Segoe UI',Tahoma,sans-serif;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
     }
 
+    /* ── Header ── */
     .page-header-row {
         display: flex;
         justify-content: space-between;
@@ -239,22 +844,93 @@
     .page-sub {
         color: #64748b;
         margin: .25rem 0 0;
+        font-size: .9rem;
     }
 
-    .btn-group {
+    /* ── Stats ── */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+    }
+
+    .stat-body {
         display: flex;
-        gap: .5rem;
-        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    /* Main Grid */
+    .stat-label {
+        font-size: .85rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: .2rem 0 0;
+    }
+
+        .stat-value.blue {
+            color: #2563eb;
+        }
+
+        .stat-value.green {
+            color: #16a34a;
+        }
+
+        .stat-value.red {
+            color: #dc2626;
+        }
+
+        .stat-value.amber {
+            color: #d97706;
+        }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .bg-blue {
+        background: #2563eb;
+    }
+
+    .bg-green {
+        background: #16a34a;
+    }
+
+    .bg-amber {
+        background: #d97706;
+    }
+
+    .bg-red {
+        background: #dc2626;
+    }
+
+    /* ── Main Grid ── */
     .main-grid {
         display: grid;
         grid-template-columns: 300px 1fr;
         gap: 1.25rem;
     }
 
-    /* Card */
+    /* ── Card ── */
     .card {
         background: #fff;
         border-radius: 12px;
@@ -262,9 +938,17 @@
         overflow: hidden;
     }
 
-    .card-header {
+    .card-header-plain {
         padding: 1rem 1.25rem;
         border-bottom: 1px solid #f1f5f9;
+    }
+
+    .card-header-row {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .card-title {
@@ -278,7 +962,7 @@
         padding: 1rem 1.25rem;
     }
 
-    /* Calendar */
+    /* ── Calendar ── */
     .cal-nav {
         display: flex;
         justify-content: space-between;
@@ -351,6 +1035,12 @@
             background: #b45309;
         }
 
+    .cal-selected {
+        background: #fef3c7;
+        border: 2px solid #d97706;
+        font-weight: 700;
+    }
+
     .cal-has-event {
         font-weight: 600;
     }
@@ -366,11 +1056,10 @@
         background: #2563eb;
     }
 
-    .cal-today .cal-dot {
-        background: #fff;
+    .dot-white {
+        background: #fff !important;
     }
 
-    /* Legend */
     .legend {
         display: flex;
         flex-direction: column;
@@ -409,7 +1098,7 @@
         background: #d97706;
     }
 
-    /* Events */
+    /* ── Events List ── */
     .events-list {
         display: flex;
         flex-direction: column;
@@ -455,6 +1144,7 @@
         display: flex;
         gap: .85rem;
         flex: 1;
+        min-width: 0;
     }
 
     .event-icon {
@@ -471,6 +1161,7 @@
 
     .event-content {
         flex: 1;
+        min-width: 0;
     }
 
     .event-title-row {
@@ -509,80 +1200,38 @@
         flex-shrink: 0;
     }
 
-    /* Stats */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
-        gap: 1rem;
-    }
-
-    .stat-card {
-        background: #fff;
-        border-radius: 12px;
-        padding: 1.25rem;
-        box-shadow: 0 1px 6px rgba(0,0,0,.08);
-    }
-
-    .stat-body {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .stat-label {
-        font-size: .85rem;
+    /* ── Empty / Loading ── */
+    .loading-msg {
+        padding: 2rem;
+        text-align: center;
         color: #64748b;
-        margin: 0;
     }
 
-    .stat-value {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin: .2rem 0 0;
+    .error-msg {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        border-radius: 8px;
+        padding: .75rem 1rem;
+        font-size: .875rem;
     }
 
-        .stat-value.red {
-            color: #dc2626;
-        }
-
-        .stat-value.amber {
-            color: #d97706;
-        }
-
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 10px;
+    .empty-msg {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: center;
-        color: #fff;
-        flex-shrink: 0;
+        gap: .75rem;
+        padding: 3rem 1rem;
+        color: #94a3b8;
     }
 
-    .bg-blue {
-        background: #2563eb;
-    }
-
-    .bg-green {
-        background: #16a34a;
-    }
-
-    .bg-amber {
-        background: #d97706;
-    }
-
-    .bg-red {
-        background: #dc2626;
-    }
-
-    /* Badges */
+    /* ── Badges ── */
     .badge {
         font-size: .72rem;
         padding: .2rem .6rem;
         border-radius: 999px;
         font-weight: 600;
+        display: inline-block;
     }
 
     .badge-outline {
@@ -596,7 +1245,12 @@
         color: #dc2626;
     }
 
-    /* Buttons */
+    .badge-green {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    /* ── Buttons ── */
     .btn-primary {
         background: #d97706;
         color: #fff;
@@ -610,16 +1264,17 @@
         gap: .35rem;
         transition: background .2s;
         white-space: nowrap;
+        font-family: inherit;
     }
 
         .btn-primary:hover {
             background: #b45309;
         }
 
-    .btn-sm {
-        padding: .3rem .65rem;
-        font-size: .8rem;
-    }
+        .btn-primary:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
 
     .btn-outline {
         background: transparent;
@@ -634,10 +1289,230 @@
         gap: .35rem;
         transition: all .2s;
         white-space: nowrap;
+        font-family: inherit;
     }
 
         .btn-outline:hover {
             border-color: #d97706;
             color: #d97706;
         }
+
+    .btn-success {
+        background: #16a34a;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+        .btn-success:hover {
+            background: #15803d;
+        }
+
+    .btn-danger {
+        background: #dc2626;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-danger:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+    .btn-link {
+        background: none;
+        border: none;
+        color: #d97706;
+        font-size: .82rem;
+        cursor: pointer;
+        padding: 0;
+        font-family: inherit;
+    }
+
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+
+    .btn-sm {
+        padding: .3rem .65rem;
+        font-size: .8rem;
+    }
+
+    /* ── Modal ── */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.45);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        backdrop-filter: blur(3px);
+    }
+
+    .modal-box {
+        background: #fff;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 460px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.2);
+        animation: modalIn .2s ease;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-md {
+        max-width: 620px;
+    }
+
+    @@keyframes modalIn {
+        from {
+            opacity: 0;
+            transform: scale(.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem .75rem;
+        position: sticky;
+        top: 0;
+        background: #fff;
+        z-index: 1;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .modal-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.1rem;
+        cursor: pointer;
+        color: #94a3b8;
+        padding: .2rem;
+        border-radius: 4px;
+    }
+
+        .modal-close:hover {
+            color: #1e293b;
+            background: #f1f5f9;
+        }
+
+    .modal-sub {
+        padding: .5rem 1.5rem .25rem;
+        font-size: .85rem;
+        color: #64748b;
+    }
+
+    .modal-body {
+        padding: 1rem 1.5rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: .75rem;
+        margin-top: .25rem;
+    }
+
+    /* ── Form ── */
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .75rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: .35rem;
+    }
+
+        .form-group label {
+            font-size: .875rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+    .form-input {
+        padding: .65rem .875rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: .9rem;
+        outline: none;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+        .form-input:focus {
+            border-color: #d97706;
+            box-shadow: 0 0 0 3px rgba(217,119,6,.1);
+        }
+
+    /* ── Details grid ── */
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .75rem;
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: .2rem;
+        padding: .6rem .75rem;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+
+    .detail-label {
+        font-size: .75rem;
+        font-weight: 700;
+        color: #64748b;
+    }
+
+    .detail-value {
+        font-size: .9rem;
+        color: #1e293b;
+    }
+
+    @@media (max-width:700px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>

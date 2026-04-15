@@ -40,12 +40,19 @@ namespace smartLaywer
 
             builder.Services.AddDbContext<LegalManagementContext>(options =>
                 options
+<<<<<<< HEAD
                     .UseSqlServer("Data Source=.\\SQLEXPRESS;Initial Catalog=LegalManagementDB;Integrated Security=True;Encrypt=False;Trust Server Certificate=True")
+=======
+                    .UseSqlServer("Data Source =.; Initial Catalog = LegalManagementDB; Integrated Security = True; Encrypt=False; Trust Server Certificate=True")
+>>>>>>> 2db0ea3599fed4764943d4eb5f9b239a765368dd
                     .ConfigureWarnings(w => w.Ignore(
                         Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
 
+<<<<<<< HEAD
             
+=======
+>>>>>>> 2db0ea3599fed4764943d4eb5f9b239a765368dd
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
