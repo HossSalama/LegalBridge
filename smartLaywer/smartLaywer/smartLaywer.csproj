@@ -82,6 +82,10 @@
       <Folder Include="DTO\Notification\" />
       <Folder Include="Mapping\HearingMapping\" />
       <Folder Include="wwwroot\uploads\documents\" />
+
+      <Folder Include="wwwroot\uploads\poa\" />
+
+      <Folder Include="wwwroot\Uploads\LegalLibrary\" />
     </ItemGroup>
 
 </Project>

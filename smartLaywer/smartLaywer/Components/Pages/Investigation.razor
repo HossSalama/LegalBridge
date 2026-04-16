@@ -1,151 +1,133 @@
 ﻿@page "/investigation"
 @namespace smartLaywer.Components.Pages
+@using smartLaywer.DTO.Investigation
+@using smartLaywer.Services.InterfaceService
+@using smartLaywer.Models
+@using smartLaywer.Repository.UnitWork
+@using Microsoft.EntityFrameworkCore
+@inject IInvestigationService InvestigationService
+@inject IUnitOfWork UnitOfWork
 
 <PageTitle>مرحلة التحقيق</PageTitle>
 
 <div class="inv-page" dir="rtl">
 
-    <!-- Header -->
     <div class="page-header">
         <div>
             <h1 class="page-title">مرحلة التحقيق</h1>
             <p class="page-sub">متابعة تفصيلية لجلسات التحقيق والإجراءات</p>
         </div>
-        <button class="btn-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <button type="button" class="btn-primary" @onclick="OpenAddModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
             إضافة تحقيق جديد
         </button>
     </div>
 
-    <!-- Stats -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-body">
-                <div><p class="stat-label">إجمالي التحقيقات</p><h3 class="stat-value">@investigations.Count</h3></div>
-                <div class="stat-icon bg-blue"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
-            </div>
+    @if (isLoading)
+    {
+        <div class="loading-wrap"><div class="spinner-lg"></div><p>جاري التحميل...</p></div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert-error">@errorMessage</div>
+    }
+    else
+    {
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-body"><div><p class="stat-label">إجمالي التحقيقات</p><h3 class="stat-value">@investigations.Count</h3></div><div class="stat-icon bg-blue"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg></div></div></div>
+            <div class="stat-card"><div class="stat-body"><div><p class="stat-label">جارية</p><h3 class="stat-value amber">@investigations.Count(i => i.Status == "ongoing")</h3></div><div class="stat-icon bg-amber"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg></div></div></div>
+            <div class="stat-card"><div class="stat-body"><div><p class="stat-label">مكتملة</p><h3 class="stat-value green">@investigations.Count(i => i.Status == "completed")</h3></div><div class="stat-icon bg-green"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg></div></div></div>
+            <div class="stat-card"><div class="stat-body"><div><p class="stat-label">موقوفة</p><h3 class="stat-value">@investigations.Count(i => i.Status == "suspended")</h3></div><div class="stat-icon" style="background:#64748b"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg></div></div></div>
         </div>
-        <div class="stat-card">
-            <div class="stat-body">
-                <div><p class="stat-label">جارية</p><h3 class="stat-value amber">@investigations.Count(i => i.Status == "ongoing")</h3></div>
-                <div class="stat-icon bg-amber"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-body">
-                <div><p class="stat-label">مكتملة</p><h3 class="stat-value green">@investigations.Count(i => i.Status == "completed")</h3></div>
-                <div class="stat-icon bg-green"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-body">
-                <div><p class="stat-label">موقوفة</p><h3 class="stat-value">@investigations.Count(i => i.Status == "suspended")</h3></div>
-                <div class="stat-icon" style="background:#64748b"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Main Grid -->
-    <div class="main-grid">
-
-        <!-- List Panel -->
-        <div class="cases-panel">
-            <div class="panel-header"><h2 class="panel-title">قائمة التحقيقات</h2></div>
-            <div class="cases-list">
-                @foreach (var inv in investigations)
-                {
-                    <div class="case-item @(selected?.Id == inv.Id ? "case-active" : "")" @onclick="() => selected = inv">
-                        <div class="case-item-top">
-                            <h4 class="case-num">@inv.CaseNumber</h4>
-                            <span class="badge @GetStatusBadge(inv.Status)">@GetStatusLabel(inv.Status)</span>
+        <div class="main-grid">
+            <div class="cases-panel">
+                <div class="panel-header"><h2 class="panel-title">قائمة التحقيقات (@investigations.Count)</h2></div>
+                <div class="cases-list">
+                    @if (!investigations.Any())
+                    {
+                        <p class="empty-small">لا توجد تحقيقات</p>
+                    }
+                    @foreach (var inv in investigations)
+                    {
+                        <div class="case-item @(selected?.Id == inv.Id ? "case-active" : "")" @onclick="() => SelectCase(inv)">
+                            <div class="case-item-top">
+                                <h4 class="case-num">@inv.CaseNumber</h4>
+                                <span class="badge @GetStatusBadge(inv.Status)">@GetStatusLabel(inv.Status)</span>
+                            </div>
+                            <p class="case-client">@inv.ClientName</p>
+                            <span class="badge @GetTypeBadge(inv.Type)">@GetTypeLabel(inv.Type)</span>
                         </div>
-                        <p class="case-client">@inv.ClientName</p>
-                        <span class="badge @GetTypeBadge(inv.Type)">@GetTypeLabel(inv.Type)</span>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <!-- Detail Panel -->
-        @if (selected != null)
-        {
-            <div class="sessions-panel">
-                <div class="panel-header">
-                    <h2 class="panel-title">تفاصيل التحقيق — @selected.CaseNumber</h2>
-                    <button class="btn-outline btn-sm">تصدير</button>
+                    }
                 </div>
+            </div>
 
-                <!-- Tabs -->
-                <div style="padding:1rem 1.25rem">
-                    <div class="tabs-wrap">
-                        <div class="tabs-nav">
-                            <button class="tab-btn @(activeTab == "info" ? "tab-active" : "")" @onclick='() => activeTab = "info"'>المعلومات</button>
-                            <button class="tab-btn @(activeTab == "sessions" ? "tab-active" : "")" @onclick='() => activeTab = "sessions"'>الجلسات</button>
-                            <button class="tab-btn @(activeTab == "witnesses" ? "tab-active" : "")" @onclick='() => activeTab = "witnesses"'>الشهود</button>
-                            <button class="tab-btn @(activeTab == "evidence" ? "tab-active" : "")" @onclick='() => activeTab = "evidence"'>الأدلة</button>
-                        </div>
-
-                        <div class="tab-content">
-
-                            @if (activeTab == "info")
-                            {
-                                <div class="info-grid">
-                                    <div class="info-item2"><p class="info-label">رقم القضية</p><p class="info-val2">@selected.CaseNumber</p></div>
-                                    <div class="info-item2"><p class="info-label">اسم العميل</p><p class="info-val2">@selected.ClientName</p></div>
-                                    <div class="info-item2">
-                                        <p class="info-label">نوع التحقيق</p>
-                                        <span class="badge @GetTypeBadge(selected.Type)">@GetTypeLabel(selected.Type)</span>
-                                    </div>
-                                    <div class="info-item2">
-                                        <p class="info-label">الحالة</p>
-                                        <span class="badge @GetStatusBadge(selected.Status)">@GetStatusLabel(selected.Status)</span>
-                                    </div>
-                                    <div class="info-item2"><p class="info-label">تاريخ البدء</p><p class="info-val2">@selected.StartDate</p></div>
-                                    <div class="info-item2"><p class="info-label">المحقق</p><p class="info-val2">@selected.Prosecutor</p></div>
-                                    <div class="info-item2" style="grid-column:span 2">
-                                        <p class="info-label">الموقع</p>
-                                        <p class="info-val2">📍 @selected.Location</p>
-                                    </div>
-                                </div>
-                                <div style="margin-top:1rem">
-                                    <label style="font-size:.875rem;font-weight:600;color:#334155;display:block;margin-bottom:.4rem">ملاحظات إضافية</label>
-                                    <textarea class="notes-textarea" rows="4" placeholder="أضف ملاحظات حول التحقيق..."></textarea>
-                                    <button class="btn-primary btn-sm" style="margin-top:.5rem">حفظ الملاحظات</button>
-                                </div>
-                            }
-
-                            @if (activeTab == "sessions")
-                            {
-                                @foreach (var s in selected.Sessions)
+            @if (selected != null)
+            {
+                <div class="sessions-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">تفاصيل التحقيق — @selected.CaseNumber</h2>
+                        <button class="btn-outline btn-sm">تصدير</button>
+                    </div>
+                    <div style="padding:1rem 1.25rem">
+                        <div class="tabs-wrap">
+                            <div class="tabs-nav">
+                                <button class="tab-btn @(activeTab == "info" ? "tab-active" : "")" @onclick='() => activeTab = "info"'>المعلومات</button>
+                                <button class="tab-btn @(activeTab == "sessions" ? "tab-active" : "")" @onclick='() => activeTab = "sessions"'>الجلسات (@selected.Sessions.Count)</button>
+                                <button class="tab-btn @(activeTab == "witnesses" ? "tab-active" : "")" @onclick='() => activeTab = "witnesses"'>الشهود (@selected.Witnesses.Count)</button>
+                                <button class="tab-btn @(activeTab == "evidence" ? "tab-active" : "")" @onclick='() => activeTab = "evidence"'>الأدلة (@selected.Evidence.Count)</button>
+                            </div>
+                            <div class="tab-content">
+                                @if (activeTab == "info")
                                 {
-                                    <div class="inv-session-card">
-                                        <div class="inv-session-icon">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                        </div>
-                                        <div style="flex:1">
-                                            <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">
-                                                <h4 style="font-weight:600;color:#1e293b;margin:0">جلسة رقم @s.Id</h4>
-                                                <span style="font-size:.82rem;color:#64748b">@s.Date — @s.Time</span>
-                                            </div>
-                                            <p style="font-size:.875rem;color:#334155;margin:0 0 .5rem">@s.Summary</p>
-                                            <div style="background:#f8fafc;border-radius:8px;padding:.75rem">
-                                                <p style="font-size:.75rem;font-weight:600;color:#64748b;margin:0 0 .3rem">الحضور:</p>
-                                                <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.5rem">
-                                                    @foreach (var a in s.Attendees)
-                                                    { <span class="badge badge-outline">@a</span> }
-                                                </div>
+                                    <div class="info-grid">
+                                        <div class="info-item2"><p class="info-label">رقم القضية</p><p class="info-val2">@selected.CaseNumber</p></div>
+                                        <div class="info-item2"><p class="info-label">اسم العميل</p><p class="info-val2">@selected.ClientName</p></div>
+                                        <div class="info-item2"><p class="info-label">نوع التحقيق</p><span class="badge @GetTypeBadge(selected.Type)">@GetTypeLabel(selected.Type)</span></div>
+                                        <div class="info-item2"><p class="info-label">الحالة</p><span class="badge @GetStatusBadge(selected.Status)">@GetStatusLabel(selected.Status)</span></div>
+                                        <div class="info-item2"><p class="info-label">تاريخ البدء</p><p class="info-val2">@selected.StartDate</p></div>
+                                        <div class="info-item2"><p class="info-label">المحقق / القاضي</p><p class="info-val2">@selected.Prosecutor</p></div>
+                                        <div class="info-item2" style="grid-column:span 2"><p class="info-label">الموقع</p><p class="info-val2">📍 @selected.Location</p></div>
+                                    </div>
+                                    <div style="margin-top:1rem">
+                                        <label style="font-size:.875rem;font-weight:600;color:#334155;display:block;margin-bottom:.4rem">ملاحظات إضافية</label>
+                                        <textarea class="notes-textarea" rows="4" placeholder="أضف ملاحظات..." @bind="notes"></textarea>
+                                        <button class="btn-primary btn-sm" style="margin-top:.5rem">حفظ الملاحظات</button>
+                                    </div>
+                                }
+                                @if (activeTab == "sessions")
+                                {
+                                    @if (!selected.Sessions.Any())
+                                    {
+                                        <p class="empty-small">لا توجد جلسات مسجلة</p>
+                                    }
+                                    @foreach (var s in selected.Sessions)
+                                    {
+                                        <div class="inv-session-card">
+                                            <div class="inv-session-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg></div>
+                                            <div style="flex:1">
+                                                <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem"><h4 style="font-weight:600;color:#1e293b;margin:0">جلسة رقم @s.Id</h4><span style="font-size:.82rem;color:#64748b">@s.Date — @s.Time</span></div>
+                                                @if (!string.IsNullOrEmpty(s.Summary))
+                                                {
+                                                    <p style="font-size:.875rem;color:#334155;margin:0 0 .5rem">@s.Summary</p>
+                                                }
+                                                <div style="background:#f8fafc;border-radius:8px;padding:.75rem">
+                                                    <p style="font-size:.75rem;font-weight:600;color:#64748b;margin:0 0 .3rem">الحضور:</p>
+                                                    <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.5rem">@foreach(var a in s.Attendees)
+                                                        {
+                                                    <span class="badge badge-outline">@a</span>
+                                                        }
+                                                        
+
+            </div>
                                                 <p style="font-size:.75rem;font-weight:600;color:#64748b;margin:0 0 .2rem">القرارات:</p>
                                                 <p style="font-size:.85rem;color:#334155;margin:0">@s.Decisions</p>
                                             </div>
                                         </div>
                                     </div>
                                 }
-                                <button class="btn-outline" style="width:100%;justify-content:center;margin-top:.5rem">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    إضافة جلسة جديدة
-                                </button>
+                                <button class="btn-outline" style="width:100%;justify-content:center;margin-top:.5rem"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg> إضافة جلسة جديدة</button>
                             }
-
                             @if (activeTab == "witnesses")
                             {
                                 @if (!selected.Witnesses.Any())
@@ -155,25 +137,16 @@
                                 @foreach (var w in selected.Witnesses)
                                 {
                                     <div class="inv-session-card">
-                                        <div class="inv-session-icon" style="background:#dcfce7;color:#16a34a">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                        </div>
+                                        <div class="inv-session-icon" style="background:#dcfce7;color:#16a34a"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></div>
                                         <div style="flex:1">
-                                            <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">
-                                                <h4 style="font-weight:600;color:#1e293b;margin:0">@w.Name</h4>
-                                                <span class="badge badge-outline">@GetRoleLabel(w.Role)</span>
-                                            </div>
+                                            <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem"><h4 style="font-weight:600;color:#1e293b;margin:0">@w.Name</h4><span class="badge badge-outline">@GetRoleLabel(w.Role)</span></div>
                                             <p style="font-size:.875rem;color:#334155;margin:0 0 .25rem">@w.Testimony</p>
                                             <p style="font-size:.75rem;color:#94a3b8;margin:0">تاريخ الشهادة: @w.Date</p>
                                         </div>
                                     </div>
                                 }
-                                <button class="btn-outline" style="width:100%;justify-content:center;margin-top:.5rem">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    إضافة شاهد جديد
-                                </button>
+                                <button class="btn-outline" style="width:100%;justify-content:center;margin-top:.5rem"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg> إضافة شاهد جديد</button>
                             }
-
                             @if (activeTab == "evidence")
                             {
                                 @if (!selected.Evidence.Any())
@@ -183,94 +156,716 @@
                                 @foreach (var e in selected.Evidence)
                                 {
                                     <div class="inv-session-card">
-                                        <div class="inv-session-icon" style="background:#fef3c7;color:#d97706">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                                        </div>
+                                        <div class="inv-session-icon" style="background:#fef3c7;color:#d97706"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg></div>
                                         <div style="flex:1">
-                                            <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">
-                                                <h4 style="font-weight:600;color:#1e293b;margin:0">@e.Type</h4>
-                                                <span style="font-size:.82rem;font-weight:600;color:@GetEvidenceColor(e.Status)">
-                                                    @(e.Status == "approved" ? "✓ معتمد" : e.Status == "pending" ? "⏳ قيد المراجعة" : "✗ مرفوض")
-                                                </span>
-                                            </div>
+                                            <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem"><h4 style="font-weight:600;color:#1e293b;margin:0">@e.Type</h4><span style="font-size:.82rem;font-weight:600;color:@GetEvidenceColor(e.Status)">@(e.Status == "approved" ? "✓ معتمد" : e.Status == "pending" ? "⏳ قيد المراجعة" : "✗ مرفوض")</span></div>
                                             <p style="font-size:.875rem;color:#334155;margin:0 0 .25rem">@e.Description</p>
-                                            <p style="font-size:.75rem;color:#94a3b8;margin:0">تاريخ الجمع: @e.DateCollected</p>
+                                            <p style="font-size:.75rem;color:#94a3b8;margin:0">تاريخ الرفع: @e.DateCollected</p>
                                         </div>
                                     </div>
                                 }
-                                <button class="btn-outline" style="width:100%;justify-content:center;margin-top:.5rem">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    إضافة دليل جديد
-                                </button>
+                                <button class="btn-outline" style="width:100%;justify-content:center;margin-top:.5rem"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg> إضافة دليل جديد</button>
                             }
-
                         </div>
                     </div>
                 </div>
             </div>
         }
+                else
+        {
+            <div class="empty-panel"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg><p>اختر تحقيقاً من القائمة لعرض تفاصيله</p></div>
+        }
     </div>
+        }
 </div>
 
+<!-- Add Modal -->
+@if (showAddModal)
+{
+    <div class="modal-overlay" @onclick="CloseModal">
+
+        <div class="modal" @onclick:stopPropagation="true">
+
+            <!-- Header -->
+            <div class="modal-header">
+                <h3>إضافة تحقيق جديد</h3>
+                <button class="modal-close" @onclick="CloseModal">✕</button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body-inner">
+
+                <div class="form-group">
+                    <label>القضية *</label>
+                    <select class="form-select" @bind="newInv.CaseId">
+                        <option value="0">-- اختر قضية --</option>
+                        @foreach (var c in availableCases)
+                        {
+                            <option value="@c.Id">@c.CaseNumber — @(c.Client?.FullName ?? "")</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>نوع التحقيق *</label>
+                    <select class="form-select" @bind="newInv.Type">
+                        <option value="">-- اختر النوع --</option>
+                        <option value="criminal">جنائي</option>
+                        <option value="civil">مدني</option>
+                        <option value="administrative">إداري</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>الحالة</label>
+                    <select class="form-select" @bind="newInv.Status">
+                        <option value="ongoing">جاري</option>
+                        <option value="completed">مكتمل</option>
+                        <option value="suspended">موقوف</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>تاريخ البدء *</label>
+                    <input class="form-input" type="date" @bind="newInv.StartDate" />
+                </div>
+
+                <div class="form-group">
+                    <label>المحقق / القاضي</label>
+                    <input class="form-input" type="text" @bind="newInv.Prosecutor" />
+                </div>
+
+                <div class="form-group">
+                    <label>الموقع / المحكمة</label>
+                    <input class="form-input" type="text" @bind="newInv.Location" />
+                </div>
+
+                @if (!string.IsNullOrEmpty(modalError))
+                {
+                    <div class="alert-error" style="grid-column:span 2">
+                        @modalError
+                    </div>
+                }
+
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer-row">
+                <button type="button" class="btn-primary" @onclick="SaveInvestigation" disabled="@isSaving">
+                    @if (isSaving)
+                    {
+                        <span class="spinner-sm"></span>
+                    }
+                    حفظ التحقيق
+                </button>
+
+                <button type="button" class="btn-outline" @onclick="CloseModal">
+                    إلغاء
+                </button>
+            </div>
+
+        </div>
+    </div>
+}
+
 <style>
-    .inv-page{display:flex;flex-direction:column;gap:1.5rem;font-family:'Cairo','Segoe UI',sans-serif}
-    .page-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
-    .page-title{font-size:1.8rem;font-weight:700;color:#1e293b;margin:0}
-    .page-sub{color:#64748b;margin:.25rem 0 0;font-size:.9rem}
-    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem}
-    .stat-card{background:#fff;border-radius:12px;padding:1.25rem;box-shadow:0 1px 6px rgba(0,0,0,.08)}
-    .stat-body{display:flex;justify-content:space-between;align-items:center}
-    .stat-label{font-size:.85rem;color:#64748b;margin:0}
-    .stat-value{font-size:1.8rem;font-weight:700;color:#1e293b;margin:.2rem 0 0}
-    .stat-value.blue{color:#2563eb}.stat-value.amber{color:#d97706}.stat-value.green{color:#16a34a}
-    .stat-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
-    .bg-blue{background:#2563eb}.bg-amber{background:#d97706}.bg-green{background:#16a34a}
-    .main-grid{display:grid;grid-template-columns:280px 1fr;gap:1.5rem;align-items:start}
-    .cases-panel,.sessions-panel{background:#fff;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,.08);overflow:hidden}
-    .panel-header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid #f1f5f9;flex-wrap:wrap;gap:.5rem}
-    .panel-title{font-size:1rem;font-weight:600;color:#1e293b;margin:0}
-    .cases-list{padding:1rem;display:flex;flex-direction:column;gap:.75rem}
-    .case-item{padding:1rem;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:border-color .2s,background .2s;display:flex;flex-direction:column;gap:.4rem}
-    .case-item:hover{border-color:#fbbf24}
-    .case-active{border-color:#d97706!important;background:#fffbeb}
-    .case-item-top{display:flex;justify-content:space-between;align-items:center}
-    .case-num{font-weight:600;color:#1e293b;margin:0;font-size:.95rem}
-    .case-client{font-size:.83rem;color:#64748b;margin:0}
-    .badge{font-size:.72rem;padding:.2rem .6rem;border-radius:999px;font-weight:600;display:inline-block}
-    .badge-outline{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}
-    .badge-upcoming{background:#dbeafe;color:#2563eb}
-    .badge-completed,.badge-green{background:#dcfce7;color:#16a34a}
-    .badge-postponed,.badge-amber{background:#fef3c7;color:#d97706}
-    .badge-cancelled,.badge-red{background:#fee2e2;color:#dc2626}
-    .badge-slate{background:#f1f5f9;color:#475569}
-    .empty-small{text-align:center;color:#94a3b8;font-size:.875rem;padding:1.5rem 0;margin:0}
-    .tabs-wrap{border:1px solid #e2e8f0;border-radius:10px;overflow:hidden}
-    .tabs-nav{display:flex;background:#f8fafc;border-bottom:1px solid #e2e8f0}
-    .tab-btn{flex:1;padding:.6rem .5rem;background:none;border:none;font-family:inherit;font-size:.82rem;color:#64748b;cursor:pointer;transition:all .15s;white-space:nowrap}
-    .tab-btn:hover{background:#f1f5f9;color:#334155}
-    .tab-active{background:#fff!important;color:#d97706!important;font-weight:600;border-bottom:2px solid #d97706}
-    .tab-content{padding:1rem;display:flex;flex-direction:column;gap:.75rem;min-height:100px}
-    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;background:#f8fafc;border-radius:10px;padding:1rem}
-    .info-item2{display:flex;flex-direction:column;gap:.25rem}
-    .info-label{font-size:.75rem;color:#64748b;margin:0}
-    .info-val2{font-size:.9rem;font-weight:600;color:#1e293b;margin:0}
-    .inv-session-card{display:flex;gap:.875rem;background:#f8fafc;border-radius:10px;padding:.875rem}
-    .inv-session-icon{width:40px;height:40px;border-radius:8px;background:#dbeafe;color:#2563eb;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .notes-textarea{width:100%;padding:.65rem .875rem;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:.9rem;outline:none;resize:vertical}
-    .notes-textarea:focus{border-color:#d97706;box-shadow:0 0 0 3px rgba(217,119,6,.1)}
-    .btn-primary{display:inline-flex;align-items:center;gap:.4rem;background:#d97706;color:#fff;border:none;border-radius:8px;padding:.6rem 1.2rem;font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;transition:background .2s}
-    .btn-primary:hover{background:#b45309}
-    .btn-outline{display:inline-flex;align-items:center;gap:.4rem;background:transparent;border:1px solid #e2e8f0;border-radius:8px;padding:.6rem 1.2rem;font-family:inherit;font-size:.9rem;color:#475569;cursor:pointer;transition:all .2s;white-space:nowrap}
-    .btn-outline:hover{border-color:#d97706;color:#d97706}
-    .btn-sm{padding:.35rem .75rem;font-size:.82rem}
-    @@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+    .inv-page {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 1.5rem;
+        font-family: 'Cairo','Segoe UI',sans-serif
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0
+    }
+
+    .page-sub {
+        color: #64748b;
+        margin: .25rem 0 0;
+        font-size: .9rem
+    }
+
+    .loading-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 4rem;
+        color: #64748b
+    }
+
+    .spinner-lg {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e2e8f0;
+        border-top-color: #d97706;
+        border-radius: 50%;
+        animation: spin .7s linear infinite
+    }
+
+    .spinner-sm {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin .7s linear infinite;
+        display: inline-block
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg)
+        }
+    }
+
+    .alert-error {
+        background: #fee2e2;
+        border: 1px solid #fca5a5;
+        color: #dc2626;
+        border-radius: 8px;
+        padding: .75rem 1rem;
+        font-size: .875rem
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+        gap: 1rem
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08)
+    }
+
+    .stat-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center
+    }
+
+    .stat-label {
+        font-size: .85rem;
+        color: #64748b;
+        margin: 0
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: .2rem 0 0
+    }
+
+        .stat-value.amber {
+            color: #d97706
+        }
+
+        .stat-value.green {
+            color: #16a34a
+        }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        flex-shrink: 0
+    }
+
+    .bg-blue {
+        background: #2563eb
+    }
+
+    .bg-amber {
+        background: #d97706
+    }
+
+    .bg-green {
+        background: #16a34a
+    }
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 1.5rem;
+        align-items: start
+    }
+
+    .cases-panel, .sessions-panel {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        overflow: hidden
+    }
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+        flex-wrap: wrap;
+        gap: .5rem
+    }
+
+    .panel-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0
+    }
+
+    .cases-list {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: .75rem
+    }
+
+    .case-item {
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: border-color .2s,background .2s;
+        display: flex;
+        flex-direction: column;
+        gap: .4rem
+    }
+
+        .case-item:hover {
+            border-color: #fbbf24
+        }
+
+    .case-active {
+        border-color: #d97706 !important;
+        background: #fffbeb
+    }
+
+    .case-item-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center
+    }
+
+    .case-num {
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        font-size: .95rem
+    }
+
+    .case-client {
+        font-size: .83rem;
+        color: #64748b;
+        margin: 0
+    }
+
+    .empty-panel {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 1px 6px rgba(0,0,0,.08);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 4rem;
+        color: #94a3b8
+    }
+
+    .empty-small {
+        text-align: center;
+        color: #94a3b8;
+        font-size: .875rem;
+        padding: 1.5rem 0;
+        margin: 0
+    }
+
+    .badge {
+        font-size: .72rem;
+        padding: .2rem .6rem;
+        border-radius: 999px;
+        font-weight: 600;
+        display: inline-block
+    }
+
+    .badge-outline {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0
+    }
+
+    .badge-green {
+        background: #dcfce7;
+        color: #16a34a
+    }
+
+    .badge-amber {
+        background: #fef3c7;
+        color: #d97706
+    }
+
+    .badge-red {
+        background: #fee2e2;
+        color: #dc2626
+    }
+
+    .badge-upcoming {
+        background: #dbeafe;
+        color: #2563eb
+    }
+
+    .badge-slate {
+        background: #f1f5f9;
+        color: #475569
+    }
+
+    .tabs-wrap {
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        overflow: hidden
+    }
+
+    .tabs-nav {
+        display: flex;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0
+    }
+
+    .tab-btn {
+        flex: 1;
+        padding: .6rem .5rem;
+        background: none;
+        border: none;
+        font-family: inherit;
+        font-size: .78rem;
+        color: #64748b;
+        cursor: pointer;
+        transition: all .15s;
+        white-space: nowrap
+    }
+
+        .tab-btn:hover {
+            background: #f1f5f9;
+            color: #334155
+        }
+
+    .tab-active {
+        background: #fff !important;
+        color: #d97706 !important;
+        font-weight: 600;
+        border-bottom: 2px solid #d97706
+    }
+
+    .tab-content {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+        min-height: 100px
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 1rem
+    }
+
+    .info-item2 {
+        display: flex;
+        flex-direction: column;
+        gap: .25rem
+    }
+
+    .info-label {
+        font-size: .75rem;
+        color: #64748b;
+        margin: 0
+    }
+
+    .info-val2 {
+        font-size: .9rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0
+    }
+
+    .inv-session-card {
+        display: flex;
+        gap: .875rem;
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: .875rem
+    }
+
+    .inv-session-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: #dbeafe;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0
+    }
+
+    .notes-textarea {
+        width: 100%;
+        padding: .65rem .875rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: .9rem;
+        outline: none;
+        resize: vertical;
+        box-sizing: border-box
+    }
+
+        .notes-textarea:focus {
+            border-color: #d97706
+        }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        background: #d97706;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: .6rem 1.2rem;
+        font-family: inherit;
+        font-size: .9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background .2s
+    }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #b45309
+        }
+
+        .btn-primary:disabled {
+            opacity: .6;
+            cursor: not-allowed
+        }
+
+    .btn-outline {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: .6rem 1.2rem;
+        font-family: inherit;
+        font-size: .9rem;
+        color: #475569;
+        cursor: pointer;
+        transition: all .2s
+    }
+
+        .btn-outline:hover {
+            border-color: #d97706;
+            color: #d97706
+        }
+
+    .btn-sm {
+        padding: .35rem .75rem;
+        font-size: .82rem
+    }
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000
+    }
+
+    .modal {
+        background: #fff;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 560px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0,0,0,.2)
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+        position: sticky;
+        top: 0;
+        background: #fff;
+        z-index: 1
+    }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b
+        }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.1rem;
+        cursor: pointer;
+        color: #94a3b8
+    }
+
+    .modal-body-inner {
+        padding: 1.25rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .85rem
+    }
+
+    .modal-footer-row {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem 1.25rem;
+        border-top: 1px solid #f1f5f9;
+        position: sticky;
+        bottom: 0;
+        background: #fff
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: .35rem
+    }
+
+        .form-group label {
+            font-size: .875rem;
+            font-weight: 600;
+            color: #334155
+        }
+
+    .form-select, .form-input {
+        padding: .6rem .75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: .9rem;
+        outline: none;
+        width: 100%;
+        box-sizing: border-box
+    }
+
+        .form-select:focus, .form-input:focus {
+            border-color: #d97706
+        }
+
+    @@media(max-width:900px) {
+        .main-grid {
+            grid-template-columns: 1fr
+        }
+
+        .modal-body-inner {
+            grid-template-columns: 1fr
+        }
+    }
 </style>
 
 @code {
+    private List<InvestigationDto> investigations = new();
+    private List<Case> availableCases = new();
+    private InvestigationDto? selected;
     private string activeTab = "info";
-    private InvItem? selected;
+    private bool isLoading = true;
+    private string errorMessage = string.Empty;
+    private string notes = string.Empty;
+    private bool showAddModal = false;
+    private bool isSaving = false;
+    private string modalError = string.Empty;
+    private NewInvestigationForm newInv = new();
 
-    protected override void OnInitialized() => selected = investigations.FirstOrDefault();
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private void OpenAddModal()
+    {
+        showAddModal = true;
+        StateHasChanged();
+    }
+    private void CloseModal()
+    {
+        showAddModal = false;
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        errorMessage = string.Empty;
+        try
+        {
+            investigations = await InvestigationService.GetInvestigationsAsync();
+            selected = investigations.FirstOrDefault();
+            availableCases = await UnitOfWork.Cases.GetAllQueryableTracking()
+                .Include(c => c.Client)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+        catch (Exception ex) { errorMessage = $"خطأ في تحميل البيانات: {ex.Message}"; }
+        finally { isLoading = false; }
+    }
+
+    private void SelectCase(InvestigationDto inv) { selected = inv; activeTab = "info"; notes = string.Empty; }
+
+    private async Task SaveInvestigation()
+    {
+        modalError = string.Empty;
+        if (newInv.CaseId <= 0) { modalError = "يرجى اختيار القضية"; return; }
+        if (string.IsNullOrEmpty(newInv.Type)) { modalError = "يرجى اختيار نوع التحقيق"; return; }
+        isSaving = true;
+        try
+        {
+            await InvestigationService.AddInvestigationAsync(
+                newInv.CaseId, newInv.Type, newInv.Status,
+                newInv.StartDate, newInv.Prosecutor, newInv.Location);
+            showAddModal = false;
+            await LoadData();
+            StateHasChanged();
+        }
+        catch (Exception ex) { modalError = $"خطأ في الحفظ: {ex.Message}"; }
+        finally { isSaving = false; }
+    }
 
     private string GetStatusLabel(string s) => s switch { "ongoing" => "جاري", "completed" => "مكتمل", "suspended" => "موقوف", _ => s };
     private string GetStatusBadge(string s) => s switch { "ongoing" => "badge-amber", "completed" => "badge-green", "suspended" => "badge-slate", _ => "badge-outline" };
@@ -279,20 +874,13 @@
     private string GetRoleLabel(string r) => r switch { "plaintiff" => "مدعي", "defendant" => "متهم", "witness" => "شاهد", _ => r };
     private string GetEvidenceColor(string s) => s switch { "approved" => "#16a34a", "pending" => "#d97706", "rejected" => "#dc2626", _ => "#64748b" };
 
-    private record InvSession(int Id, string Date, string Time, string Summary, List<string> Attendees, string Decisions);
-    private record InvWitness(int Id, string Name, string Role, string Testimony, string Date);
-    private record InvEvidence(int Id, string Type, string Description, string DateCollected, string Status);
-    private record InvItem(int Id, string CaseNumber, string ClientName, string Type, string Status, string StartDate, string Prosecutor, string Location, List<InvSession> Sessions, List<InvWitness> Witnesses, List<InvEvidence> Evidence);
-
-    private List<InvItem> investigations = new()
+    private class NewInvestigationForm
     {
-        new(1, "2024/201", "أحمد محمود", "criminal", "ongoing", "2024-03-15", "النائب العام الأول", "النيابة العامة - القاهرة",
-            new(){ new(1,"2024-03-15","10:00 ص","جلسة استماع أولية - تحقيق في الوقائع",new(){"المتهم","المحامي","النيابة"},"تأجيل التحقيق لحين استدعاء الشهود"), new(2,"2024-03-22","11:00 ص","جلسة استماع للشهود",new(){"المتهم","المحامي","النيابة","الشاهد الأول"},"إحالة القضية للمحاكمة") },
-            new(){ new(1,"محمد علي","witness","شهادة حول وقائع الحادث","2024-03-22"), new(2,"سارة أحمد","witness","شهادة حول الظروف المحيطة","2024-03-22") },
-            new(){ new(1,"مستند","تقرير الشرطة الأولي","2024-03-15","approved"), new(2,"صور","صور من موقع الحادث","2024-03-16","approved") }),
-
-        new(2, "2024/189", "فاطمة حسن", "civil", "completed", "2024-02-01", "قاضي التحقيق", "محكمة الجيزة",
-            new(){ new(1,"2024-02-01","09:00 ص","جلسة تحقيق أولية",new(){"المدعي","المحامي","القاضي"},"طلب تقديم مستندات إضافية") },
-            new(), new()),
-    };
+        public int CaseId { get; set; }
+        public string Type { get; set; } = string.Empty;
+        public string Status { get; set; } = "ongoing";
+        public DateTime StartDate { get; set; } = DateTime.Today;
+        public string Prosecutor { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+    }
 }

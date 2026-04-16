@@ -1,6 +1,7 @@
+using Microsoft.AspNetCore.Components.Forms;
+using smartLaywer.DTO.Document;
 ﻿using smartLaywer.DTO.Documents;
 using smartLaywer.Models;
-using Microsoft.AspNetCore.Components.Forms;
 
 namespace smartLaywer.Services.InterfaceService
 {
@@ -12,5 +13,24 @@ namespace smartLaywer.Services.InterfaceService
         Task<Document> UploadDocumentAsync(DocumentCreateDto dto, IBrowserFile file, int uploadedByUserId, string wwwrootPath);
         Task DeleteDocumentAsync(int id, string wwwrootPath);
         Task<(byte[] FileBytes, string MimeType, string FileName)> GetFileForDownloadAsync(int id, string wwwrootPath);
+        Task<string> UploadDocumentAsync(UploadDocumentDto dto);
+                Task<List<DocumentDto>> GetAllAsync();
     }
 }
+//=======
+//﻿using smartLaywer.DTO.Document;
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+
+//namespace smartLaywer.Services.InterfaceService
+//{
+//    public interface IDocumentService
+//    {
+//        Task<string> UploadDocumentAsync(UploadDocumentDto dto);
+//        Task<List<DocumentDto>> GetAllAsync();
+//    }
+//}
+//>>>>>>> 4b45134b5934d36d05d4a158da3ceae6c758dda6

@@ -1203,47 +1203,45 @@
 </style>
 
 @code {
-    // ── Data
     private List<CaseSummaryDto> allCases = new();
     private List<CaseSummaryDto> filteredCases = new();
     private CaseStatsDto? stats;
 
-    // Lookups
+    
     private List<Client> existingClients = new();
     private List<CaseType> caseTypes = new();
     private List<CaseStatus> caseStatuses = new();
     private List<Court> courts = new();
     private List<User> lawyers = new();
 
-    // ── UI State
+    
     private bool isLoading = true;
     private bool isSaving = false;
 
-    // Separate error states
+    
     private string loadErrorMsg = string.Empty;
     private string addErrorMsg = string.Empty;
     private string editErrorMsg = string.Empty;
     private string modalErrorMsg = string.Empty;
 
-    // Filter
+    
     private string searchTerm = string.Empty;
     private string statusFilter = string.Empty;
 
-    // Add modal
+    
     private bool showAddModal = false;
     private bool isNewClient = false;
     private Case newCase = new();
     private Client newClient = new();
 
-    // Details modal
+    
     private bool showDetailsModal = false;
     private Case? selectedCase;
 
-    // Edit modal
+    
     private bool showEditModal = false;
     private CaseEditDto? editDto;
 
-    // Fee for the new case
     private decimal newCaseFeeAmount = 0;
     private string newCaseFeeNotes = string.Empty;
     private DateTime newCaseFeeDueDate = DateTime.Today.AddMonths(1);
@@ -1254,7 +1252,6 @@
         await LoadDataAsync();
     }
 
-    // ── Data Loading
     private async Task LoadDataAsync()
     {
         isLoading = true;
@@ -1262,10 +1259,8 @@
         StateHasChanged();
         try
         {
-            // Lookups first so dropdowns are ready
             await LoadLookupsAsync();
 
-            // Then cases & stats (sequential — same DbContext)
             allCases = await CaseService.GetAllCasesAsync();
             stats = await CaseService.GetCaseStatsAsync();
             ApplyFilters();

@@ -1,19 +1,24 @@
-﻿@page "/legal-library"
+@page "/legal-library"
 @namespace smartLaywer.Components.Pages
+@using smartLaywer.Models
+@using smartLaywer.Enum
+@using smartLaywer.Services.ClassService
+@using Microsoft.Maui.Storage
+@inject ILegalLibraryService LegalService
 
-<PageTitle>المكتبة القانونية</PageTitle>
+<PageTitle>������� ���������</PageTitle>
 
 <div class="library-page" dir="rtl">
 
     <!-- Header -->
     <div class="page-header-row">
         <div>
-            <h1 class="page-title">المكتبة القانونية</h1>
-            <p class="page-sub">مكتبة شاملة للقوانين والأحكام والنماذج القانونية</p>
+            <h1 class="page-title">������� ���������</h1>
+            <p class="page-sub">����� ����� �������� �������� �������� ���������</p>
         </div>
-        <button class="btn-primary">
+        <button class="btn-primary" @onclick="OpenModal">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-            إضافة مستند
+            ����� �����
         </button>
     </div>
 
@@ -21,7 +26,7 @@
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-body">
-                <div><p class="stat-label">إجمالي المستندات</p><h3 class="stat-value">8</h3></div>
+                <div><p class="stat-label">������ ���������</p><h3 class="stat-value">8</h3></div>
                 <div class="stat-icon bg-blue">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>
                 </div>
@@ -29,7 +34,7 @@
         </div>
         <div class="stat-card">
             <div class="stat-body">
-                <div><p class="stat-label">المفضلة</p><h3 class="stat-value amber">4</h3></div>
+                <div><p class="stat-label">�������</p><h3 class="stat-value amber">4</h3></div>
                 <div class="stat-icon bg-amber">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
                 </div>
@@ -37,7 +42,7 @@
         </div>
         <div class="stat-card">
             <div class="stat-body">
-                <div><p class="stat-label">إجمالي التحميلات</p><h3 class="stat-value green">1558</h3></div>
+                <div><p class="stat-label">������ ���������</p><h3 class="stat-value green">1558</h3></div>
                 <div class="stat-icon bg-green">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
                 </div>
@@ -45,7 +50,7 @@
         </div>
         <div class="stat-card">
             <div class="stat-body">
-                <div><p class="stat-label">النماذج</p><h3 class="stat-value">2</h3></div>
+                <div><p class="stat-label">�������</p><h3 class="stat-value">2</h3></div>
                 <div class="stat-icon bg-purple">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
                 </div>
@@ -56,17 +61,17 @@
     <!-- Search -->
     <div class="search-box">
         <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-        <input class="search-input" placeholder="البحث في المكتبة القانونية..." />
+        <input class="search-input" placeholder="����� �� ������� ���������..." />
     </div>
 
     <!-- Tabs -->
     <div class="tabs">
-        <button class="tab tab-active">الكل (8)</button>
-        <button class="tab">قوانين</button>
-        <button class="tab">أحكام</button>
-        <button class="tab">نماذج</button>
-        <button class="tab">مقالات</button>
-        <button class="tab">المفضلة</button>
+        <button class="tab tab-active">���� (8)</button>
+        <button class="tab">������</button>
+        <button class="tab">�����</button>
+        <button class="tab">�����</button>
+        <button class="tab">������</button>
+        <button class="tab">�������</button>
     </div>
 
     <!-- Documents Grid -->
@@ -76,47 +81,33 @@
             <div class="doc-card">
                 <div class="doc-top">
                     <div class="doc-icon-wrap">
-                        @((MarkupString)doc.Icon)
+                        @((MarkupString)GetIcon(doc.MimeType))
                     </div>
                     <div class="doc-title-area">
                         <div class="doc-title-row">
                             <h3 class="doc-title">@doc.Title</h3>
-                            <button class="star-btn @(doc.Favorite ? "star-active" : "")">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="@(doc.Favorite ? "currentColor" : "none")" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
-                            </button>
                         </div>
-                        <span class="badge @doc.CategoryBadge">@doc.CategoryLabel</span>
+                        <span class="badge @GetBadgeClass(doc.Category)">@doc.Category.ToString()</span>
                     </div>
                 </div>
 
                 <p class="doc-desc">@doc.Description</p>
 
-                <div class="doc-tags">
-                    @foreach (var tag in doc.Tags)
-                    {
-                        <span class="tag">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" /></svg>
-                            @tag
-                        </span>
-                    }
-                </div>
-
                 <div class="doc-footer">
                     <div class="doc-meta">
-                        <p class="doc-source">@doc.Source</p>
+                        <p class="doc-source">������: @doc.AddedByNavigation?.FullName</p>
                         <p class="doc-downloads">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
-                            @doc.Downloads تحميل
+                            <small>��� �����: @doc.MimeType</small>
                         </p>
                     </div>
                     <div class="doc-actions">
-                        <button class="btn-outline btn-sm">
+                        <button class="btn-outline btn-sm" @onclick="() => HandleOpenFile(doc.FilePath)">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-                            عرض
+                            ���
                         </button>
-                        <button class="btn-primary btn-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
-                            تحميل
+
+                        <button class="btn-outline btn-sm border-danger text-danger" @onclick="() => LegalService.DeleteDocumentAsync(doc.Id)">
+                            ���
                         </button>
                     </div>
                 </div>
@@ -124,60 +115,129 @@
         }
     </div>
 </div>
+@if (isModalOpen)
+{
+    <div class="modal-backdrop">
+        <div class="modal-content" dir="rtl">
+            <h3>����� ����� ���� �������</h3>
+            <EditForm Model="newDoc" OnValidSubmit="HandleAddDocument">
+                <div class="form-group">
+                    <label>����� �������</label>
+                    <InputText @bind-Value="newDoc.Title" class="form-control" placeholder="�����: ����� ��������" />
+                </div>
+
+                <div class="form-group">
+                    <label>�����</label>
+                    <InputSelect @bind-Value="newDoc.Category" class="form-control">
+                        @foreach (var cat in Enum.GetValues<LibraryCategoryEnum>())
+                        {
+                            <option value="@cat">@cat.ToString()</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="form-group">
+                    <label>�����</label>
+                    <InputTextArea @bind-Value="newDoc.Description" class="form-control" rows="3" />
+                </div>
+
+                <div class="form-group">
+                    <label>������ �����</label>
+                    <InputFile OnChange="OnFileChange" class="form-control" />
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary" >��� �������</button>
+                    <button type="button" class="btn-outline" @onclick="CloseModal">�����</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
 
 @code {
-    private record DocItem(string Title, string CategoryLabel, string CategoryBadge,
-        string Description, string Source, int Downloads, bool Favorite,
-        List<string> Tags, string Icon);
+    private IEnumerable<smartLaywer.Models.LegalLibrary> documents = new List<smartLaywer.Models.LegalLibrary>();
+    private string searchTerm = "";
+    private smartLaywer.Models.LegalLibrary newDoc = new();
+    private IBrowserFile? selectedFile;
+    private bool isModalOpen = false; 
 
-    private List<DocItem> documents = new()
+    private void OpenModal() { newDoc = new(); isModalOpen = true; }
+    private void CloseModal() => isModalOpen = false;
+    protected override async Task OnInitializedAsync()
     {
-        new("قانون الإجراءات الجنائية المصري", "قوانين", "badge badge-blue",
-            "القانون رقم 150 لسنة 1950 - النص الكامل مع التعديلات الأخيرة",
-            "الجريدة الرسمية", 245, true,
-            new(){"جنائي","إجراءات","قانون"}, IconScale),
+        await LoadDocuments();
+    }
 
-        new("حكم النقض في قضية التزوير", "أحكام قضائية", "badge badge-green",
-            "حكم محكمة النقض - الطعن رقم 12345 - تزوير في محررات رسمية",
-            "محكمة النقض", 128, false,
-            new(){"نقض","تزوير","جنائي"}, IconFile),
+    private async Task LoadDocuments()
+    {
+        documents = await LegalService.GetAllDocumentsAsync();
+    }
+    private void OnFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
 
-        new("مبادئ القانون المدني", "مقالات", "badge badge-purple",
-            "مقال تحليلي عن أحكام المسؤولية التقصيرية",
-            "مجلة القانون المصرية", 89, true,
-            new(){"مدني","مسؤولية","تحليل"}, IconBook),
+    private async Task HandleAddDocument()
+    {
+        if (selectedFile == null) return;
 
-        new("نموذج عقد توكيل", "نماذج", "badge badge-amber",
-            "نموذج قانوني معتمد لعقد التوكيل العام والخاص",
-            "نقابة المحامين", 312, false,
-            new(){"توكيل","نموذج","عقود"}, IconFile),
+        newDoc.AddedBy = 1;
+        newDoc.AddedByNavigation = null!;
 
-        new("بحث في الجرائم الإلكترونية", "أبحاث", "badge badge-red",
-            "دراسة قانونية شاملة حول الجرائم الإلكترونية في القانون المصري",
-            "جامعة القاهرة", 167, true,
-            new(){"جرائم إلكترونية","بحث","تكنولوجيا"}, IconBook),
+        newDoc.MimeType = "pen";
+        newDoc.FilePath = "pending";
 
-        new("قانون المرافعات المدنية والتجارية", "قوانين", "badge badge-blue",
-            "القانون رقم 13 لسنة 1968 مع التعديلات",
-            "الجريدة الرسمية", 198, false,
-            new(){"مدني","تجاري","مرافعات"}, IconScale),
+        var success = await LegalService.AddDocumentAsync(selectedFile, newDoc);
+        if (success)
+        {
+            await LoadDocuments(); 
+            CloseModal();
+            selectedFile = null;
+        }
+    }
 
-        new("نموذج صحيفة دعوى مدنية", "نماذج", "badge badge-amber",
-            "نموذج كامل لصحيفة دعوى مدنية مع الشروط والبيانات",
-            "نقابة المحامين", 276, true,
-            new(){"دعوى","نموذج","مدني"}, IconFile),
 
-        new("أحكام المحكمة الدستورية في حقوق الإنسان", "أحكام قضائية", "badge badge-green",
-            "مجموعة من أحكام المحكمة الدستورية المتعلقة بحقوق الإنسان",
-            "المحكمة الدستورية", 143, false,
-            new(){"دستوري","حقوق إنسان","أحكام"}, IconFile),
-    };
+    private async Task HandleOpenFile(string path)
+    {
+        var fullPath = LegalService.GetFullPath(path);
+        if (File.Exists(fullPath))
+        {
+            await Launcher.Default.OpenAsync(new OpenFileRequest
+            {
+                File = new ReadOnlyFile(fullPath)
+            });
+        }
+        else
+        {
+            await App.Current.MainPage.DisplayAlert("�����", "����� ��� ����� �� ������ ������", "�����");
+        }
+    }
 
     private const string IconScale = """<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="3" x2="12" y2="21"/><path d="M3 9l9-7 9 7"/><path d="M3 9l4.5 9 4.5-9"/><path d="M12 9l4.5 9 4.5-9"/></svg>""";
     private const string IconFile = """<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>""";
     private const string IconBook = """<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>""";
-}
 
+    // ����� �� ����� GetIcon ��������� ��:
+    private string GetIcon(string mimeType)
+    {
+        if (string.IsNullOrEmpty(mimeType)) return IconFile;
+
+        if (mimeType.Contains("pdf")) return IconFile;
+        if (mimeType.Contains("word") || mimeType.Contains("officedocument")) return IconBook;
+
+        return IconFile;
+    }
+    // ����� ������ ��� CSS Class ���� ��� Badge
+    private string GetBadgeClass(LibraryCategoryEnum category) => category switch
+    {
+        LibraryCategoryEnum.Civil => "badge-blue",
+        LibraryCategoryEnum.Criminal => "badge-red",
+        LibraryCategoryEnum.PersonalStatus => "badge-amber",
+        LibraryCategoryEnum.Commercial => "badge-purple",
+        _ => "badge-green"
+    };
+}
 <style>
     .library-page {
         padding: 1.5rem;
@@ -195,6 +255,49 @@
         gap: .75rem;
     }
 
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        width: 500px;
+        max-width: 90%;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-control {
+        padding: 0.6rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+        margin-top: 1rem;
+    }
     .page-title {
         font-size: 1.8rem;
         font-weight: 700;
