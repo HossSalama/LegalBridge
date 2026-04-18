@@ -465,7 +465,7 @@ public partial class LegalManagementContext : DbContext
             entity.HasData(new User
             {
                 Id = 1,
-                FullName = "„œÌ— «·‰Ÿ«„",
+                FullName = "„—ÌÂ«‰ „Õ„œ",
                 Email = "admin@lawyer.com",
                 PasswordHash = adminPasswordHash,
                 PhoneNumber = "01000000000",
